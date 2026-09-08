@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { AuthProvider, useAuthContext } from './features/auth/context/AuthContext';
+import { UsersProvider } from './features/users/context/UsersContext';
+import { RolesProvider } from './features/roles/context/RolesContext';
 import { LoginPage } from './features/auth/pages/LoginPage';
 import { RolesPage } from './features/roles/pages/RolesPage';
 import { UsersPage } from './features/users/pages/UsersPage';
@@ -24,7 +26,11 @@ function MainApp() {
 export function App() {
   return (
     <AuthProvider>
-      <MainApp />
+      <UsersProvider>
+        <RolesProvider>
+          <MainApp />
+        </RolesProvider>
+      </UsersProvider>
     </AuthProvider>
   );
 }

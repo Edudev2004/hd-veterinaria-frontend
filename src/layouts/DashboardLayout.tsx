@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../features/auth/hooks/useAuth';
+import { usePermissions } from '../features/auth/hooks/usePermissions';
+import { AccessDeniedView } from '../components/ui/AccessDeniedView';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -13,16 +15,26 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   onNavigate
 }) => {
   const { user, logout } = useAuth();
+  const { canRead, roleName } = usePermissions();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const logoUrl = 'https://lh3.googleusercontent.com/aida/AEtjO1VCc64tB3YZugjZgTfq2fv9QeeBgaM54ZmDS9fZTaNM2DhxonXTMCZGPoQagZ6JniSuWwSxVB3UkB9oJzGOrXEqY22oT8ViputscjnDKz5WsLSXmy8994Jcke63GDtzdAnPn3sLiXAnJnFZXDapolCp7zQKg3f7-dj7GgaS56jxBgZRmpHO_NwXEVfSk52MYU1seremDCio-bt_aoNsH5mz196dGtAU0ia6aDkBACpl1s51q5_CMgd1c64';
-
   const defaultAvatar = 'https://lh3.googleusercontent.com/aida-public/AB6AXuDL-QGH-WFTpd7iyuG5QNKGiwl_FsZOVTkWVutex4LxUjdxWcfMgCH1WJCBH9XwXKh7mqVw9etKolHgkeuGbZyQ5j2wZ9bSGT_DJvYPfUM8imx3DRlowiru0Ee6fYfXiAKJxkydbF5Pmmvv9jdu97CTlr6vfS-owOkQjh17M2HO5YFrhpzohrGF-AXqiaxosi-zCJ0RfDIT3tPFwHxV1rTrWk2IK-Gy5e4Aa0IRrgxKNWFKGRPbhPRF';
+
+  const canReadRoles = canRead('roles');
+  const canReadUsers = canRead('usuarios');
 
   const handleLogout = () => {
     logout();
     onNavigate('login');
   };
+
+  // Determine if active view is restricted
+  const isRolesRestricted = activeModule === 'roles' && !canReadRoles;
+  const isUsersRestricted = activeModule === 'users' && !canReadUsers;
+  const isAccessBlocked = isRolesRestricted || isUsersRestricted;
+
+  const currentModuleName = activeModule === 'roles' ? 'Gestión de Roles y Permisos' : 'Gestión de Usuarios';
 
   return (
     <div className="min-h-screen bg-surface flex flex-col font-sans text-dark-slate">
@@ -37,7 +49,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             <span className="material-symbols-outlined text-[24px]">menu</span>
           </button>
 
-          <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => onNavigate('users')}>
+          <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => onNavigate(canReadUsers ? 'users' : 'roles')}>
             <img src={logoUrl} alt="Veterinaria HD Logo" className="h-8 w-auto object-contain" />
             <div className="flex flex-col">
               <div className="flex items-center gap-2">
@@ -101,27 +113,43 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             {/* Menu Option 1: Roles y Permisos */}
             <button
               onClick={() => onNavigate('roles')}
-              className={`w-full px-3 py-2.5 rounded-xl font-heading font-semibold text-sm flex items-center gap-3 transition-colors ${
+              className={`w-full px-3 py-2.5 rounded-xl font-heading font-semibold text-sm flex items-center justify-between transition-colors ${
                 activeModule === 'roles'
                   ? 'bg-primary text-white shadow-md'
                   : 'text-slate-300 hover:bg-slate-800'
               }`}
             >
-              <span className="material-symbols-outlined text-[20px]">admin_panel_settings</span>
-              {isSidebarOpen && <span>Roles y Permisos</span>}
+              <div className="flex items-center gap-3">
+                <span className="material-symbols-outlined text-[20px]">admin_panel_settings</span>
+                {isSidebarOpen && <span>Roles y Permisos</span>}
+              </div>
+              {isSidebarOpen && !canReadRoles && (
+                <span className="text-[10px] bg-red-950/80 text-red-300 border border-red-800 px-1.5 py-0.5 rounded font-medium flex items-center gap-0.5">
+                  <span className="material-symbols-outlined text-[12px]">lock</span>
+                  Bloqueado
+                </span>
+              )}
             </button>
 
             {/* Menu Option 2: Usuarios del Sistema */}
             <button
               onClick={() => onNavigate('users')}
-              className={`w-full px-3 py-2.5 rounded-xl font-heading font-semibold text-sm flex items-center gap-3 transition-colors ${
+              className={`w-full px-3 py-2.5 rounded-xl font-heading font-semibold text-sm flex items-center justify-between transition-colors ${
                 activeModule === 'users'
                   ? 'bg-primary text-white shadow-md'
                   : 'text-slate-300 hover:bg-slate-800'
               }`}
             >
-              <span className="material-symbols-outlined text-[20px]">badge</span>
-              {isSidebarOpen && <span>Usuarios del Sistema</span>}
+              <div className="flex items-center gap-3">
+                <span className="material-symbols-outlined text-[20px]">badge</span>
+                {isSidebarOpen && <span>Usuarios del Sistema</span>}
+              </div>
+              {isSidebarOpen && !canReadUsers && (
+                <span className="text-[10px] bg-red-950/80 text-red-300 border border-red-800 px-1.5 py-0.5 rounded font-medium flex items-center gap-0.5">
+                  <span className="material-symbols-outlined text-[12px]">lock</span>
+                  Bloqueado
+                </span>
+              )}
             </button>
 
             <div className="text-[11px] font-bold text-slate-400 px-3 pt-6 pb-2 uppercase tracking-wider">
@@ -168,7 +196,18 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
         {/* Main View Workspace */}
         <main className="flex-1 bg-surface min-h-[calc(100vh-4rem)] overflow-y-auto">
-          {children}
+          {isAccessBlocked ? (
+            <AccessDeniedView
+              moduleName={currentModuleName}
+              userRole={roleName}
+              onNavigateBack={() => {
+                if (canReadUsers) onNavigate('users');
+                else if (canReadRoles) onNavigate('roles');
+              }}
+            />
+          ) : (
+            children
+          )}
         </main>
       </div>
     </div>

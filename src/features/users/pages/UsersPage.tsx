@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useUsers } from '../hooks/useUsers';
+import { usePermissions } from '../../auth/hooks/usePermissions';
 import { UserListTable } from '../components/UserListTable';
 import { UserModal } from '../components/UserModal';
 import { Button } from '../../../components/ui/Button';
@@ -22,22 +23,43 @@ export const UsersPage: React.FC = () => {
     setError
   } = useUsers();
 
+  const { canCreate, canUpdate } = usePermissions();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserProfile | null>(null);
 
   const activeCount = users.filter((u) => u.isActive).length;
   const inactiveCount = users.filter((u) => !u.isActive).length;
 
+  const canCreateUser = canCreate('usuarios');
+  const canUpdateUser = canUpdate('usuarios');
+
   const handleOpenCreateModal = () => {
+    if (!canCreateUser) {
+      setError('Tu rol no tiene permiso para registrar nuevos usuarios.');
+      return;
+    }
     setEditingUser(null);
     setError(null);
     setIsModalOpen(true);
   };
 
   const handleOpenEditModal = (user: UserProfile) => {
+    if (!canUpdateUser) {
+      setError('Tu rol no tiene permiso para editar usuarios.');
+      return;
+    }
     setEditingUser(user);
     setError(null);
     setIsModalOpen(true);
+  };
+
+  const handleToggleStatus = (id: string) => {
+    if (!canUpdateUser) {
+      setError('Tu rol no tiene permiso para modificar el estado de usuarios.');
+      return;
+    }
+    toggleUserStatus(id);
   };
 
   const handleModalSubmit = (dto: CreateUserDTO, roleName: string): boolean => {
@@ -62,7 +84,12 @@ export const UsersPage: React.FC = () => {
           </p>
         </div>
 
-        <Button icon="person_add" onClick={handleOpenCreateModal}>
+        <Button
+          icon="person_add"
+          onClick={handleOpenCreateModal}
+          disabled={!canCreateUser}
+          title={!canCreateUser ? 'Permiso de registro restringido' : 'Registrar usuario'}
+        >
           Registrar Usuario
         </Button>
       </div>
@@ -145,7 +172,7 @@ export const UsersPage: React.FC = () => {
       <UserListTable
         users={filteredUsers}
         onEdit={handleOpenEditModal}
-        onToggleStatus={toggleUserStatus}
+        onToggleStatus={handleToggleStatus}
       />
 
       {/* Modal para Crear/Editar Usuario */}

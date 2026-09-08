@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useRoles } from '../hooks/useRoles';
+import { usePermissions } from '../../auth/hooks/usePermissions';
 import { PermissionMatrix } from '../components/PermissionMatrix';
 import { RoleModal } from '../components/RoleModal';
 import { Button } from '../../../components/ui/Button';
@@ -19,9 +20,19 @@ export const RolesPage: React.FC = () => {
     setError
   } = useRoles();
 
+  const { canCreate, canUpdate, canDelete } = usePermissions();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const canCreateRole = canCreate('roles');
+  const canEditMatrix = canUpdate('roles');
+  const canDeleteRole = canDelete('roles');
+
   const handleDelete = () => {
+    if (!canDeleteRole) {
+      setError('Tu rol no tiene permiso para eliminar roles.');
+      return;
+    }
     deleteRole(selectedRoleId);
   };
 
@@ -39,7 +50,15 @@ export const RolesPage: React.FC = () => {
           </p>
         </div>
 
-        <Button icon="add" onClick={() => setIsModalOpen(true)}>
+        <Button
+          icon="add"
+          onClick={() => {
+            if (canCreateRole) setIsModalOpen(true);
+            else setError('Tu rol no tiene permiso para crear nuevos roles.');
+          }}
+          disabled={!canCreateRole}
+          title={!canCreateRole ? 'Permiso de creación restringido' : 'Crear un nuevo rol'}
+        >
           Nuevo Rol
         </Button>
       </div>
@@ -96,8 +115,11 @@ export const RolesPage: React.FC = () => {
             variant="danger"
             icon="delete"
             onClick={handleDelete}
+            disabled={!canDeleteRole || selectedRole.assignedUsersCount > 0}
             title={
-              selectedRole.assignedUsersCount > 0
+              !canDeleteRole
+                ? 'Permiso de eliminación restringido'
+                : selectedRole.assignedUsersCount > 0
                 ? 'No se puede eliminar un rol con usuarios asignados'
                 : 'Eliminar este rol'
             }
@@ -119,7 +141,11 @@ export const RolesPage: React.FC = () => {
       </div>
 
       {/* Permission Matrix */}
-      <PermissionMatrix role={selectedRole} onToggle={togglePermission} />
+      <PermissionMatrix
+        role={selectedRole}
+        onToggle={togglePermission}
+        isReadOnly={!canEditMatrix}
+      />
 
       {/* Modal para Crear Rol */}
       <RoleModal
