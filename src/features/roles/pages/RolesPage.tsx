@@ -24,11 +24,16 @@ export const RolesPage: React.FC = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const isAdminRole = selectedRole.id === 'role-admin' || selectedRole.name.toLowerCase() === 'administrador';
   const canCreateRole = canCreate('roles');
-  const canEditMatrix = canUpdate('roles');
-  const canDeleteRole = canDelete('roles');
+  const canEditMatrix = canUpdate('roles') && !isAdminRole;
+  const canDeleteRole = canDelete('roles') && !isAdminRole;
 
   const handleDelete = () => {
+    if (isAdminRole) {
+      setError('El rol Administrador del sistema está protegido y no se puede eliminar.');
+      return;
+    }
     if (!canDeleteRole) {
       setError('Tu rol no tiene permiso para eliminar roles.');
       return;
@@ -115,9 +120,11 @@ export const RolesPage: React.FC = () => {
             variant="danger"
             icon="delete"
             onClick={handleDelete}
-            disabled={!canDeleteRole || selectedRole.assignedUsersCount > 0}
+            disabled={!canDeleteRole || selectedRole.assignedUsersCount > 0 || isAdminRole}
             title={
-              !canDeleteRole
+              isAdminRole
+                ? 'El rol Administrador está protegido del sistema'
+                : !canDeleteRole
                 ? 'Permiso de eliminación restringido'
                 : selectedRole.assignedUsersCount > 0
                 ? 'No se puede eliminar un rol con usuarios asignados'
@@ -132,7 +139,9 @@ export const RolesPage: React.FC = () => {
       {/* Role Info Summary */}
       <div className="bg-emerald-50/60 border border-emerald-200/80 p-4 px-6 rounded-2xl flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <span className="material-symbols-outlined text-emerald-700 text-[24px]">info</span>
+          <span className="material-symbols-outlined text-emerald-700 text-[24px]">
+            {isAdminRole ? 'shield' : 'info'}
+          </span>
           <div>
             <span className="font-bold text-emerald-900 text-sm">{selectedRole.name}: </span>
             <span className="text-sm text-emerald-800">{selectedRole.description}</span>

@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState } from 'react';
 import { Role, ModulePermission, CreateRoleDTO, ModuleName } from '../types/role';
 import { useUsersContext } from '../../users/context/UsersContext';
 
-const STORAGE_KEY = 'vethd_roles_data_v2';
+const STORAGE_KEY = 'vethd_roles_data_v3';
 
 const defaultModules: { module: ModuleName; label: string }[] = [
   { module: 'usuarios', label: 'Gestión de Usuarios' },
@@ -87,12 +87,19 @@ export const RolesProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const [rawRoles, setRawRoles] = useState<Omit<Role, 'assignedUsersCount'>[]>(() => {
     localStorage.removeItem('vethd_roles_data');
+    localStorage.removeItem('vethd_roles_data_v2');
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
+          // Always force role-admin to have all permissions true
+          return parsed.map((r) => {
+            if (r.id === 'role-admin' || r.name.toLowerCase() === 'administrador') {
+              return { ...r, permissions: createDefaultPermissions(true) };
+            }
+            return r;
+          });
         }
       } catch {
         localStorage.removeItem(STORAGE_KEY);
@@ -122,6 +129,13 @@ export const RolesProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     module: ModuleName,
     action: 'canCreate' | 'canRead' | 'canUpdate' | 'canDelete'
   ) => {
+    // PROTECCIÓN: El rol Administrador no se puede modificar para evitar bloqueos del sistema
+    const target = rawRoles.find((r) => r.id === roleId);
+    if (target && (target.id === 'role-admin' || target.name.toLowerCase() === 'administrador')) {
+      setError('Los permisos del rol Administrador están protegidos y no pueden ser desactivados.');
+      return;
+    }
+
     const updated = rawRoles.map((role) => {
       if (role.id !== roleId) return role;
       const updatedPermissions = role.permissions.map((p) => {
@@ -131,6 +145,7 @@ export const RolesProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       return { ...role, permissions: updatedPermissions, updatedAt: new Date().toISOString() };
     });
     saveRoles(updated);
+    setError(null);
   };
 
   const createRole = (dto: CreateRoleDTO): boolean => {
@@ -165,6 +180,12 @@ export const RolesProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const role = roles.find((r) => r.id === roleId);
     if (!role) return false;
 
+    // PROTECCIÓN: El rol Administrador del sistema está protegido contra eliminación
+    if (role.id === 'role-admin' || role.name.toLowerCase() === 'administrador') {
+      setError('El rol Administrador es un rol base del sistema y no se puede eliminar.');
+      return false;
+    }
+
     if (role.assignedUsersCount > 0) {
       setError(`No se puede eliminar el rol "${role.name}" porque tiene ${role.assignedUsersCount} usuario(s) asignado(s).`);
       return false;
@@ -189,6 +210,11 @@ export const RolesProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       (r) => r.id === roleIdOrName || r.name.toLowerCase() === roleIdOrName.toLowerCase()
     );
     if (!targetRole) return false;
+
+    // El rol Administrador siempre tiene permiso total
+    if (targetRole.id === 'role-admin' || targetRole.name.toLowerCase() === 'administrador') {
+      return true;
+    }
 
     const perm = targetRole.permissions.find((p) => p.module === module);
     return perm ? perm[action] : false;

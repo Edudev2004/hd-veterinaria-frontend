@@ -9,20 +9,30 @@ interface PermissionMatrixProps {
 }
 
 export const PermissionMatrix: React.FC<PermissionMatrixProps> = ({ role, onToggle, isReadOnly = false }) => {
+  const isAdminRole = role.id === 'role-admin' || role.name.toLowerCase() === 'administrador';
+  const isLocked = isReadOnly || isAdminRole;
+
   return (
     <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-      <div className="p-4 px-6 bg-surface-low border-b border-slate-200 flex items-center justify-between">
+      <div className="p-4 px-6 bg-surface-low border-b border-slate-200 flex items-center justify-between flex-wrap gap-2">
         <div>
           <div className="flex items-center gap-2">
             <h4 className="font-heading font-bold text-dark-slate text-base">Matriz de Permisos por Módulo</h4>
-            {isReadOnly && (
+            {isAdminRole ? (
+              <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2.5 py-0.5 rounded-full border border-emerald-200 flex items-center gap-1">
+                <span className="material-symbols-outlined text-[13px]">lock</span>
+                Permisos Totales Protegidos
+              </span>
+            ) : isReadOnly ? (
               <span className="text-[10px] bg-amber-100 text-amber-800 font-semibold px-2 py-0.5 rounded border border-amber-200">
                 Solo Lectura
               </span>
-            )}
+            ) : null}
           </div>
-          <p className="text-xs text-slate-500">
-            {isReadOnly
+          <p className="text-xs text-slate-500 mt-0.5">
+            {isAdminRole
+              ? `El rol "${role.name}" tiene acceso total permanente para garantizar la administración del sistema.`
+              : isReadOnly
               ? `Vista de permisos configurados para el rol "${role.name}" (No tienes permiso de edición)`
               : `Configuración de acciones permitidas para el rol "${role.name}"`}
           </p>
@@ -54,33 +64,33 @@ export const PermissionMatrix: React.FC<PermissionMatrixProps> = ({ role, onTogg
 
                 <td className="p-4 text-center">
                   <ToggleSwitch
-                    checked={perm.canCreate}
-                    onChange={() => !isReadOnly && onToggle(role.id, perm.module, 'canCreate')}
-                    disabled={isReadOnly}
+                    checked={isAdminRole ? true : perm.canCreate}
+                    onChange={() => !isLocked && onToggle(role.id, perm.module, 'canCreate')}
+                    disabled={isLocked}
                   />
                 </td>
 
                 <td className="p-4 text-center">
                   <ToggleSwitch
-                    checked={perm.canRead}
-                    onChange={() => !isReadOnly && onToggle(role.id, perm.module, 'canRead')}
-                    disabled={isReadOnly}
+                    checked={isAdminRole ? true : perm.canRead}
+                    onChange={() => !isLocked && onToggle(role.id, perm.module, 'canRead')}
+                    disabled={isLocked}
                   />
                 </td>
 
                 <td className="p-4 text-center">
                   <ToggleSwitch
-                    checked={perm.canUpdate}
-                    onChange={() => !isReadOnly && onToggle(role.id, perm.module, 'canUpdate')}
-                    disabled={isReadOnly}
+                    checked={isAdminRole ? true : perm.canUpdate}
+                    onChange={() => !isLocked && onToggle(role.id, perm.module, 'canUpdate')}
+                    disabled={isLocked}
                   />
                 </td>
 
                 <td className="p-4 text-center pr-6">
                   <ToggleSwitch
-                    checked={perm.canDelete}
-                    onChange={() => !isReadOnly && onToggle(role.id, perm.module, 'canDelete')}
-                    disabled={isReadOnly}
+                    checked={isAdminRole ? true : perm.canDelete}
+                    onChange={() => !isLocked && onToggle(role.id, perm.module, 'canDelete')}
+                    disabled={isLocked}
                   />
                 </td>
               </tr>
