@@ -12,10 +12,17 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   activeModule,
   onNavigate
 }) => {
-  const { isAuthenticated, user, logout } = useAuth();
+  const { user, logout } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const logoUrl = 'https://lh3.googleusercontent.com/aida/AEtjO1VCc64tB3YZugjZgTfq2fv9QeeBgaM54ZmDS9fZTaNM2DhxonXTMCZGPoQagZ6JniSuWwSxVB3UkB9oJzGOrXEqY22oT8ViputscjnDKz5WsLSXmy8994Jcke63GDtzdAnPn3sLiXAnJnFZXDapolCp7zQKg3f7-dj7GgaS56jxBgZRmpHO_NwXEVfSk52MYU1seremDCio-bt_aoNsH5mz196dGtAU0ia6aDkBACpl1s51q5_CMgd1c64';
+
+  const defaultAvatar = 'https://lh3.googleusercontent.com/aida-public/AB6AXuDL-QGH-WFTpd7iyuG5QNKGiwl_FsZOVTkWVutex4LxUjdxWcfMgCH1WJCBH9XwXKh7mqVw9etKolHgkeuGbZyQ5j2wZ9bSGT_DJvYPfUM8imx3DRlowiru0Ee6fYfXiAKJxkydbF5Pmmvv9jdu97CTlr6vfS-owOkQjh17M2HO5YFrhpzohrGF-AXqiaxosi-zCJ0RfDIT3tPFwHxV1rTrWk2IK-Gy5e4Aa0IRrgxKNWFKGRPbhPRF';
+
+  const handleLogout = () => {
+    logout();
+    onNavigate('login');
+  };
 
   return (
     <div className="min-h-screen bg-surface flex flex-col font-sans text-dark-slate">
@@ -55,20 +62,20 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
           <div className="h-6 w-px bg-slate-200 hidden sm:block" />
 
-          {/* User Profile */}
+          {/* Dynamic User Profile Header */}
           <div className="flex items-center gap-2.5">
             <img
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDL-QGH-WFTpd7iyuG5QNKGiwl_FsZOVTkWVutex4LxUjdxWcfMgCH1WJCBH9XwXKh7mqVw9etKolHgkeuGbZyQ5j2wZ9bSGT_DJvYPfUM8imx3DRlowiru0Ee6fYfXiAKJxkydbF5Pmmvv9jdu97CTlr6vfS-owOkQjh17M2HO5YFrhpzohrGF-AXqiaxosi-zCJ0RfDIT3tPFwHxV1rTrWk2IK-Gy5e4Aa0IRrgxKNWFKGRPbhPRF"
-              alt="Perfil"
-              className="w-9 h-9 rounded-full object-cover border border-slate-200 shadow-2xs"
+              src={user?.avatarUrl || defaultAvatar}
+              alt={user?.name || "Perfil"}
+              className="w-9 h-9 rounded-full object-cover border border-slate-200 shadow-2xs bg-slate-100"
             />
             <div className="hidden md:flex flex-col text-left">
-              <span className="text-xs font-bold text-dark-slate">Dr. Fernando Delgado</span>
-              <span className="text-[10px] text-emerald-700 font-semibold">Administrador</span>
+              <span className="text-xs font-bold text-dark-slate">{user?.name || 'Dr. Fernando Delgado'}</span>
+              <span className="text-[10px] text-emerald-700 font-semibold">{user?.role || 'Administrador'}</span>
             </div>
 
             <button
-              onClick={() => onNavigate('login')}
+              onClick={handleLogout}
               className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors ml-1"
               title="Cerrar sesión"
             >

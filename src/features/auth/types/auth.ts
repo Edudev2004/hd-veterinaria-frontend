@@ -1,8 +1,9 @@
 export interface UserSession {
   id: string;
   email: string;
-  name?: string;
-  role?: string;
+  name: string;
+  role: string;
+  avatarUrl: string;
   token?: string;
 }
 
