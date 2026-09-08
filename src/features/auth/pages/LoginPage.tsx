@@ -1,12 +1,23 @@
 import React from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { LoginForm } from '../components/LoginForm';
-import { Button } from '../../../components/ui/Button';
 
-export const LoginPage: React.FC = () => {
-  const { isAuthenticated, user, loading, error, isLocked, login, logout } = useAuth();
+interface LoginPageProps {
+  onSuccessLogin?: () => void;
+}
+
+export const LoginPage: React.FC<LoginPageProps> = ({ onSuccessLogin }) => {
+  const { loading, error, isLocked, login } = useAuth();
 
   const logoUrl = 'https://lh3.googleusercontent.com/aida/AEtjO1VCc64tB3YZugjZgTfq2fv9QeeBgaM54ZmDS9fZTaNM2DhxonXTMCZGPoQagZ6JniSuWwSxVB3UkB9oJzGOrXEqY22oT8ViputscjnDKz5WsLSXmy8994Jcke63GDtzdAnPn3sLiXAnJnFZXDapolCp7zQKg3f7-dj7GgaS56jxBgZRmpHO_NwXEVfSk52MYU1seremDCio-bt_aoNsH5mz196dGtAU0ia6aDkBACpl1s51q5_CMgd1c64';
+
+  const handleLogin = async (email: string, pass: string) => {
+    const success = await login(email, pass);
+    if (success && onSuccessLogin) {
+      onSuccessLogin();
+    }
+    return success;
+  };
 
   return (
     <div className="min-h-screen bg-surface flex flex-col items-center justify-center p-4 sm:p-6 relative overflow-hidden">
@@ -33,30 +44,12 @@ export const LoginPage: React.FC = () => {
 
       {/* Main Content Card / Form */}
       <main className="z-10 w-full flex justify-center">
-        {isAuthenticated ? (
-          <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 w-full max-w-md text-center flex flex-col items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center">
-              <span className="material-symbols-outlined text-[36px]">verified_user</span>
-            </div>
-            <div>
-              <h2 className="font-heading text-xl font-bold text-dark-slate">¡Bienvenido de nuevo!</h2>
-              <p className="text-sm text-slate-500 mt-1">{user?.email}</p>
-            </div>
-            <div className="px-4 py-2 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold">
-              Sesión Autenticada con InsForge SDK
-            </div>
-            <Button variant="outline" icon="logout" onClick={logout} className="w-full mt-2">
-              Cerrar Sesión
-            </Button>
-          </div>
-        ) : (
-          <LoginForm
-            onLogin={login}
-            loading={loading}
-            error={error}
-            isLocked={isLocked}
-          />
-        )}
+        <LoginForm
+          onLogin={handleLogin}
+          loading={loading}
+          error={error}
+          isLocked={isLocked}
+        />
       </main>
 
       {/* Footer copyright */}

@@ -5,10 +5,11 @@ import { UsersPage } from './features/users/pages/UsersPage';
 import { DashboardLayout } from './layouts/DashboardLayout';
 
 export function App() {
-  const [currentModule, setCurrentModule] = useState<'users' | 'roles' | 'login'>('users');
+  // El flujo por defecto inicia en la pantalla de Login
+  const [currentModule, setCurrentModule] = useState<'login' | 'users' | 'roles'>('login');
 
   if (currentModule === 'login') {
-    return <LoginPage />;
+    return <LoginPage onSuccessLogin={() => setCurrentModule('users')} />;
   }
 
   return (
