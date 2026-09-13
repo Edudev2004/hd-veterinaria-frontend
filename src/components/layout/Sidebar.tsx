@@ -95,7 +95,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewAppointmentClick }) => {
         setIsHovered(false);
         setIsPortalMenuOpen(false);
       }}
-      className={`fixed top-0 left-0 h-screen bg-[#edf2fa] border-r border-slate-200/80 z-40 transition-all duration-300 ease-in-out flex flex-col justify-between p-4 shadow-sm ${
+      className={`hidden md:flex fixed top-0 left-0 h-screen bg-[#edf2fa] border-r border-slate-200/80 z-40 transition-all duration-300 ease-in-out flex-col justify-between p-4 shadow-sm ${
         isHovered ? 'w-64' : 'w-20'
       }`}
     >
