@@ -4,7 +4,7 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-6.4-646CFF?style=for-the-badge&logo=vite&logoColor=white)
 ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-3.4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
-![InsForge](https://img.shields.io/badge/InsForge-BaaS-0D9488?style=for-the-badge&logo=postgresql&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-Deployment-000000?style=for-the-badge&logo=vercel&logoColor=white)
 ![GitFlow](https://img.shields.io/badge/GitFlow-Enforced-F05032?style=for-the-badge&logo=git&logoColor=white)
 
 > **Proyecto Universitario**: Plataforma Clínica Veterinaria de Alta Definición  
@@ -15,58 +15,43 @@
 
 ## 📖 Descripción General
 
-**VetHD (Herramientas de Desarrollo Veterinary Suite)** es una aplicación web SaaS moderna orientada a la gestión integral de clínicas veterinarias. Ofrece control de acceso basado en roles (RBAC), autenticación segura con InsForge BaaS, administración de personal médico, matriz de permisos dinámica y gestión asistida de pacientes.
+**VetHD (Herramientas de Desarrollo Veterinary Suite)** es una aplicación web SaaS moderna orientada a la gestión integral de clínicas veterinarias. La suite frontend está construida con **React, Vite y Tailwind CSS**, desplegada en **Vercel** y estructurada mediante una arquitectura modular basada en **Components + Features**.
 
 ---
 
-## ✨ Características Principales (Épica 1)
+## 🛠️ Tecnologías y Nube
 
-- 🔒 **Autenticación y Seguridad**: Inicie sesión seguro con InsForge Auth JWT, bloqueo automático tras 5 intentos fallidos y persistencia de sesión local.
-- 👤 **Perfiles Dinámicos de Usuarios**: Mapeo en tiempo real de roles, fotos de perfil, estado activo/inactivo (Soft Delete) y correo institucional.
-- 🛡️ **Matriz de Permisos por Módulo (RBAC)**: Configuración granular de acciones (`Crear`, `Leer/Ver`, `Editar`, `Eliminar`) por rol de usuario con bloqueo inmediato en la navegación.
-- 🎨 **Diseño Moderno SaaS**: Interfaz en modo oscuro/claro profesional con componentes reutilizables (Botones, Modales, Tablas, Insignias, Alertas).
-- 📊 **Conteos Dinámicos Sincronizados**: Métricas reactivas conectadas directamente a la base de datos PostgreSQL de InsForge.
-
----
-
-## 🛠️ Tecnologías Utilizadas
-
-| Categoría | Tecnología | Versión / Detalle |
+| Categoría | Tecnología | Detalle |
 | :--- | :--- | :--- |
-| **Framework UI** | React | `18.3.1` |
-| **Lenguaje** | TypeScript | `5.5.3` |
-| **Bundler / Dev Server** | Vite | `6.4.3` |
-| **Estilos** | Vanilla CSS + Tailwind CSS | `3.4.1` (Locked) |
-| **Iconografía** | Google Material Symbols | Outlined / Rounded |
-| **BaaS / Backend Client** | `@insforge/sdk` | Integración PostgreSQL & Auth |
+| **Framework UI** | React + Vite | React 18 / Vite 6 (TypeScript) |
+| **Estilos** | Tailwind CSS | v3.4 (Diseño responsivo y componentes modernos) |
+| **Arquitectura** | Components + Features | Módulos encapsulados por dominio |
+| **Despliegue Cloud** | Vercel | Integración continua para Frontend |
 
 ---
 
-## 📁 Estructura del Proyecto (Feature-Based Architecture)
+## 📁 Arquitectura del Frontend (Components + Features)
 
 ```text
 src/
-├── components/          # Componentes UI atómicos y reutilizables
-│   └── ui/              # Button, Input, Modal, Badge, ToggleSwitch, AlertPill, AccessDeniedView
-├── config/              # Configuración de clientes (InsForge SDK)
-├── features/            # Módulos organizados por características
-│   ├── auth/            # Contexto de Autenticación, Login, Permisos
-│   ├── roles/           # Gestión de Roles, Matriz de Permisos, Modales
-│   └── users/           # Gestión de Usuarios del Sistema, Tabla, Modales
-├── layouts/             # DashboardLayout con Sidebar dinámico y cabecera
-├── types/               # Tipos e interfaces globales
-└── App.tsx              # Componente principal con Proveedores de Estado
+├── assets/              # Recursos estáticos (imágenes, logotipos, iconos)
+├── components/          # Componentes globales compartidos
+│   ├── layout/          # Estructuras principales (Sidebar, Header, DashboardLayout)
+│   └── ui/              # Primitivas UI (Button, Input, Modal, Badge, Table, ToggleSwitch)
+├── config/              # Configuración de variables de entorno y clientes API
+├── features/            # Módulos funcionales organizados por características/dominio
+│   ├── auth/            # Autenticación, Login, Contexto de sesión
+│   ├── roles/           # Gestión de roles y matriz de permisos
+│   └── users/           # Administración de usuarios del sistema
+├── hooks/               # Custom hooks globales de React
+├── services/            # Clientes de API REST (Backend Spring Boot)
+├── types/               # Tipos e interfaces globales TypeScript
+└── App.tsx              # Componente raíz y enrutador principal
 ```
 
 ---
 
-## ⚙️ Requisitos Previos e Instalación
-
-### Requisitos
-- **Node.js**: v18.0.0 o superior
-- **npm**: v9.0.0 o superior
-
-### Pasos de Instalación
+## ⚙️ Ejecución Local
 
 1. **Clonar el repositorio**:
    ```bash
@@ -79,37 +64,17 @@ src/
    npm install
    ```
 
-3. **Configurar variables de entorno (`.env.local`)**:
-   Cree un archivo `.env.local` en la raíz con la URL de InsForge:
-   ```env
-   VITE_INSFORGE_URL=https://c2g6m52b.us-east.insforge.app
-   VITE_INSFORGE_ANON_KEY=your-anon-key
-   ```
-
-4. **Iniciar el servidor de desarrollo**:
+3. **Iniciar el servidor de desarrollo**:
    ```bash
    npm run dev
    ```
-   La aplicación estará disponible en `http://localhost:3000`.
-
----
-
-## 🔑 Cuentas de Demostración (Épica 1)
-
-| Rol | Correo Electrónico | Contraseña | Permisos |
-| :--- | :--- | :--- | :--- |
-| **Administrador** | `admin@veterinariahd.com` | `ClaveSegura2026` | Acceso total protegido |
-| **Veterinario** | `vet.montes@veterinariahd.com` | `ClaveSegura2026` | Historial médico y consultas |
-| **Recepcionista** | `carlos.recepcion@veterinariahd.com` | `ClaveSegura2026` | Citas, clientes y facturación |
 
 ---
 
 ## 🌿 Flujo de Trabajo (GitFlow)
 
-El desarrollo sigue el estándar estricto de **GitFlow**:
-- `main`: Rama de producción lista para lanzamientos oficiales.
-- `develop`: Rama de integración continua con características estables probadas.
-- `feature/HU-xx-*`: Ramas de desarrollo por Historia de Usuario.
+- `main`: Rama de producción sincronizada con el despliegue en Vercel.
+- `develop`: Rama de integración continua de frontend.
 
 ---
 
