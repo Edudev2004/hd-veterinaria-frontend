@@ -1,0 +1,12 @@
+# Dependencies & build
+node_modules/
+dist/
+.env
+.env.*
+
+# Antigravity local custom configs & secrets
+.agents/mcp_config.json
+
+# IDE & OS
+.DS_Store
+*.log
