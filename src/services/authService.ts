@@ -12,6 +12,9 @@ export interface User {
   createdAt: string;
 }
 
+// Alias para compatibilidad
+export type Usuario = User;
+
 export interface RegisterPayload {
   nombre: string;
   email: string;
@@ -61,69 +64,76 @@ const getStoredPropietarios = (): DBPropietario[] => {
   }
 };
 
-export const authService = {
-  // US-01: Registro de propietario segun bd-veterinaria-hd.sql
-  register: async (payload: RegisterPayload): Promise<User> => {
-    const users = getStoredUsers();
-    const propietarios = getStoredPropietarios();
+export const registerOwner = async (payload: RegisterPayload): Promise<User> => {
+  const users = getStoredUsers();
+  const propietarios = getStoredPropietarios();
 
-    const normalizedEmail = payload.email.trim().toLowerCase();
+  const normalizedEmail = payload.email.trim().toLowerCase();
 
-    // Validar duplicado de correo en localStorage (Criterio de Aceptacion 5)
-    const existingUser = users.find((u) => u.email.toLowerCase() === normalizedEmail);
-    if (existingUser) {
-      throw new Error('El correo electrónico ya se encuentra registrado en el sistema.');
-    }
-
-    const newUserId = crypto.randomUUID ? crypto.randomUUID() : `usr-${Date.now()}`;
-    const newPropietarioId = crypto.randomUUID ? crypto.randomUUID() : `prop-${Date.now()}`;
-
-    const newDBUser: DBUsuario = {
-      id: newUserId,
-      nombre: payload.nombre.trim(),
-      email: normalizedEmail,
-      password_hash: payload.password, // En backend real se usara BCrypt
-      rol: 'propietario',
-      activo: true,
-      created_at: new Date().toISOString()
-    };
-
-    const newDBPropietario: DBPropietario = {
-      id: newPropietarioId,
-      usuario_id: newUserId,
-      telefono: payload.telefono.trim(),
-      direccion: payload.direccion?.trim() || ''
-    };
-
-    users.push(newDBUser);
-    propietarios.push(newDBPropietario);
-
-    localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(users));
-    localStorage.setItem(STORAGE_PROPIETARIOS_KEY, JSON.stringify(propietarios));
-
-    const sessionUser: User = {
-      id: newDBUser.id,
-      propietarioId: newDBPropietario.id,
-      nombre: newDBUser.nombre,
-      email: newDBUser.email,
-      telefono: newDBPropietario.telefono,
-      direccion: newDBPropietario.direccion,
-      rol: newDBUser.rol,
-      activo: newDBUser.activo,
-      createdAt: newDBUser.created_at
-    };
-
-    localStorage.setItem(STORAGE_CURRENT_USER_KEY, JSON.stringify(sessionUser));
-    return sessionUser;
-  },
-
-  getCurrentUser: (): User | null => {
-    const data = localStorage.getItem(STORAGE_CURRENT_USER_KEY);
-    if (!data) return null;
-    try {
-      return JSON.parse(data);
-    } catch {
-      return null;
-    }
+  // Validar duplicado de correo en localStorage (Criterio de Aceptación 5)
+  const existingUser = users.find((u) => u.email.toLowerCase() === normalizedEmail);
+  if (existingUser) {
+    throw new Error('El correo electrónico ya se encuentra registrado en el sistema.');
   }
+
+  const newUserId = crypto.randomUUID ? crypto.randomUUID() : `usr-${Date.now()}`;
+  const newPropietarioId = crypto.randomUUID ? crypto.randomUUID() : `prop-${Date.now()}`;
+
+  const newDBUser: DBUsuario = {
+    id: newUserId,
+    nombre: payload.nombre.trim(),
+    email: normalizedEmail,
+    password_hash: payload.password, // En backend real se usará BCrypt
+    rol: 'propietario',
+    activo: true,
+    created_at: new Date().toISOString()
+  };
+
+  const newDBPropietario: DBPropietario = {
+    id: newPropietarioId,
+    usuario_id: newUserId,
+    telefono: payload.telefono.trim(),
+    direccion: payload.direccion?.trim() || ''
+  };
+
+  users.push(newDBUser);
+  propietarios.push(newDBPropietario);
+
+  localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(users));
+  localStorage.setItem(STORAGE_PROPIETARIOS_KEY, JSON.stringify(propietarios));
+
+  const sessionUser: User = {
+    id: newDBUser.id,
+    propietarioId: newDBPropietario.id,
+    nombre: newDBUser.nombre,
+    email: newDBUser.email,
+    telefono: newDBPropietario.telefono,
+    direccion: newDBPropietario.direccion,
+    rol: newDBUser.rol,
+    activo: newDBUser.activo,
+    createdAt: newDBUser.created_at
+  };
+
+  localStorage.setItem(STORAGE_CURRENT_USER_KEY, JSON.stringify(sessionUser));
+  return sessionUser;
+};
+
+export const getCurrentUser = (): User | null => {
+  const data = localStorage.getItem(STORAGE_CURRENT_USER_KEY);
+  if (!data) return null;
+  try {
+    return JSON.parse(data);
+  } catch {
+    return null;
+  }
+};
+
+export const logoutUser = (): void => {
+  localStorage.removeItem(STORAGE_CURRENT_USER_KEY);
+};
+
+export const authService = {
+  register: registerOwner,
+  getCurrentUser,
+  logout: logoutUser
 };

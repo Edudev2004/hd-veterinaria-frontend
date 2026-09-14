@@ -231,7 +231,7 @@ export const RegisterPage: React.FC = () => {
                   onChange={(e) => setAcceptedTerms(e.target.checked)}
                   className="w-4 h-4 rounded border-slate-300 text-[#0D7C84] focus:ring-[#0D7C84]/30 focus:ring-offset-0 cursor-pointer"
                 />
-                <label htmlFor="terms" className="text-xs text-slate-600 cursor-pointer select-none">
+                <label htmlFor="terms" className="text-xs text-[#0D7C84] hover:text-[#0b686f] cursor-pointer select-none">
                   Acepto los <span className="font-bold text-slate-900 underline underline-offset-2">Términos y Condiciones</span> del Servicio
                 </label>
               </div>

@@ -35,7 +35,7 @@ export const Button: React.FC<ButtonProps> = ({
       `}
       {...props}
     >
-      {/* Animated Skew Light Bar (#F59E0B / Amber shine effect - Slower and smoother 1s duration) */}
+      {/* Animated Skew Light Bar (#F59E0B / Amber shine effect - 1s duration) */}
       <span className="absolute top-1/2 left-0 w-28 h-[160%] bg-[#F59E0B] opacity-90 -translate-y-1/2 skew-x-[30deg] -translate-x-44 transition-transform duration-1000 ease-in-out group-hover:translate-x-[480px]" />
 
       <span className="relative z-10 flex items-center justify-center gap-2">
