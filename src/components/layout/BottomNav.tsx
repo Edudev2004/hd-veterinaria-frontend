@@ -13,25 +13,36 @@ import {
   ShieldCheck,
   FileSpreadsheet,
   Award,
-  ChevronUp
+  ChevronUp,
+  LogOut
 } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { PortalType } from './Sidebar';
 
 export const BottomNav: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const [activePortal, setActivePortal] = useState<PortalType>('propietario');
   const [showPortalSelector, setShowPortalSelector] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   useEffect(() => {
-    if (location.pathname.startsWith('/admin')) {
-      setActivePortal('admin');
-    } else if (location.pathname.startsWith('/veterinario')) {
+    if (user?.rol === 'admin') {
+      if (location.pathname.startsWith('/veterinario')) {
+        setActivePortal('veterinario');
+      } else if (location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/mascotas') || location.pathname.startsWith('/citas')) {
+        setActivePortal('propietario');
+      } else {
+        setActivePortal('admin');
+      }
+    } else if (user?.rol === 'veterinario') {
       setActivePortal('veterinario');
     } else {
       setActivePortal('propietario');
     }
-  }, [location.pathname]);
+  }, [location.pathname, user?.rol]);
 
   const navPortals = {
     propietario: [
@@ -104,6 +115,18 @@ export const BottomNav: React.FC = () => {
           >
             Panel Administrador
           </button>
+          <div className="pt-1 border-t border-slate-200">
+            <button
+              onClick={() => {
+                setShowPortalSelector(false);
+                setShowLogoutModal(true);
+              }}
+              className="w-full py-2 px-3 rounded-xl text-left text-xs font-bold text-rose-600 hover:bg-rose-50 flex items-center gap-2 transition-all cursor-pointer"
+            >
+              <LogOut className="w-3.5 h-3.5 text-rose-600" />
+              <span>Cerrar Sesión</span>
+            </button>
+          </div>
         </div>
       )}
 
@@ -144,18 +167,33 @@ export const BottomNav: React.FC = () => {
           );
         })}
 
-        {/* Portal Switcher Button at end */}
-        <button
-          onClick={() => setShowPortalSelector(!showPortalSelector)}
-          className="relative flex flex-col items-center justify-center px-2 py-1.5 text-slate-400 hover:text-slate-700 transition-colors"
-          title="Cambiar Vista"
-        >
-          <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 shadow-xs">
-            <ChevronUp className={`w-4 h-4 transition-transform duration-200 ${showPortalSelector ? 'rotate-180' : ''}`} />
-          </div>
-          <span className="text-[10px] font-semibold text-slate-400">Rol</span>
-        </button>
+        {/* Portal Switcher Button at end (Solo visible para Administrador) */}
+        {user?.rol === 'admin' && (
+          <button
+            onClick={() => setShowPortalSelector(!showPortalSelector)}
+            className="relative flex flex-col items-center justify-center px-2 py-1.5 text-slate-400 hover:text-slate-700 transition-colors"
+            title="Cambiar Vista"
+          >
+            <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 shadow-xs">
+              <ChevronUp className={`w-4 h-4 transition-transform duration-200 ${showPortalSelector ? 'rotate-180' : ''}`} />
+            </div>
+            <span className="text-[10px] font-semibold text-slate-400">Rol</span>
+          </button>
+        )}
       </nav>
+
+      {/* Modal de confirmación en móvil */}
+      <ConfirmModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={() => {
+          setShowLogoutModal(false);
+          logout();
+          navigate('/login');
+        }}
+        title="¿Cerrar Sesión?"
+        description="¿Estás seguro de que deseas salir del sistema?"
+      />
     </div>
   );
 };

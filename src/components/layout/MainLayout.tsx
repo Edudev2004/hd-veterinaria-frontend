@@ -12,7 +12,7 @@ export const MainLayout: React.FC = () => {
 
       {/* Area principal de contenido */}
       <div className="flex-1 flex flex-col pl-0 md:pl-20 transition-all duration-300 min-w-0 pb-28 md:pb-8">
-        <Header userName="Carlos" />
+        <Header />
 
         <main className="flex-1 p-4 md:p-8 max-w-7xl w-full mx-auto">
           <Outlet />

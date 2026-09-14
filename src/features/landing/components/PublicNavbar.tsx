@@ -91,11 +91,11 @@ export const PublicNavbar: React.FC = () => {
           <div className="hidden sm:flex items-center gap-4">
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <button
-                onClick={() => navigateWithLoader('/dashboard')}
+                onClick={() => navigateWithLoader('/login')}
                 className="text-xs font-bold text-slate-700 hover:text-[#0D7C84] px-4 py-2.5 rounded-xl border border-slate-200 hover:border-[#0D7C84]/40 hover:bg-[#E2F2F3]/50 transition-all flex items-center gap-2"
               >
                 <User className="w-4 h-4 text-[#0D7C84]" />
-                <span>Acceso Panel</span>
+                <span>Iniciar Sesión</span>
               </button>
             </motion.div>
 
@@ -140,10 +140,10 @@ export const PublicNavbar: React.FC = () => {
             ))}
             <div className="pt-4 border-t border-slate-200 flex flex-col gap-3">
               <button
-                onClick={() => { setMobileMenuOpen(false); navigateWithLoader('/dashboard'); }}
-                className="w-full text-center py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-700"
+                onClick={() => { setMobileMenuOpen(false); navigateWithLoader('/login'); }}
+                className="w-full text-center py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-700 hover:text-[#0D7C84]"
               >
-                Acceso Panel
+                Iniciar Sesión
               </button>
               <Button
                 onClick={() => { setMobileMenuOpen(false); navigateWithLoader('/register'); }}

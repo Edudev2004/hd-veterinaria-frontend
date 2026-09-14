@@ -23,6 +23,11 @@ export interface RegisterPayload {
   direccion?: string;
 }
 
+export interface LoginPayload {
+  email: string;
+  password: string;
+}
+
 const STORAGE_USERS_KEY = 'vethd_db_usuarios';
 const STORAGE_PROPIETARIOS_KEY = 'vethd_db_propietarios';
 const STORAGE_CURRENT_USER_KEY = 'vethd_session_usuario';
@@ -44,23 +49,88 @@ interface DBPropietario {
   direccion: string;
 }
 
+// Cuentas iniciales de prueba para evaluar los 3 roles del sistema
+const DEFAULT_SEED_USERS: DBUsuario[] = [
+  {
+    id: 'usr-seed-prop-01',
+    nombre: 'Carlos Propietario',
+    email: 'propietario@vethd.com',
+    password_hash: '12345678',
+    rol: 'propietario',
+    activo: true,
+    created_at: new Date('2026-01-01').toISOString()
+  },
+  {
+    id: 'usr-seed-vet-01',
+    nombre: 'Dra. Laura Veterinario',
+    email: 'veterinario@vethd.com',
+    password_hash: '12345678',
+    rol: 'veterinario',
+    activo: true,
+    created_at: new Date('2026-01-01').toISOString()
+  },
+  {
+    id: 'usr-seed-admin-01',
+    nombre: 'Administrador VetHD',
+    email: 'admin@vethd.com',
+    password_hash: '12345678',
+    rol: 'admin',
+    activo: true,
+    created_at: new Date('2026-01-01').toISOString()
+  }
+];
+
+const DEFAULT_SEED_PROPIETARIOS: DBPropietario[] = [
+  {
+    id: 'prop-seed-01',
+    usuario_id: 'usr-seed-prop-01',
+    telefono: '987654321',
+    direccion: 'Av. Las Palmeras 450, Lima'
+  }
+];
+
 const getStoredUsers = (): DBUsuario[] => {
   const data = localStorage.getItem(STORAGE_USERS_KEY);
-  if (!data) return [];
+  if (!data) {
+    // Inicializar con semillas por defecto si no existen
+    localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(DEFAULT_SEED_USERS));
+    return DEFAULT_SEED_USERS;
+  }
   try {
-    return JSON.parse(data);
+    const parsed: DBUsuario[] = JSON.parse(data);
+    // Asegurar que las cuentas por defecto existan siempre para pruebas
+    let modified = false;
+    DEFAULT_SEED_USERS.forEach((seed) => {
+      if (!parsed.some((u) => u.email.toLowerCase() === seed.email.toLowerCase())) {
+        parsed.push(seed);
+        modified = true;
+      }
+    });
+    if (modified) {
+      localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(parsed));
+    }
+    return parsed;
   } catch {
-    return [];
+    return DEFAULT_SEED_USERS;
   }
 };
 
 const getStoredPropietarios = (): DBPropietario[] => {
   const data = localStorage.getItem(STORAGE_PROPIETARIOS_KEY);
-  if (!data) return [];
+  if (!data) {
+    localStorage.setItem(STORAGE_PROPIETARIOS_KEY, JSON.stringify(DEFAULT_SEED_PROPIETARIOS));
+    return DEFAULT_SEED_PROPIETARIOS;
+  }
   try {
-    return JSON.parse(data);
+    const parsed: DBPropietario[] = JSON.parse(data);
+    DEFAULT_SEED_PROPIETARIOS.forEach((seed) => {
+      if (!parsed.some((p) => p.usuario_id === seed.usuario_id)) {
+        parsed.push(seed);
+      }
+    });
+    return parsed;
   } catch {
-    return [];
+    return DEFAULT_SEED_PROPIETARIOS;
   }
 };
 
@@ -118,6 +188,43 @@ export const registerOwner = async (payload: RegisterPayload): Promise<User> => 
   return sessionUser;
 };
 
+// US-02: Inicio de sesión validando credenciales contra localStorage
+export const loginUser = async (payload: LoginPayload): Promise<User> => {
+  // Simular breve latencia de red realista
+  await new Promise((resolve) => setTimeout(resolve, 350));
+
+  const users = getStoredUsers();
+  const propietarios = getStoredPropietarios();
+  const normalizedEmail = payload.email.trim().toLowerCase();
+
+  const user = users.find((u) => u.email.toLowerCase() === normalizedEmail);
+
+  if (!user || user.password_hash !== payload.password) {
+    throw new Error('Correo electrónico o contraseña incorrectos. Verifica tus credenciales.');
+  }
+
+  if (!user.activo) {
+    throw new Error('Esta cuenta ha sido desactivada. Por favor, comunícate con la administración.');
+  }
+
+  const prop = propietarios.find((p) => p.usuario_id === user.id);
+
+  const sessionUser: User = {
+    id: user.id,
+    propietarioId: prop?.id,
+    nombre: user.nombre,
+    email: user.email,
+    telefono: prop?.telefono,
+    direccion: prop?.direccion,
+    rol: user.rol,
+    activo: user.activo,
+    createdAt: user.created_at
+  };
+
+  localStorage.setItem(STORAGE_CURRENT_USER_KEY, JSON.stringify(sessionUser));
+  return sessionUser;
+};
+
 export const getCurrentUser = (): User | null => {
   const data = localStorage.getItem(STORAGE_CURRENT_USER_KEY);
   if (!data) return null;
@@ -132,8 +239,49 @@ export const logoutUser = (): void => {
   localStorage.removeItem(STORAGE_CURRENT_USER_KEY);
 };
 
+// US-05: Solicitar recuperación de contraseña (simula envío de correo y genera token)
+export const requestPasswordReset = async (email: string): Promise<{ email: string; token: string }> => {
+  await new Promise((resolve) => setTimeout(resolve, 400));
+
+  const users = getStoredUsers();
+  const normalizedEmail = email.trim().toLowerCase();
+  const user = users.find((u) => u.email.toLowerCase() === normalizedEmail);
+
+  if (!user) {
+    throw new Error('No se encontró ninguna cuenta registrada con este correo electrónico.');
+  }
+
+  const token = crypto.randomUUID ? crypto.randomUUID() : `reset-${Date.now()}`;
+  return { email: normalizedEmail, token };
+};
+
+// US-05: Actualizar la contraseña en localStorage
+export const resetPassword = async (email: string, newPassword: string): Promise<boolean> => {
+  await new Promise((resolve) => setTimeout(resolve, 400));
+
+  if (newPassword.length < 8) {
+    throw new Error('La contraseña debe tener al menos 8 caracteres.');
+  }
+
+  const users = getStoredUsers();
+  const normalizedEmail = email.trim().toLowerCase();
+  const userIndex = users.findIndex((u) => u.email.toLowerCase() === normalizedEmail);
+
+  if (userIndex === -1) {
+    throw new Error('No se encontró la cuenta para actualizar la contraseña.');
+  }
+
+  users[userIndex].password_hash = newPassword;
+  localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(users));
+
+  return true;
+};
+
 export const authService = {
   register: registerOwner,
+  login: loginUser,
   getCurrentUser,
-  logout: logoutUser
+  logout: logoutUser,
+  requestPasswordReset,
+  resetPassword
 };
