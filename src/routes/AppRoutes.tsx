@@ -5,6 +5,7 @@ import { MainLayout } from '@/components/layout/MainLayout';
 // Public Landing & Auth Pages
 import { LandingPage } from '@/features/landing/pages/LandingPage';
 import { RegisterPage } from '@/features/auth/pages/RegisterPage';
+import { LoginPage } from '@/features/auth/pages/LoginPage';
 
 // Propietario Pages
 import { DashboardPage } from '@/features/dashboard/pages/DashboardPage';
@@ -33,6 +34,7 @@ export const AppRoutes: React.FC = () => {
       {/* Public Routes (without MainLayout Sidebar) */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/login" element={<LoginPage />} />
 
       {/* Internal System Routes (with MainLayout Sidebar/Header) */}
       <Route element={<MainLayout />}>
