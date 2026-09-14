@@ -239,9 +239,49 @@ export const logoutUser = (): void => {
   localStorage.removeItem(STORAGE_CURRENT_USER_KEY);
 };
 
+// US-05: Solicitar recuperación de contraseña (simula envío de correo y genera token)
+export const requestPasswordReset = async (email: string): Promise<{ email: string; token: string }> => {
+  await new Promise((resolve) => setTimeout(resolve, 400));
+
+  const users = getStoredUsers();
+  const normalizedEmail = email.trim().toLowerCase();
+  const user = users.find((u) => u.email.toLowerCase() === normalizedEmail);
+
+  if (!user) {
+    throw new Error('No se encontró ninguna cuenta registrada con este correo electrónico.');
+  }
+
+  const token = crypto.randomUUID ? crypto.randomUUID() : `reset-${Date.now()}`;
+  return { email: normalizedEmail, token };
+};
+
+// US-05: Actualizar la contraseña en localStorage
+export const resetPassword = async (email: string, newPassword: string): Promise<boolean> => {
+  await new Promise((resolve) => setTimeout(resolve, 400));
+
+  if (newPassword.length < 8) {
+    throw new Error('La contraseña debe tener al menos 8 caracteres.');
+  }
+
+  const users = getStoredUsers();
+  const normalizedEmail = email.trim().toLowerCase();
+  const userIndex = users.findIndex((u) => u.email.toLowerCase() === normalizedEmail);
+
+  if (userIndex === -1) {
+    throw new Error('No se encontró la cuenta para actualizar la contraseña.');
+  }
+
+  users[userIndex].password_hash = newPassword;
+  localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(users));
+
+  return true;
+};
+
 export const authService = {
   register: registerOwner,
   login: loginUser,
   getCurrentUser,
-  logout: logoutUser
+  logout: logoutUser,
+  requestPasswordReset,
+  resetPassword
 };

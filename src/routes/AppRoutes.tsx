@@ -7,6 +7,8 @@ import { useAuth } from '@/context/AuthContext';
 import { LandingPage } from '@/features/landing/pages/LandingPage';
 import { RegisterPage } from '@/features/auth/pages/RegisterPage';
 import { LoginPage } from '@/features/auth/pages/LoginPage';
+import { ForgotPasswordPage } from '@/features/auth/pages/ForgotPasswordPage';
+import { ResetPasswordPage } from '@/features/auth/pages/ResetPasswordPage';
 import { UnauthorizedPage } from '@/features/auth/pages/UnauthorizedPage';
 
 // Propietario Pages
@@ -49,6 +51,8 @@ export const AppRoutes: React.FC = () => {
       <Route path="/" element={<LandingPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/recuperar-password" element={<ForgotPasswordPage />} />
+      <Route path="/restablecer-password" element={<ResetPasswordPage />} />
       <Route path="/no-autorizado" element={<UnauthorizedPage />} />
 
       {/* 2. Rutas Protegidas del Sistema (Requieren Autenticación) */}

@@ -253,13 +253,12 @@ export const LoginPage: React.FC = () => {
                   <span>Recordar sesión</span>
                 </label>
 
-                <button
-                  type="button"
-                  onClick={() => alert('Para restablecer tu contraseña, contacta al administrador del sistema o solicita asistencia.')}
+                <Link
+                  to="/recuperar-password"
                   className="font-semibold text-[#0D7C84] hover:text-[#0b686f] hover:underline"
                 >
                   ¿Olvidaste tu contraseña?
-                </button>
+                </Link>
               </div>
 
               {/* Submit Button */}
