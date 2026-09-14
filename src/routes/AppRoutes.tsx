@@ -28,6 +28,9 @@ import { AdminSpecialtiesPage } from '@/features/admin/pages/AdminSpecialtiesPag
 import { AdminRolesPage } from '@/features/admin/pages/AdminRolesPage';
 import { AdminReportsPage } from '@/features/admin/pages/AdminReportsPage';
 
+// Route Guards
+import { ProtectedRoute } from '@/routes/ProtectedRoute';
+
 export const AppRoutes: React.FC = () => {
   return (
     <Routes>
@@ -36,8 +39,9 @@ export const AppRoutes: React.FC = () => {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/login" element={<LoginPage />} />
 
-      {/* Internal System Routes (with MainLayout Sidebar/Header) */}
-      <Route element={<MainLayout />}>
+      {/* Protected System Routes (Requires Authentication) */}
+      <Route element={<ProtectedRoute />}>
+        <Route element={<MainLayout />}>
         {/* Portal Propietario Routes */}
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="mascotas" element={<PetsPage />} />
@@ -62,6 +66,7 @@ export const AppRoutes: React.FC = () => {
         {/* Fallback Redirect */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Route>
-    </Routes>
+    </Route>
+  </Routes>
   );
 };

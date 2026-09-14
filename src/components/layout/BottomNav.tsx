@@ -13,15 +13,20 @@ import {
   ShieldCheck,
   FileSpreadsheet,
   Award,
-  ChevronUp
+  ChevronUp,
+  LogOut
 } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { PortalType } from './Sidebar';
 
 export const BottomNav: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const [activePortal, setActivePortal] = useState<PortalType>('propietario');
   const [showPortalSelector, setShowPortalSelector] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   useEffect(() => {
     if (location.pathname.startsWith('/admin')) {
@@ -104,6 +109,18 @@ export const BottomNav: React.FC = () => {
           >
             Panel Administrador
           </button>
+          <div className="pt-1 border-t border-slate-200">
+            <button
+              onClick={() => {
+                setShowPortalSelector(false);
+                setShowLogoutModal(true);
+              }}
+              className="w-full py-2 px-3 rounded-xl text-left text-xs font-bold text-rose-600 hover:bg-rose-50 flex items-center gap-2 transition-all cursor-pointer"
+            >
+              <LogOut className="w-3.5 h-3.5 text-rose-600" />
+              <span>Cerrar Sesión</span>
+            </button>
+          </div>
         </div>
       )}
 
@@ -156,6 +173,19 @@ export const BottomNav: React.FC = () => {
           <span className="text-[10px] font-semibold text-slate-400">Rol</span>
         </button>
       </nav>
+
+      {/* Modal de confirmación en móvil */}
+      <ConfirmModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={() => {
+          setShowLogoutModal(false);
+          logout();
+          navigate('/login');
+        }}
+        title="¿Cerrar Sesión?"
+        description="¿Estás seguro de que deseas salir del sistema?"
+      />
     </div>
   );
 };

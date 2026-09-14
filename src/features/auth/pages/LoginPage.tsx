@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/Button';
 import { UnderlineInput } from '@/components/ui/UnderlineInput';
+import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
+import { useLoadingNavigate } from '@/hooks/useLoadingNavigate';
 import {
   Mail,
   Eye,
@@ -19,7 +21,7 @@ import bgImage from '@/assets/images/vet_happy_pets_bg.jpg';
 
 export const LoginPage: React.FC = () => {
   const { login } = useAuth();
-  const navigate = useNavigate();
+  const { loading, navigateWithLoader } = useLoadingNavigate(700);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -45,14 +47,14 @@ export const LoginPage: React.FC = () => {
       setError(null);
       const user = await login({ email: email.trim(), password });
 
-      // US-02: Redirigir según el rol del usuario autenticado
+      // US-02: Redirigir con loader según el rol del usuario autenticado
+      let targetPath = '/dashboard';
       if (user.rol === 'veterinario') {
-        navigate('/veterinario/agenda');
+        targetPath = '/veterinario/agenda';
       } else if (user.rol === 'admin') {
-        navigate('/admin/dashboard');
-      } else {
-        navigate('/dashboard');
+        targetPath = '/admin/dashboard';
       }
+      navigateWithLoader(targetPath);
     } catch (err: any) {
       setError(err?.message || 'Error al iniciar sesión. Verifica tus credenciales.');
     } finally {
@@ -69,6 +71,9 @@ export const LoginPage: React.FC = () => {
 
   return (
     <div className="relative min-h-screen w-full flex overflow-hidden font-sans bg-slate-100 text-slate-800">
+      {/* Loader animado de transición */}
+      <LoadingOverlay visible={loading} message="Iniciando sesión..." />
+
       {/* Background Image across full screen */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-1000"
