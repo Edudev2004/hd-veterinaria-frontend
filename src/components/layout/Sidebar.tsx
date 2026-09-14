@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import {
   LayoutDashboard,
   PawPrint,
@@ -32,6 +34,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewAppointmentClick }) => {
   
   const navigate = useNavigate();
   const location = useLocation();
+  const { logout } = useAuth();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   // Auto-select active portal based on route path
   React.useEffect(() => {
@@ -213,8 +217,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewAppointmentClick }) => {
 
         {/* Logout */}
         <button
-          onClick={() => navigate('/')}
-          className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-rose-50 hover:text-rose-600 transition-all duration-150 overflow-hidden ${
+          onClick={() => setShowLogoutModal(true)}
+          className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-rose-50 hover:text-rose-600 transition-all duration-150 overflow-hidden cursor-pointer ${
             !isHovered ? 'justify-center' : ''
           }`}
           title={!isHovered ? 'Cerrar Sesión' : undefined}
@@ -229,6 +233,19 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewAppointmentClick }) => {
           </span>
         </button>
       </div>
+
+      {/* Modal de confirmación */}
+      <ConfirmModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={() => {
+          setShowLogoutModal(false);
+          logout();
+          navigate('/login');
+        }}
+        title="¿Cerrar Sesión?"
+        description="¿Estás seguro de que deseas salir del sistema? Tendrás que volver a ingresar tus credenciales."
+      />
     </aside>
   );
 };
