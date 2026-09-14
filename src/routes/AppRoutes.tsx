@@ -2,6 +2,10 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 
+// Public Landing & Auth Pages
+import { LandingPage } from '@/features/landing/pages/LandingPage';
+import { RegisterPage } from '@/features/auth/pages/RegisterPage';
+
 // Propietario Pages
 import { DashboardPage } from '@/features/dashboard/pages/DashboardPage';
 import { PetsPage } from '@/features/pets/pages/PetsPage';
@@ -26,10 +30,12 @@ import { AdminReportsPage } from '@/features/admin/pages/AdminReportsPage';
 export const AppRoutes: React.FC = () => {
   return (
     <Routes>
-      <Route path="/" element={<MainLayout />}>
-        {/* Default Redirect */}
-        <Route index element={<Navigate to="/dashboard" replace />} />
+      {/* Public Routes (without MainLayout Sidebar) */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/register" element={<RegisterPage />} />
 
+      {/* Internal System Routes (with MainLayout Sidebar/Header) */}
+      <Route element={<MainLayout />}>
         {/* Portal Propietario Routes */}
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="mascotas" element={<PetsPage />} />
