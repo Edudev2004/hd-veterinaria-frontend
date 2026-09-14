@@ -3,25 +3,25 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 
 // Propietario Pages
-import { DashboardPage } from '@/pages/DashboardPage';
-import { PetsPage } from '@/pages/PetsPage';
-import { AppointmentsPage } from '@/pages/AppointmentsPage';
-import { NotificationsPage } from '@/pages/notifications/NotificationsPage';
-import { ReviewsPage } from '@/pages/reviews/ReviewsPage';
-import { ProfilePage } from '@/pages/ProfilePage';
+import { DashboardPage } from '@/features/dashboard/pages/DashboardPage';
+import { PetsPage } from '@/features/pets/pages/PetsPage';
+import { AppointmentsPage } from '@/features/appointments/pages/AppointmentsPage';
+import { NotificationsPage } from '@/features/notifications/pages/NotificationsPage';
+import { ReviewsPage } from '@/features/reviews/pages/ReviewsPage';
+import { ProfilePage } from '@/features/profile/pages/ProfilePage';
 
 // Veterinario Pages
-import { VetSchedulePage } from '@/pages/vet/VetSchedulePage';
-import { VetConsultationsPage } from '@/pages/vet/VetConsultationsPage';
-import { VetMedicalHistoryPage } from '@/pages/vet/VetMedicalHistoryPage';
-import { VetReviewsPage } from '@/pages/vet/VetReviewsPage';
+import { VetSchedulePage } from '@/features/appointments/pages/VetSchedulePage';
+import { VetConsultationsPage } from '@/features/vet/pages/VetConsultationsPage';
+import { VetMedicalHistoryPage } from '@/features/vet/pages/VetMedicalHistoryPage';
+import { VetReviewsPage } from '@/features/vet/pages/VetReviewsPage';
 
 // Admin Pages
-import { AdminDashboardPage } from '@/pages/admin/AdminDashboardPage';
-import { AdminVetsPage } from '@/pages/admin/AdminVetsPage';
-import { AdminSpecialtiesPage } from '@/pages/admin/AdminSpecialtiesPage';
-import { AdminRolesPage } from '@/pages/admin/AdminRolesPage';
-import { AdminReportsPage } from '@/pages/admin/AdminReportsPage';
+import { AdminDashboardPage } from '@/features/admin/pages/AdminDashboardPage';
+import { AdminVetsPage } from '@/features/admin/pages/AdminVetsPage';
+import { AdminSpecialtiesPage } from '@/features/admin/pages/AdminSpecialtiesPage';
+import { AdminRolesPage } from '@/features/admin/pages/AdminRolesPage';
+import { AdminReportsPage } from '@/features/admin/pages/AdminReportsPage';
 
 export const AppRoutes: React.FC = () => {
   return (
