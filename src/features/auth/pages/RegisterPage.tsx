@@ -1,7 +1,20 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { Stethoscope, User, Mail, Lock, Phone, MapPin, Eye, EyeOff, AlertCircle, ArrowRight } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
+import { UnderlineInput } from '@/components/ui/UnderlineInput';
+import { 
+  User, 
+  Mail, 
+  Phone, 
+  MapPin, 
+  Eye, 
+  EyeOff, 
+  AlertCircle, 
+  ArrowRight,
+  Stethoscope
+} from 'lucide-react';
+import bgImage from '@/assets/images/vet_happy_pets_bg.jpg';
 
 export const RegisterPage: React.FC = () => {
   const { register } = useAuth();
@@ -16,10 +29,11 @@ export const RegisterPage: React.FC = () => {
   });
 
   const [showPassword, setShowPassword] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Real-time field validations
+  // Field validations
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email);
   const isPasswordValid = formData.password.length >= 8;
   const isPhoneValid = formData.telefono.trim().length >= 7;
@@ -48,6 +62,10 @@ export const RegisterPage: React.FC = () => {
       setError('Por favor, ingresa un número de teléfono válido.');
       return;
     }
+    if (!acceptedTerms) {
+      setError('Debes aceptar los Términos y Condiciones del Servicio.');
+      return;
+    }
 
     try {
       setIsSubmitting(true);
@@ -68,177 +86,180 @@ export const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Background Glow Overlay */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-80 h-80 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
-
-      <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
-        <div className="flex justify-center items-center gap-3 mb-2">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-sky-500 to-teal-400 flex items-center justify-center shadow-lg shadow-sky-500/20">
-            <Stethoscope className="w-7 h-7 text-white" />
-          </div>
-          <span className="text-2xl font-bold tracking-tight text-white">
-            Vet<span className="text-sky-400">HD</span>
-          </span>
-        </div>
-        <h2 className="mt-4 text-center text-3xl font-extrabold text-white">
-          Crea tu cuenta
-        </h2>
-        <p className="mt-2 text-center text-sm text-slate-400">
-          Únete a nuestra plataforma veterinaria y gestiona la salud de tus mascotas
-        </p>
+    <div className="relative min-h-screen w-full flex overflow-hidden font-sans bg-slate-100 text-slate-800">
+      {/* Bright & Joyful Background Image across full screen */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-1000"
+        style={{ backgroundImage: `url(${bgImage})` }}
+      >
+        {/* Soft overlay blending left dark/hero text with right bright card */}
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/75 via-slate-900/40 to-slate-100/90 md:to-white/95" />
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md relative z-10">
-        <div className="bg-slate-900/80 backdrop-blur-xl py-8 px-4 shadow-2xl border border-slate-800 sm:rounded-2xl sm:px-10">
-          {error && (
-            <div className="mb-6 bg-rose-500/10 border border-rose-500/30 rounded-xl p-4 flex items-start gap-3 text-rose-400 text-sm">
-              <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-              <span>{error}</span>
-            </div>
-          )}
-
-          <form className="space-y-5" onSubmit={handleSubmit}>
-            {/* Nombre Completo */}
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
-                Nombre Completo *
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
-                  <User className="h-5 w-5" />
-                </div>
-                <input
-                  name="nombre"
-                  type="text"
-                  required
-                  value={formData.nombre}
-                  onChange={handleChange}
-                  placeholder="Juan Pérez"
-                  className="block w-full pl-10 pr-3 py-2.5 bg-slate-950/60 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 text-sm transition-all"
-                />
+      {/* Main Split Content Container */}
+      <div className="relative z-10 w-full min-h-screen flex flex-col md:flex-row">
+        
+        {/* LEFT COLUMN: Hero Heading & Description */}
+        <div className="w-full md:w-1/2 p-8 sm:p-12 lg:p-16 flex flex-col justify-between">
+          
+          {/* Logo / Brand Header */}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#0D7C84] p-0.5 shadow-lg shadow-[#0D7C84]/30">
+              <div className="w-full h-full bg-white rounded-[10px] flex items-center justify-center">
+                <Stethoscope className="w-5 h-5 text-[#0D7C84]" />
               </div>
             </div>
+            <span className="text-2xl font-black tracking-tight text-white drop-shadow-md">
+              Vet<span className="text-[#F59E0B]">HD</span>
+            </span>
+          </div>
 
-            {/* Correo Electrónico */}
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
-                Correo Electrónico *
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
-                  <Mail className="h-5 w-5" />
-                </div>
-                <input
-                  name="email"
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="ejemplo@correo.com"
-                  className="block w-full pl-10 pr-3 py-2.5 bg-slate-950/60 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 text-sm transition-all"
-                />
-              </div>
-            </div>
-
-            {/* Contraseña */}
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
-                Contraseña *
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
-                  <Lock className="h-5 w-5" />
-                </div>
-                <input
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Mínimo 8 caracteres"
-                  className="block w-full pl-10 pr-10 py-2.5 bg-slate-950/60 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 text-sm transition-all"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-300 transition-colors"
-                >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                </button>
-              </div>
-            </div>
-
-            {/* Teléfono */}
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
-                Teléfono / Celular *
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
-                  <Phone className="h-5 w-5" />
-                </div>
-                <input
-                  name="telefono"
-                  type="tel"
-                  required
-                  value={formData.telefono}
-                  onChange={handleChange}
-                  placeholder="+51 987 654 321"
-                  className="block w-full pl-10 pr-3 py-2.5 bg-slate-950/60 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 text-sm transition-all"
-                />
-              </div>
-            </div>
-
-            {/* Dirección */}
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
-                Dirección <span className="text-slate-500 text-xs font-normal">(Opcional)</span>
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
-                  <MapPin className="h-5 w-5" />
-                </div>
-                <input
-                  name="direccion"
-                  type="text"
-                  value={formData.direccion}
-                  onChange={handleChange}
-                  placeholder="Av. Principal 123, Lima"
-                  className="block w-full pl-10 pr-3 py-2.5 bg-slate-950/60 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 text-sm transition-all"
-                />
-              </div>
-            </div>
-
-            {/* Submit Button */}
-            <div className="pt-2">
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full flex justify-center items-center gap-2 py-3 px-4 rounded-xl shadow-lg shadow-sky-500/25 text-sm font-semibold text-white bg-gradient-to-r from-sky-500 to-teal-500 hover:from-sky-400 hover:to-teal-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform active:scale-[0.99]"
-              >
-                {isSubmitting ? (
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                ) : (
-                  <>
-                    <span>Registrarse</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-sm text-slate-400">
-              ¿Ya tienes una cuenta?{' '}
-              <Link to="/login" className="font-semibold text-sky-400 hover:text-sky-300 transition-colors">
-                Inicia sesión
-              </Link>
+          {/* Center Callout Text */}
+          <div className="my-auto py-12 max-w-lg space-y-6">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight drop-shadow-lg">
+              ¿No tienes una <br />
+              <span className="text-[#F59E0B]">
+                cuenta?
+              </span>
+            </h1>
+            <p className="text-slate-100 text-base sm:text-lg leading-relaxed font-normal drop-shadow-md">
+              Regístrate para acceder a todas las funciones de nuestro servicio. Gestiona la salud, vacunas e historial clínico de tus mascotas en un solo lugar. <strong className="text-[#F59E0B] font-bold">¡Es totalmente gratis!</strong>
             </p>
           </div>
+
+          {/* Footer Copyright */}
+          <div className="text-xs text-slate-300 drop-shadow-md">
+            © {new Date().getFullYear()} VetHD. Sistema de Gestión Veterinaria.
+          </div>
         </div>
+
+        {/* RIGHT COLUMN: Light Mode Glassmorphic Register Form Container */}
+        <div className="w-full md:w-1/2 bg-white/95 md:bg-white/90 backdrop-blur-2xl border-t md:border-t-0 md:border-l border-slate-200/80 p-8 sm:p-12 lg:p-16 flex flex-col justify-center shadow-2xl">
+          <div className="max-w-md w-full mx-auto space-y-8">
+            
+            <div className="space-y-2">
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+                Crear Cuenta
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                Completa tus datos para registrarte como propietario de mascota
+              </p>
+            </div>
+
+            {error && (
+              <div className="bg-rose-50 border border-rose-200 rounded-xl p-3.5 flex items-start gap-3 text-rose-600 text-xs sm:text-sm">
+                <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                <span>{error}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              
+              {/* Nombre Completo */}
+              <UnderlineInput
+                label="Nombre Completo"
+                name="nombre"
+                type="text"
+                required
+                value={formData.nombre}
+                onChange={handleChange}
+                placeholder="Ej. Juan Carlos Pérez"
+                icon={<User className="w-4 h-4" />}
+              />
+
+              {/* Correo Electrónico */}
+              <UnderlineInput
+                label="Correo Electrónico"
+                name="email"
+                type="email"
+                required
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="ejemplo@correo.com"
+                icon={<Mail className="w-4 h-4" />}
+              />
+
+              {/* Contraseña */}
+              <UnderlineInput
+                label="Contraseña"
+                name="password"
+                type={showPassword ? 'text' : 'password'}
+                required
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Mínimo 8 caracteres"
+                rightElement={
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="focus:outline-none p-1 text-slate-500 hover:text-slate-700"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                }
+              />
+
+              {/* Teléfono */}
+              <UnderlineInput
+                label="Teléfono / Celular"
+                name="telefono"
+                type="tel"
+                required
+                value={formData.telefono}
+                onChange={handleChange}
+                placeholder="+51 987 654 321"
+                icon={<Phone className="w-4 h-4" />}
+              />
+
+              {/* Dirección */}
+              <UnderlineInput
+                label="Dirección (Opcional)"
+                name="direccion"
+                type="text"
+                value={formData.direccion}
+                onChange={handleChange}
+                placeholder="Av. Principal 123, Lima"
+                icon={<MapPin className="w-4 h-4" />}
+              />
+
+              {/* Terms Checkbox */}
+              <div className="flex items-center gap-3 pt-2">
+                <input
+                  id="terms"
+                  type="checkbox"
+                  checked={acceptedTerms}
+                  onChange={(e) => setAcceptedTerms(e.target.checked)}
+                  className="w-4 h-4 rounded border-slate-300 text-[#0D7C84] focus:ring-[#0D7C84]/30 focus:ring-offset-0 cursor-pointer"
+                />
+                <label htmlFor="terms" className="text-xs text-slate-600 cursor-pointer select-none">
+                  Acepto los <span className="font-bold text-slate-900 underline underline-offset-2">Términos y Condiciones</span> del Servicio
+                </label>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="pt-4 flex flex-col sm:flex-row items-center gap-4 justify-between">
+                <Button
+                  type="submit"
+                  isLoading={isSubmitting}
+                  variant="primary"
+                  className="w-full sm:w-auto min-w-[170px]"
+                >
+                  <span>Registrarse</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+
+                <Link
+                  to="/login"
+                  className="text-xs text-[#0D7C84] hover:text-[#0b686f] font-bold underline underline-offset-4 transition-colors"
+                >
+                  ¿Ya tienes una cuenta?
+                </Link>
+              </div>
+            </form>
+
+          </div>
+        </div>
+
       </div>
     </div>
   );
