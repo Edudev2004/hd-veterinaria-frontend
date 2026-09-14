@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 interface LoadingOverlayProps {
   visible: boolean;
+  message?: string;
 }
 
 const css = `
@@ -85,7 +86,10 @@ const css = `
 }
 `;
 
-export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({ visible }) => {
+export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
+  visible,
+  message = 'Ingresando al sistema...'
+}) => {
   return (
     <>
       <style>{css}</style>
@@ -123,9 +127,9 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({ visible }) => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="mt-8 text-sm text-slate-400 font-medium tracking-wide"
+              className="mt-8 text-sm text-slate-600 font-medium tracking-wide"
             >
-              Ingresando al sistema...
+              {message}
             </motion.p>
           </motion.div>
         )}
