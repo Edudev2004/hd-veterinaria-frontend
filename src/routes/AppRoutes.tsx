@@ -2,6 +2,9 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 
+// Auth Pages
+import { RegisterPage } from '@/features/auth/pages/RegisterPage';
+
 // Propietario Pages
 import { DashboardPage } from '@/features/dashboard/pages/DashboardPage';
 import { PetsPage } from '@/features/pets/pages/PetsPage';
@@ -26,6 +29,9 @@ import { AdminReportsPage } from '@/features/admin/pages/AdminReportsPage';
 export const AppRoutes: React.FC = () => {
   return (
     <Routes>
+      {/* Rutas de Autenticación (sin MainLayout) */}
+      <Route path="/register" element={<RegisterPage />} />
+
       <Route path="/" element={<MainLayout />}>
         {/* Default Redirect */}
         <Route index element={<Navigate to="/dashboard" replace />} />
