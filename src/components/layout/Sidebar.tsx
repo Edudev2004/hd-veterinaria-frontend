@@ -34,19 +34,25 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewAppointmentClick }) => {
   
   const navigate = useNavigate();
   const location = useLocation();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-  // Auto-select active portal based on route path
+  // Auto-select active portal based on user role and path
   React.useEffect(() => {
-    if (location.pathname.startsWith('/admin')) {
-      setActivePortal('admin');
-    } else if (location.pathname.startsWith('/veterinario')) {
+    if (user?.rol === 'admin') {
+      if (location.pathname.startsWith('/veterinario')) {
+        setActivePortal('veterinario');
+      } else if (location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/mascotas') || location.pathname.startsWith('/citas')) {
+        setActivePortal('propietario');
+      } else {
+        setActivePortal('admin');
+      }
+    } else if (user?.rol === 'veterinario') {
       setActivePortal('veterinario');
     } else {
       setActivePortal('propietario');
     }
-  }, [location.pathname]);
+  }, [location.pathname, user?.rol]);
 
   // Menu items configuration per portal perspective (Mapped from Jira HGV-8 to HGV-41)
   const navPortals = {
@@ -122,43 +128,51 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewAppointmentClick }) => {
           </div>
         </div>
 
-        {/* Portal Switcher Dropdown (Only visible when expanded) */}
+        {/* Portal Badge / Switcher (Dropdown only for Admin) */}
         {isHovered && (
           <div className="relative px-1">
-            <button
-              onClick={() => setIsPortalMenuOpen(!isPortalMenuOpen)}
-              className="w-full flex items-center justify-between px-3 py-2 bg-white/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 hover:bg-white transition-all shadow-xs"
-            >
-              <span>{currentNav.title}</span>
-              <ChevronDown className="w-4 h-4 text-slate-400" />
-            </button>
+            {user?.rol === 'admin' ? (
+              <>
+                <button
+                  onClick={() => setIsPortalMenuOpen(!isPortalMenuOpen)}
+                  className="w-full flex items-center justify-between px-3 py-2 bg-white/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 hover:bg-white transition-all shadow-xs cursor-pointer"
+                >
+                  <span>{currentNav.title}</span>
+                  <ChevronDown className="w-4 h-4 text-slate-400" />
+                </button>
 
-            {isPortalMenuOpen && (
-              <div className="absolute top-full left-1 right-1 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-50 py-1 flex flex-col">
-                <button
-                  onClick={() => handlePortalSwitch('propietario')}
-                  className={`px-3 py-2 text-left text-xs font-medium hover:bg-slate-50 ${
-                    activePortal === 'propietario' ? 'text-[#0d9488] font-bold' : 'text-slate-700'
-                  }`}
-                >
-                  Portal Propietario
-                </button>
-                <button
-                  onClick={() => handlePortalSwitch('veterinario')}
-                  className={`px-3 py-2 text-left text-xs font-medium hover:bg-slate-50 ${
-                    activePortal === 'veterinario' ? 'text-[#0d9488] font-bold' : 'text-slate-700'
-                  }`}
-                >
-                  Panel Veterinario
-                </button>
-                <button
-                  onClick={() => handlePortalSwitch('admin')}
-                  className={`px-3 py-2 text-left text-xs font-medium hover:bg-slate-50 ${
-                    activePortal === 'admin' ? 'text-[#0d9488] font-bold' : 'text-slate-700'
-                  }`}
-                >
-                  Panel Administración
-                </button>
+                {isPortalMenuOpen && (
+                  <div className="absolute top-full left-1 right-1 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-50 py-1 flex flex-col">
+                    <button
+                      onClick={() => handlePortalSwitch('admin')}
+                      className={`px-3 py-2 text-left text-xs font-medium hover:bg-slate-50 cursor-pointer ${
+                        activePortal === 'admin' ? 'text-[#0d9488] font-bold' : 'text-slate-700'
+                      }`}
+                    >
+                      Panel Administración
+                    </button>
+                    <button
+                      onClick={() => handlePortalSwitch('veterinario')}
+                      className={`px-3 py-2 text-left text-xs font-medium hover:bg-slate-50 cursor-pointer ${
+                        activePortal === 'veterinario' ? 'text-[#0d9488] font-bold' : 'text-slate-700'
+                      }`}
+                    >
+                      Panel Veterinario
+                    </button>
+                    <button
+                      onClick={() => handlePortalSwitch('propietario')}
+                      className={`px-3 py-2 text-left text-xs font-medium hover:bg-slate-50 cursor-pointer ${
+                        activePortal === 'propietario' ? 'text-[#0d9488] font-bold' : 'text-slate-700'
+                      }`}
+                    >
+                      Portal Propietario
+                    </button>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="w-full px-3 py-2 bg-white/60 border border-slate-200/80 rounded-xl text-xs font-bold text-slate-700 shadow-2xs">
+                {currentNav.title}
               </div>
             )}
           </div>
