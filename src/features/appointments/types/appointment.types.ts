@@ -13,11 +13,15 @@ export interface Veterinarian {
   averageRating: number;
 }
 
+export type SlotStatus = "available" | "occupied";
+
 export interface AvailabilitySlot {
   id: number;
   vetId: number;
   date: string;
   startTime: string;
+  status: SlotStatus;
+  appointmentId?: string;
 }
 
 export interface StepperState {

@@ -3,6 +3,7 @@ import { StepIndicator } from "./StepIndicator";
 import { StepSpecialtySelection } from "./StepSpecialtySelection";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { StepVetSelection } from "./StepVetSelection";
+import { StepAvailabilitySelection } from "./StepAvailabilitySelection";
 
 const steps = [
   { number: 1, label: "Especialidad" },
@@ -38,7 +39,7 @@ function StepperAppointment({ onBack }: StepperAppointmentProps) {
       case 2:
         return <StepVetSelection />;
       case 3:
-        return <div>Paso 3 - Horario</div>;
+        return <StepAvailabilitySelection />;
       case 4:
         return <div>Paso 4 - Resumen</div>;
       default:
