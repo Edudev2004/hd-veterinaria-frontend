@@ -42,14 +42,18 @@ const initialSpecialties: Specialty[] = [
 export const AdminSpecialtiesPage: React.FC = () => {
   const [specialties] = useState<Specialty[]>(initialSpecialties);
   const [query, setQuery] = useState('');
+  const [showInactive, setShowInactive] = useState(false);
 
   const filteredSpecialties = specialties.filter((specialty) => {
   const search = query.toLowerCase();
 
-  return (
+  const matchesSearch =
     specialty.name.toLowerCase().includes(search) ||
-    specialty.description.toLowerCase().includes(search)
-  );
+    specialty.description.toLowerCase().includes(search);
+
+  const matchesStatus = showInactive || specialty.active;
+
+  return matchesSearch && matchesStatus;
 });
 
   return (
@@ -73,7 +77,25 @@ export const AdminSpecialtiesPage: React.FC = () => {
            placeholder="Buscar especialidad..."
            className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-slate-400"
            />
+      <div className="flex items-center gap-2">
+         <input
+          id="showInactive"
+          type="checkbox"
+          checked={showInactive}
+          onChange={(event) => setShowInactive(event.target.checked)}
+          className="h-4 w-4"
+         />
+
+        <label
+          htmlFor="showInactive"
+          className="text-sm text-slate-600"
+        >
+          Mostrar especialidades inactivas
+   </label>
+</div>
+           
        </div>
+
         <h2 className="font-bold mb-4">
           Especialidades
         </h2>
