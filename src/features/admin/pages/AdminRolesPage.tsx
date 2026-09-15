@@ -9,6 +9,16 @@ interface Role {
   isCustom: boolean;
 }
 
+export const availablePermissions = [
+  'Gestionar propietarios',
+  'Gestionar mascotas',
+  'Gestionar citas',
+  'Gestionar veterinarios',
+  'Gestionar especialidades',
+  'Gestionar roles y permisos',
+  'Consultar reportes',
+];
+
 export const initialRoles: Role[] = [
   {
     id: '1',
