@@ -92,8 +92,8 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Right Controls: Notifications, Profile & Visible Logout Button */}
         <div className="flex items-center gap-3 sm:gap-4">
-          {/* Notification Bell Icon */}
-          <NotificationDropdown />
+          {/* Notification Bell Icon con el rol actual */}
+          <NotificationDropdown role={user?.rol || 'propietario'} />
 
           {/* User Info (Avatar + Name) */}
           <div className="flex items-center gap-2.5 pl-2 sm:pl-3 border-l border-slate-200">
