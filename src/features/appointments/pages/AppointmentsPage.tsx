@@ -1,10 +1,22 @@
 import React from "react";
 import { Calendar, Plus } from "lucide-react";
-import { AppointmentStepperProvider } from "../context/AppointmentStepperContext";
+import {
+  AppointmentStepperProvider,
+  useStepperContext,
+} from "../context/AppointmentStepperContext";
 import { useSearchParams } from "react-router-dom";
 import StepperAppointment from "../components/StepperAppointment";
 
 export const AppointmentsPage: React.FC = () => {
+  return (
+    <AppointmentStepperProvider>
+      <AppointmentsContent />
+    </AppointmentStepperProvider>
+  );
+};
+
+const AppointmentsContent: React.FC = () => {
+  const { resetStepper } = useStepperContext();
   const [searchParams, setSearchParams] = useSearchParams();
   const isCreating = searchParams.get("action") === "new";
 
@@ -13,7 +25,7 @@ export const AppointmentsPage: React.FC = () => {
   };
 
   return (
-    <AppointmentStepperProvider>
+    <div className="flex flex-col gap-6">
       {isCreating ? (
         <StepperAppointment onBack={handleBack} />
       ) : (
@@ -28,7 +40,10 @@ export const AppointmentsPage: React.FC = () => {
               </p>
             </div>
             <button
-              onClick={() => setSearchParams({ action: "new" })}
+              onClick={() => {
+                resetStepper();
+                setSearchParams({ action: "new" });
+              }}
               className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-[#0d9488] hover:bg-[#0f766e] rounded-xl transition-colors"
             >
               <Plus className="w-4 h-4" />
@@ -54,6 +69,6 @@ export const AppointmentsPage: React.FC = () => {
           </div>
         </div>
       )}
-    </AppointmentStepperProvider>
+    </div>
   );
 };
