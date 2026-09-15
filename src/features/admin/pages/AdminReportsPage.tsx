@@ -426,6 +426,72 @@ export const AdminReportsPage: React.FC = () => {
       </div>
 
       <div className="rounded-2xl bg-white p-6 shadow-sm">
+        <div className="mb-5">
+          <h2 className="text-lg font-bold text-slate-800">
+            Mascotas atendidas por especie
+          </h2>
+
+          <p className="mt-1 text-sm text-slate-500">
+            Distribución de mascotas atendidas agrupadas por especie.
+          </p>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {mockSpecies.map((item) => (
+            <div
+              key={item.species}
+              className="rounded-xl border border-slate-200 p-5"
+            >
+              <p className="text-sm font-medium text-slate-500">
+                {item.species}
+              </p>
+
+              <p className="mt-2 text-3xl font-bold text-slate-800">
+                {item.count}
+              </p>
+
+              <p className="mt-1 text-xs text-slate-500">
+                mascotas atendidas
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-6 overflow-x-auto">
+          <table className="w-full min-w-[500px] text-left text-sm">
+            <thead>
+              <tr className="border-b border-slate-200">
+                <th className="px-4 py-3 font-semibold text-slate-700">
+                  Especie
+                </th>
+
+                <th className="px-4 py-3 text-center font-semibold text-slate-700">
+                  Mascotas atendidas
+                </th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {mockSpecies.map((item) => (
+                <tr
+                  key={item.species}
+                  className="border-b border-slate-100 last:border-b-0"
+                >
+                  <td className="px-4 py-4 font-medium text-slate-800">
+                    {item.species}
+                  </td>
+
+                  <td className="px-4 py-4 text-center font-semibold text-slate-700">
+                    {item.count}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div className="rounded-2xl bg-white p-6 shadow-sm">
         <h2 className="text-lg font-bold text-slate-800">
           Panel de reportes
         </h2>
