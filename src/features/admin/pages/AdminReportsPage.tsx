@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BarChart3, CalendarDays, PawPrint, Stethoscope } from 'lucide-react';
 
 interface AppointmentReport {
@@ -127,6 +127,9 @@ export const mockSpecies: SpeciesReport[] = [
 ];
 
 export const AdminReportsPage: React.FC = () => {
+  const [startDate, setStartDate] = useState('2026-09-01');
+  const [endDate, setEndDate] = useState('2026-09-30');
+
   return (
     <div className="flex flex-col gap-6">
       <div>
@@ -137,6 +140,54 @@ export const AdminReportsPage: React.FC = () => {
         <p className="mt-1 text-sm text-slate-500">
           Consulta información estadística y reportes del sistema veterinario.
         </p>
+      </div>
+
+      <div className="rounded-2xl bg-white p-6 shadow-sm">
+        <div className="mb-5">
+          <h2 className="text-lg font-bold text-slate-800">
+            Filtro por período
+          </h2>
+
+          <p className="mt-1 text-sm text-slate-500">
+            Selecciona el período que deseas consultar en los reportes.
+          </p>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <div>
+            <label
+              htmlFor="startDate"
+              className="mb-2 block text-sm font-medium text-slate-700"
+            >
+              Fecha de inicio
+            </label>
+
+            <input
+              id="startDate"
+              type="date"
+              value={startDate}
+              onChange={(event) => setStartDate(event.target.value)}
+              className="w-full rounded-lg border border-slate-200 px-4 py-2 text-sm outline-none transition focus:border-slate-400"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="endDate"
+              className="mb-2 block text-sm font-medium text-slate-700"
+            >
+              Fecha de fin
+            </label>
+
+            <input
+              id="endDate"
+              type="date"
+              value={endDate}
+              onChange={(event) => setEndDate(event.target.value)}
+              className="w-full rounded-lg border border-slate-200 px-4 py-2 text-sm outline-none transition focus:border-slate-400"
+            />
+          </div>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
