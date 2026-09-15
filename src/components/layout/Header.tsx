@@ -8,14 +8,12 @@ import { NotificationDropdown } from '@/features/notifications/components/notifi
 
 interface HeaderProps {
   userName?: string;
-  userAvatar?: string;
-  unreadNotifications?: number; 
+  userAvatar?: string; 
 }
 
 export const Header: React.FC<HeaderProps> = ({
   userName = 'Carlos',
   userAvatar = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80',
-  unreadNotifications = 2 
 }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
