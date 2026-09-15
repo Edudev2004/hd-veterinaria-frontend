@@ -1,5 +1,37 @@
 import React from 'react';
 
+interface Role {
+  id: string;
+  name: string;
+  description: string;
+  permissions: string[];
+  isCustom: boolean;
+}
+
+export const initialRoles: Role[] = [
+  {
+    id: '1',
+    name: 'PROPIETARIO',
+    description: 'Usuario propietario de mascotas.',
+    permissions: [],
+    isCustom: false,
+  },
+  {
+    id: '2',
+    name: 'VETERINARIO',
+    description: 'Profesional encargado de la atención veterinaria.',
+    permissions: [],
+    isCustom: false,
+  },
+  {
+    id: '3',
+    name: 'ADMIN',
+    description: 'Administrador del sistema.',
+    permissions: [],
+    isCustom: false,
+  },
+];
+
 export const AdminRolesPage: React.FC = () => {
   return (
     <div className="flex flex-col gap-6">
