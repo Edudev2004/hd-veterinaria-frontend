@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useStepperContext } from "../context/AppointmentStepperContext";
 import { StepIndicator } from "./StepIndicator";
 import { StepSpecialtySelection } from "./StepSpecialtySelection";
@@ -6,6 +7,13 @@ import { StepVetSelection } from "./StepVetSelection";
 import { StepAvailabilitySelection } from "./StepAvailabilitySelection";
 import { StepPetSelection } from "./StepPetSelection";
 import { StepMotivo } from "./StepMotivo";
+import { StepSummary } from "./StepSummary";
+import { ConfirmationView } from "./ConfirmationView";
+import {
+  saveAppointment,
+  isSlotAvailable,
+  type Appointment,
+} from "../services/appointmentService";
 
 const steps = [
   { number: 1, label: "Especialidad" },
@@ -29,7 +37,11 @@ function StepperAppointment({ onBack }: StepperAppointmentProps) {
     selectedSlot,
     selectedPet,
     motivo,
+    resetStepper,
   } = useStepperContext();
+
+  const [savedAppointment, setSavedAppointment] = useState<Appointment | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const canNext = () => {
     if (currentStep === 1) return selectedSpecialty !== null;
@@ -38,6 +50,37 @@ function StepperAppointment({ onBack }: StepperAppointmentProps) {
     if (currentStep === 4) return selectedPet !== null;
     if (currentStep === 5) return motivo.trim().length >= 3;
     return false;
+  };
+
+  const handleConfirm = () => {
+    if (!selectedSpecialty || !selectedVet || !selectedPet || !selectedSlot)
+      return;
+
+    if (
+      !isSlotAvailable(
+        selectedVet.id,
+        selectedSlot.date,
+        selectedSlot.startTime,
+      )
+    ) {
+      setError(
+        "Este horario ya fue tomado por otro propietario. Volvé al paso 3 para elegir otro.",
+      );
+      return;
+    }
+
+    const appointment = saveAppointment({
+      petId: selectedPet.id,
+      petName: selectedPet.name,
+      vetId: selectedVet.id,
+      vetName: selectedVet.name,
+      specialty: selectedSpecialty.name,
+      date: selectedSlot.date,
+      startTime: selectedSlot.startTime,
+      motivo,
+    });
+
+    setSavedAppointment(appointment);
   };
 
   const renderStep = () => {
@@ -52,10 +95,24 @@ function StepperAppointment({ onBack }: StepperAppointmentProps) {
         return <StepPetSelection />;
       case 5:
         return <StepMotivo />;
+      case 6:
+        return <StepSummary />;
       default:
         return null;
     }
   };
+
+  if (savedAppointment) {
+    return (
+      <ConfirmationView
+        appointment={savedAppointment}
+        onBackToList={() => {
+          resetStepper();
+          onBack();
+        }}
+      />
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -81,6 +138,13 @@ function StepperAppointment({ onBack }: StepperAppointmentProps) {
       {/* Step Indicator */}
       <StepIndicator steps={steps} currentStep={currentStep} />
 
+      {/* Error */}
+      {error && (
+        <div className="px-4 py-3 rounded-xl bg-amber-50 border border-amber-200 text-sm text-amber-800">
+          {error}
+        </div>
+      )}
+
       {/* Step Content */}
       <div className="bg-white rounded-2xl border border-slate-200 p-6">
         {renderStep()}
@@ -89,7 +153,10 @@ function StepperAppointment({ onBack }: StepperAppointmentProps) {
       {/* Navigation */}
       <div className="flex items-center justify-between">
         <button
-          onClick={() => goToStep(Math.max(currentStep - 1, 1))}
+          onClick={() => {
+            setError(null);
+            goToStep(Math.max(currentStep - 1, 1));
+          }}
           disabled={currentStep === 1}
           className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
@@ -108,7 +175,7 @@ function StepperAppointment({ onBack }: StepperAppointmentProps) {
           </button>
         ) : (
           <button
-            onClick={() => console.log("Agendar cita")}
+            onClick={handleConfirm}
             className="flex items-center gap-2 px-6 py-2.5 text-sm font-medium text-white bg-[#f59e0b] hover:bg-[#d97706] rounded-xl transition-colors"
           >
             Agendar Cita
