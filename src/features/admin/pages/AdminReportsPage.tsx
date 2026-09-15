@@ -363,6 +363,69 @@ export const AdminReportsPage: React.FC = () => {
       </div>
 
       <div className="rounded-2xl bg-white p-6 shadow-sm">
+        <div className="mb-5">
+          <h2 className="text-lg font-bold text-slate-800">
+            Veterinarios más solicitados
+          </h2>
+
+          <p className="mt-1 text-sm text-slate-500">
+            Ranking de veterinarios según la cantidad de atenciones registradas.
+          </p>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[600px] text-left text-sm">
+            <thead>
+              <tr className="border-b border-slate-200">
+                <th className="px-4 py-3 font-semibold text-slate-700">
+                  Posición
+                </th>
+
+                <th className="px-4 py-3 font-semibold text-slate-700">
+                  Veterinario
+                </th>
+
+                <th className="px-4 py-3 font-semibold text-slate-700">
+                  Especialidad
+                </th>
+
+                <th className="px-4 py-3 text-center font-semibold text-slate-700">
+                  Atenciones
+                </th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {mockVeterinarians
+                .sort((a, b) => b.appointments - a.appointments)
+                .map((veterinarian, index) => (
+                  <tr
+                    key={veterinarian.id}
+                    className="border-b border-slate-100 last:border-b-0"
+                  >
+                    <td className="px-4 py-4 font-semibold text-slate-700">
+                      #{index + 1}
+                    </td>
+
+                    <td className="px-4 py-4 font-medium text-slate-800">
+                      {veterinarian.name}
+                    </td>
+
+                    <td className="px-4 py-4 text-slate-600">
+                      {veterinarian.specialty}
+                    </td>
+
+                    <td className="px-4 py-4 text-center font-semibold text-slate-800">
+                      {veterinarian.appointments}
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div className="rounded-2xl bg-white p-6 shadow-sm">
         <h2 className="text-lg font-bold text-slate-800">
           Panel de reportes
         </h2>
