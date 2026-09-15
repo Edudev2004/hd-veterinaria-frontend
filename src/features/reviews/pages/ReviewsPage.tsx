@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Star, CheckCircle2, Calendar, User, Heart } from 'lucide-react';
+import { Star, CheckCircle2, Calendar, User, Heart, MessageSquare } from 'lucide-react';
 
 interface AppointmentReview {
   id: string;
@@ -68,51 +68,60 @@ export const ReviewsPage: React.FC = () => {
 
       <div className="grid gap-4">
         {appointments.map((item) => (
-          <div key={item.id} className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:flex-row sm:items-center">
-            <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700">
-                  <Heart className="mr-1 h-3 w-3" /> {item.petName}
-                </span>
-                <span className="text-sm font-semibold text-slate-800">{item.service}</span>
-                {item.status === 'ATENDIDA' && (
-                  <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
-                    <CheckCircle2 className="mr-1 h-3 w-3" /> ATENDIDA
+          <div key={item.id} className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all">
+            <div className="flex flex-col justify-between sm:flex-row sm:items-center">
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700">
+                    <Heart className="mr-1 h-3 w-3" /> {item.petName}
                   </span>
-                )}
+                  <span className="text-sm font-semibold text-slate-800">{item.service}</span>
+                  {item.status === 'ATENDIDA' && (
+                    <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
+                      <CheckCircle2 className="mr-1 h-3 w-3" /> ATENDIDA
+                    </span>
+                  )}
+                </div>
+                <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500">
+                  <span className="flex items-center"><User className="mr-1.5 h-3.5 w-3.5 text-slate-400" /> {item.veterinarian}</span>
+                  <span className="flex items-center"><Calendar className="mr-1.5 h-3.5 w-3.5 text-slate-400" /> {item.date}</span>
+                </div>
               </div>
-              <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500">
-                <span className="flex items-center"><User className="mr-1.5 h-3.5 w-3.5 text-slate-400" /> {item.veterinarian}</span>
-                <span className="flex items-center"><Calendar className="mr-1.5 h-3.5 w-3.5 text-slate-400" /> {item.date}</span>
+
+              <div className="mt-4 flex items-center sm:mt-0">
+                {item.status === 'ATENDIDA' ? (
+                  item.rating ? (
+                    <div className="flex items-center space-x-1 rounded-xl bg-amber-50 px-3 py-1.5 border border-amber-100">
+                      <div className="flex">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className={`h-4 w-4 ${i < item.rating! ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}`} />
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <button onClick={() => handleOpenModal(item)} className="inline-flex items-center rounded-xl bg-amber-500 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-amber-600 transition-colors">
+                      <Star className="mr-1.5 h-4 w-4 fill-white" /> Calificar atención
+                    </button>
+                  )
+                ) : (
+                  <span className="text-xs italic text-slate-400">Disponible tras la atención</span>
+                )}
               </div>
             </div>
 
-            <div className="mt-4 flex items-center sm:mt-0">
-              {item.status === 'ATENDIDA' ? (
-                item.rating ? (
-                  <div className="flex items-center space-x-1 rounded-lg bg-amber-50 px-3 py-1.5">
-                    <div className="flex">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} className={`h-4 w-4 ${i < item.rating! ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}`} />
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <button onClick={() => handleOpenModal(item)} className="inline-flex items-center rounded-xl bg-amber-500 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-amber-600 transition-colors">
-                    <Star className="mr-1.5 h-4 w-4 fill-white" /> Calificar atención
-                  </button>
-                )
-              ) : (
-                <span className="text-xs italic text-slate-400">Disponible tras la atención</span>
-              )}
-            </div>
+            {item.rating && item.comment && (
+              <div className="mt-3 flex items-start space-x-2 rounded-xl bg-slate-50 p-3 text-xs text-slate-600 border border-slate-100">
+                <MessageSquare className="h-4 w-4 text-slate-400 shrink-0 mt-0.5" />
+                <p className="italic">"{item.comment}"</p>
+              </div>
+            )}
           </div>
         ))}
       </div>
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl animate-in fade-in zoom-in-95 duration-150">
             <h3 className="text-xl font-bold text-slate-900">Calificar atención</h3>
             <p className="mt-1 text-sm text-slate-600">
               ¿Cómo fue tu experiencia con <span className="font-medium text-slate-900">{selectedAppointment?.veterinarian}</span>?
