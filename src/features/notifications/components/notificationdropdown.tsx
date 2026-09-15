@@ -2,26 +2,32 @@ import React, { useState, useEffect } from 'react';
 import { Notificacion } from '../notification';
 import { notificationService } from '../../../services/notificationService';
 
-export const NotificationDropdown: React.FC = () => {
+// Se define la interfaz para las propiedades que recibirá el componente
+interface NotificationDropdownProps {
+  role?: string; // Ejemplo: 'propietario' | 'veterinario' | 'admin'
+}
+
+export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ role = 'propietario' }) => {
   const [notificaciones, setNotificaciones] = useState<Notificacion[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 
+  // Cada vez que cambie el rol, volvemos a cargar las notificaciones correspondientes
   useEffect(() => {
     cargarNotificaciones();
-  }, []);
+  }, [role]);
 
   const cargarNotificaciones = () => {
-    const data = notificationService.obtenerNotificaciones();
+    const data = notificationService.obtenerNotificaciones(role);
     setNotificaciones(data);
   };
 
   const handleMarcarLeida = (id: string) => {
-    const actualizadas = notificationService.marcarComoLeida(id);
+    const actualizadas = notificationService.marcarComoLeida(id, role);
     setNotificaciones(actualizadas);
   };
 
   const handleMarcarTodas = () => {
-    const actualizadas = notificationService.marcarTodasComoLeidas();
+    const actualizadas = notificationService.marcarTodasComoLeidas(role);
     setNotificaciones(actualizadas);
   };
 
@@ -54,7 +60,7 @@ export const NotificationDropdown: React.FC = () => {
       {isOpen && (
         <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-white shadow-xl border border-gray-100 py-3 z-50">
           <div className="flex items-center justify-between px-4 pb-3 border-b border-gray-100">
-            <h3 className="font-semibold text-gray-800">Notificaciones</h3>
+            <h3 className="font-semibold text-gray-800">Notificaciones ({role})</h3>
             {noLeidasCount > 0 && (
               <button
                 onClick={handleMarcarTodas}
