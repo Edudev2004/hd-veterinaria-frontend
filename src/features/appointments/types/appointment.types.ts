@@ -13,6 +13,15 @@ export interface Veterinarian {
   averageRating: number;
 }
 
+export interface Pet {
+  id: number;
+  name: string;
+  species: string;
+  breed: string;
+  age: number;
+  image: string;
+}
+
 export type SlotStatus = "available" | "occupied";
 
 export interface AvailabilitySlot {
