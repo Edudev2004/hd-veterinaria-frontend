@@ -15,7 +15,20 @@ interface StepperAppointmentProps {
 }
 
 function StepperAppointment({ onBack }: StepperAppointmentProps) {
-  const { currentStep, goToStep } = useStepperContext();
+  const {
+    currentStep,
+    goToStep,
+    selectedSpecialty,
+    selectedVet,
+    selectedSlot,
+  } = useStepperContext();
+
+  const canNext = () => {
+    if (currentStep === 1) return selectedSpecialty !== null;
+    if (currentStep === 2) return selectedVet !== null;
+    if (currentStep === 3) return selectedSlot !== null;
+    return false;
+  };
 
   const renderStep = () => {
     switch (currentStep) {
@@ -75,6 +88,7 @@ function StepperAppointment({ onBack }: StepperAppointmentProps) {
         {currentStep < 4 ? (
           <button
             onClick={() => goToStep(currentStep + 1)}
+            disabled={!canNext()}
             className="flex items-center gap-2 px-6 py-2.5 text-sm font-medium text-white bg-[#0d9488] hover:bg-[#0f766e] rounded-xl transition-colors"
           >
             Siguiente
