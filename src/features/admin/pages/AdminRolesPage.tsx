@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { Shield, Users, Stethoscope, Settings, Plus, X } from 'lucide-react';
+import {
+  Shield,
+  Users,
+  Stethoscope,
+  Settings,
+  Plus,
+  X,
+  Trash2,
+} from 'lucide-react';
 
 interface Role {
   id: string;
@@ -43,45 +51,68 @@ export const initialRoles: Role[] = [
   },
 ];
 
+const STORAGE_KEY = 'vethd-admin-roles';
+
 const getRoleIcon = (roleName: string) => {
   switch (roleName) {
     case 'PROPIETARIO':
       return <Users size={24} />;
+
     case 'VETERINARIO':
       return <Stethoscope size={24} />;
+
     case 'ADMIN':
       return <Settings size={24} />;
+
     default:
       return <Shield size={24} />;
   }
 };
 
 export const AdminRolesPage: React.FC = () => {
-  const [roles, setRoles] = useState<Role[]>(initialRoles);
+  const [roles, setRoles] = useState<Role[]>(() => {
+    const storedRoles = localStorage.getItem(STORAGE_KEY);
+
+    if (storedRoles) {
+      try {
+        return JSON.parse(storedRoles) as Role[];
+      } catch {
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    }
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(initialRoles));
+
+    return initialRoles;
+  });
+
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [roleName, setRoleName] = useState('');
   const [roleDescription, setRoleDescription] = useState('');
-  const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
+  const [selectedPermissions, setSelectedPermissions] = useState<string[]>(
+    []
+  );
 
   const togglePermission = (roleId: string, permission: string) => {
-    setRoles((currentRoles) =>
-      currentRoles.map((role) => {
-        if (role.id !== roleId) {
-          return role;
-        }
+    const updatedRoles = roles.map((role) => {
+      if (role.id !== roleId) {
+        return role;
+      }
 
-        const hasPermission = role.permissions.includes(permission);
+      const hasPermission = role.permissions.includes(permission);
 
-        return {
-          ...role,
-          permissions: hasPermission
-            ? role.permissions.filter(
-                (currentPermission) => currentPermission !== permission
-              )
-            : [...role.permissions, permission],
-        };
-      })
-    );
+      return {
+        ...role,
+        permissions: hasPermission
+          ? role.permissions.filter(
+              (currentPermission) => currentPermission !== permission
+            )
+          : [...role.permissions, permission],
+      };
+    });
+
+    setRoles(updatedRoles);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedRoles));
   };
 
   const toggleSelectedPermission = (permission: string) => {
@@ -114,8 +145,25 @@ export const AdminRolesPage: React.FC = () => {
       isCustom: true,
     };
 
-    setRoles((currentRoles) => [...currentRoles, newRole]);
+    const updatedRoles = [...roles, newRole];
+
+    setRoles(updatedRoles);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedRoles));
+
     resetForm();
+  };
+
+  const handleDeleteRole = (roleId: string) => {
+    const roleToDelete = roles.find((role) => role.id === roleId);
+
+    if (!roleToDelete || !roleToDelete.isCustom) {
+      return;
+    }
+
+    const updatedRoles = roles.filter((role) => role.id !== roleId);
+
+    setRoles(updatedRoles);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedRoles));
   };
 
   return (
@@ -348,12 +396,26 @@ export const AdminRolesPage: React.FC = () => {
                 </div>
               </div>
 
-              <button
-                type="button"
-                className="mt-5 w-full rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
-              >
-                Gestionar permisos
-              </button>
+              <div className="mt-5 flex gap-2">
+                <button
+                  type="button"
+                  className="flex-1 rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                >
+                  Gestionar permisos
+                </button>
+
+                {role.isCustom && (
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteRole(role.id)}
+                    className="flex items-center justify-center rounded-lg border border-red-200 px-3 py-2 text-red-600 transition hover:bg-red-50"
+                    aria-label={`Eliminar rol ${role.name}`}
+                    title="Eliminar rol"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                )}
+              </div>
             </div>
           ))}
         </div>
