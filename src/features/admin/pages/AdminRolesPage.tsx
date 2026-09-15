@@ -104,6 +104,37 @@ export const AdminRolesPage: React.FC = () => {
                 {role.description}
               </p>
 
+<div className="mt-5">
+  <h4 className="mb-3 text-sm font-semibold text-slate-700">
+    Permisos
+  </h4>
+
+  <div className="space-y-2">
+    {availablePermissions.map((permission) => (
+      <div
+        key={permission}
+        className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2"
+      >
+        <span className="text-sm text-slate-600">
+          {permission}
+        </span>
+
+        <span
+          className={`rounded-full px-2 py-1 text-xs font-medium ${
+            role.permissions.includes(permission)
+              ? 'bg-green-100 text-green-700'
+              : 'bg-slate-200 text-slate-500'
+          }`}
+        >
+          {role.permissions.includes(permission)
+            ? 'Asignado'
+            : 'No asignado'}
+        </span>
+      </div>
+    ))}
+  </div>
+</div>
+
               <button
                 type="button"
                 className="mt-5 w-full rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
