@@ -41,11 +41,29 @@ const initialSpecialties: Specialty[] = [
 ];
 
 export const AdminSpecialtiesPage: React.FC = () => {
-  const [specialties] = useState<Specialty[]>(initialSpecialties);
+  const [specialties, setSpecialties] =
+   useState<Specialty[]>(initialSpecialties);
   const [query, setQuery] = useState('');
   const [showInactive, setShowInactive] = useState(false);
   const [editing, setEditing] = useState<Specialty | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    icon: '',
+  });
+
+  const openEditForm = (specialty: Specialty) => {
+  setEditing(specialty);
+
+  setFormData({
+    name: specialty.name,
+    description: specialty.description,
+    icon: specialty.icon,
+  });
+
+  setIsFormOpen(true);
+};
 
   const filteredSpecialties = specialties.filter((specialty) => {
   const search = query.toLowerCase();
@@ -59,6 +77,46 @@ export const AdminSpecialtiesPage: React.FC = () => {
   return matchesSearch && matchesStatus;
 });
 
+const handleSave = () => {
+  if (!formData.name.trim() || !formData.description.trim()) {
+    return;
+  }
+
+  if (editing) {
+    setSpecialties((current) =>
+      current.map((specialty) =>
+        specialty.id === editing.id
+          ? {
+              ...specialty,
+              name: formData.name.trim(),
+              description: formData.description.trim(),
+              icon: formData.icon.trim() || '🐾',
+            }
+          : specialty,
+      ),
+    );
+  } else {
+    const newSpecialty: Specialty = {
+      id: Date.now().toString(),
+      name: formData.name.trim(),
+      description: formData.description.trim(),
+      icon: formData.icon.trim() || '🐾',
+      active: true,
+    };
+
+    setSpecialties((current) => [...current, newSpecialty]);
+  }
+
+  setEditing(null);
+  setIsFormOpen(false);
+
+  setFormData({
+    name: '',
+    description: '',
+    icon: '',
+  });
+};
+
   return (
     <div className="flex flex-col gap-6">
       <div>
@@ -67,7 +125,17 @@ export const AdminSpecialtiesPage: React.FC = () => {
         </h1>
           <button
            type="button"
-           onClick={() => setIsFormOpen(true)}
+           onClick={() => {
+             setEditing(null);
+
+             setFormData({
+               name: '',
+               description: '',
+               icon: '',
+             });
+
+             setIsFormOpen(true);
+            }}
            className="mt-4 inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white hover:bg-slate-800"
            >
            <Plus className="h-4 w-4" />
@@ -136,7 +204,7 @@ export const AdminSpecialtiesPage: React.FC = () => {
 
               <button
                type="button"
-               onClick={() => setEditing(specialty)}
+               onClick={() => openEditForm(specialty)}
                className="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
            >
               <Edit3 className="h-4 w-4" />
@@ -177,7 +245,14 @@ export const AdminSpecialtiesPage: React.FC = () => {
 
         <input
           type="text"
-          defaultValue={editing?.name ?? ''}
+          value={formData.name}
+          onChange={(event) =>
+            setFormData({
+              ...formData,
+              name: event.target.value,
+            })
+          }
+
           placeholder="Ej. Cardiología veterinaria"
           className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-slate-400"
         />
@@ -189,7 +264,13 @@ export const AdminSpecialtiesPage: React.FC = () => {
         </label>
 
         <textarea
-          defaultValue={editing?.description ?? ''}
+          value={formData.description}
+          onChange={(event) =>
+            setFormData({
+              ...formData,
+              description: event.target.value,
+            })
+          }
           placeholder="Describe la especialidad..."
           rows={4}
           className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-slate-400"
@@ -203,7 +284,13 @@ export const AdminSpecialtiesPage: React.FC = () => {
 
         <input
           type="text"
-          defaultValue={editing?.icon ?? ''}
+          value={formData.icon}
+          onChange={(event) =>
+            setFormData({
+              ...formData,
+              icon: event.target.value,
+            })
+          }
           placeholder="Ej. 🩺"
           className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-slate-400"
         />
@@ -223,6 +310,7 @@ export const AdminSpecialtiesPage: React.FC = () => {
 
         <button
           type="button"
+          onClick={handleSave}
           className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
         >
           Guardar
