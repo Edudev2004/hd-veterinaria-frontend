@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Shield, Users, Stethoscope, Settings } from 'lucide-react';
 
 interface Role {
@@ -57,6 +57,29 @@ const getRoleIcon = (roleName: string) => {
 };
 
 export const AdminRolesPage: React.FC = () => {
+  const [roles, setRoles] = useState<Role[]>(initialRoles);
+
+  const togglePermission = (roleId: string, permission: string) => {
+    setRoles((currentRoles) =>
+      currentRoles.map((role) => {
+        if (role.id !== roleId) {
+          return role;
+        }
+
+        const hasPermission = role.permissions.includes(permission);
+
+        return {
+          ...role,
+          permissions: hasPermission
+            ? role.permissions.filter(
+                (currentPermission) => currentPermission !== permission
+              )
+            : [...role.permissions, permission],
+        };
+      })
+    );
+  };
+
   return (
     <div className="flex flex-col gap-6">
       <div>
@@ -81,7 +104,7 @@ export const AdminRolesPage: React.FC = () => {
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {initialRoles.map((role) => (
+          {roles.map((role) => (
             <div
               key={role.id}
               className="rounded-2xl bg-white p-5 shadow-sm"
@@ -104,36 +127,44 @@ export const AdminRolesPage: React.FC = () => {
                 {role.description}
               </p>
 
-<div className="mt-5">
-  <h4 className="mb-3 text-sm font-semibold text-slate-700">
-    Permisos
-  </h4>
+              <div className="mt-5">
+                <h4 className="mb-3 text-sm font-semibold text-slate-700">
+                  Permisos
+                </h4>
 
-  <div className="space-y-2">
-    {availablePermissions.map((permission) => (
-      <div
-        key={permission}
-        className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2"
-      >
-        <span className="text-sm text-slate-600">
-          {permission}
-        </span>
+                <div className="space-y-2">
+                  {availablePermissions.map((permission) => {
+                    const isAssigned = role.permissions.includes(permission);
 
-        <span
-          className={`rounded-full px-2 py-1 text-xs font-medium ${
-            role.permissions.includes(permission)
-              ? 'bg-green-100 text-green-700'
-              : 'bg-slate-200 text-slate-500'
-          }`}
-        >
-          {role.permissions.includes(permission)
-            ? 'Asignado'
-            : 'No asignado'}
-        </span>
-      </div>
-    ))}
-  </div>
-</div>
+                    return (
+                      <button
+                        key={permission}
+                        type="button"
+                        onClick={() =>
+                          togglePermission(role.id, permission)
+                        }
+                        className="flex w-full items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-left transition hover:bg-slate-100"
+                      >
+                        <span className="text-sm text-slate-600">
+                          {permission}
+                        </span>
+
+                        <span
+                          className={`rounded-full px-2 py-1 text-xs font-medium ${
+                            isAssigned
+                              ? 'bg-green-100 text-green-700'
+                              : 'bg-slate-200 text-slate-500'
+                          }`}
+                        >
+                          {isAssigned
+                            ? 'Asignado'
+                            : 'No asignado'}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
 
               <button
                 type="button"
