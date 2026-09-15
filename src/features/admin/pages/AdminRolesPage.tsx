@@ -1,22 +1,424 @@
-import React from 'react';
-import { ShieldCheck } from 'lucide-react';
+import React, { useState } from 'react';
+import {
+  Shield,
+  Users,
+  Stethoscope,
+  Settings,
+  Plus,
+  X,
+  Trash2,
+} from 'lucide-react';
+
+interface Role {
+  id: string;
+  name: string;
+  description: string;
+  permissions: string[];
+  isCustom: boolean;
+}
+
+export const availablePermissions = [
+  'Gestionar propietarios',
+  'Gestionar mascotas',
+  'Gestionar citas',
+  'Gestionar veterinarios',
+  'Gestionar especialidades',
+  'Gestionar roles y permisos',
+  'Consultar reportes',
+];
+
+export const initialRoles: Role[] = [
+  {
+    id: '1',
+    name: 'PROPIETARIO',
+    description: 'Usuario propietario de mascotas.',
+    permissions: [],
+    isCustom: false,
+  },
+  {
+    id: '2',
+    name: 'VETERINARIO',
+    description: 'Profesional encargado de la atención veterinaria.',
+    permissions: [],
+    isCustom: false,
+  },
+  {
+    id: '3',
+    name: 'ADMIN',
+    description: 'Administrador del sistema.',
+    permissions: [],
+    isCustom: false,
+  },
+];
+
+const STORAGE_KEY = 'vethd-admin-roles';
+
+const getRoleIcon = (roleName: string) => {
+  switch (roleName) {
+    case 'PROPIETARIO':
+      return <Users size={24} />;
+
+    case 'VETERINARIO':
+      return <Stethoscope size={24} />;
+
+    case 'ADMIN':
+      return <Settings size={24} />;
+
+    default:
+      return <Shield size={24} />;
+  }
+};
 
 export const AdminRolesPage: React.FC = () => {
+  const [roles, setRoles] = useState<Role[]>(() => {
+    const storedRoles = localStorage.getItem(STORAGE_KEY);
+
+    if (storedRoles) {
+      try {
+        return JSON.parse(storedRoles) as Role[];
+      } catch {
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    }
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(initialRoles));
+
+    return initialRoles;
+  });
+
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [roleName, setRoleName] = useState('');
+  const [roleDescription, setRoleDescription] = useState('');
+  const [selectedPermissions, setSelectedPermissions] = useState<string[]>(
+    []
+  );
+
+  const togglePermission = (roleId: string, permission: string) => {
+    const updatedRoles = roles.map((role) => {
+      if (role.id !== roleId) {
+        return role;
+      }
+
+      const hasPermission = role.permissions.includes(permission);
+
+      return {
+        ...role,
+        permissions: hasPermission
+          ? role.permissions.filter(
+              (currentPermission) => currentPermission !== permission
+            )
+          : [...role.permissions, permission],
+      };
+    });
+
+    setRoles(updatedRoles);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedRoles));
+  };
+
+  const toggleSelectedPermission = (permission: string) => {
+    setSelectedPermissions((currentPermissions) =>
+      currentPermissions.includes(permission)
+        ? currentPermissions.filter(
+            (currentPermission) => currentPermission !== permission
+          )
+        : [...currentPermissions, permission]
+    );
+  };
+
+  const resetForm = () => {
+    setRoleName('');
+    setRoleDescription('');
+    setSelectedPermissions([]);
+    setIsFormOpen(false);
+  };
+
+  const handleCreateRole = () => {
+    if (!roleName.trim()) {
+      return;
+    }
+
+    const newRole: Role = {
+      id: Date.now().toString(),
+      name: roleName.trim(),
+      description: roleDescription.trim(),
+      permissions: selectedPermissions,
+      isCustom: true,
+    };
+
+    const updatedRoles = [...roles, newRole];
+
+    setRoles(updatedRoles);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedRoles));
+
+    resetForm();
+  };
+
+  const handleDeleteRole = (roleId: string) => {
+    const roleToDelete = roles.find((role) => role.id === roleId);
+
+    if (!roleToDelete || !roleToDelete.isCustom) {
+      return;
+    }
+
+    const updatedRoles = roles.filter((role) => role.id !== roleId);
+
+    setRoles(updatedRoles);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedRoles));
+  };
+
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900 font-outfit">Gestión de Roles y Matriz de Permisos</h1>
-        <p className="text-sm text-slate-500">Mapeado desde Jira US-30</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800">
+            Gestión de Roles y Permisos
+          </h1>
+
+          <p className="mt-1 text-sm text-slate-500">
+            Administración de roles y permisos del sistema
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setIsFormOpen(true)}
+          className="flex items-center gap-2 rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
+        >
+          <Plus size={18} />
+          Nuevo rol
+        </button>
       </div>
 
-      <div className="p-8 rounded-2xl border-2 border-dashed border-slate-200 bg-white text-center flex flex-col items-center justify-center gap-3">
-        <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center">
-          <ShieldCheck className="w-6 h-6" />
+      {isFormOpen && (
+        <div className="rounded-2xl bg-white p-6 shadow-sm">
+          <div className="mb-5 flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-slate-800">
+                Crear rol personalizado
+              </h2>
+
+              <p className="mt-1 text-sm text-slate-500">
+                Define el nombre, descripción y permisos del nuevo rol.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={resetForm}
+              className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100"
+              aria-label="Cerrar formulario"
+            >
+              <X size={20} />
+            </button>
+          </div>
+
+          <div className="grid gap-5 md:grid-cols-2">
+            <div>
+              <label
+                htmlFor="roleName"
+                className="mb-2 block text-sm font-medium text-slate-700"
+              >
+                Nombre del rol
+              </label>
+
+              <input
+                id="roleName"
+                type="text"
+                value={roleName}
+                onChange={(event) => setRoleName(event.target.value)}
+                placeholder="Ej. RECEPCIONISTA"
+                className="w-full rounded-lg border border-slate-200 px-4 py-2 text-sm outline-none transition focus:border-slate-400"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="roleDescription"
+                className="mb-2 block text-sm font-medium text-slate-700"
+              >
+                Descripción
+              </label>
+
+              <input
+                id="roleDescription"
+                type="text"
+                value={roleDescription}
+                onChange={(event) =>
+                  setRoleDescription(event.target.value)
+                }
+                placeholder="Describe las funciones del rol"
+                className="w-full rounded-lg border border-slate-200 px-4 py-2 text-sm outline-none transition focus:border-slate-400"
+              />
+            </div>
+          </div>
+
+          <div className="mt-5">
+            <h3 className="mb-3 text-sm font-semibold text-slate-700">
+              Seleccionar permisos
+            </h3>
+
+            <div className="grid gap-2 md:grid-cols-2">
+              {availablePermissions.map((permission) => {
+                const isSelected =
+                  selectedPermissions.includes(permission);
+
+                return (
+                  <button
+                    key={permission}
+                    type="button"
+                    onClick={() =>
+                      toggleSelectedPermission(permission)
+                    }
+                    className={`flex items-center justify-between rounded-lg border px-3 py-2 text-left transition ${
+                      isSelected
+                        ? 'border-green-200 bg-green-50'
+                        : 'border-slate-200 bg-white hover:bg-slate-50'
+                    }`}
+                  >
+                    <span className="text-sm text-slate-600">
+                      {permission}
+                    </span>
+
+                    <span
+                      className={`text-xs font-medium ${
+                        isSelected
+                          ? 'text-green-700'
+                          : 'text-slate-400'
+                      }`}
+                    >
+                      {isSelected ? 'Seleccionado' : 'Seleccionar'}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="mt-6 flex justify-end gap-3">
+            <button
+              type="button"
+              onClick={resetForm}
+              className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+            >
+              Cancelar
+            </button>
+
+            <button
+              type="button"
+              onClick={handleCreateRole}
+              disabled={!roleName.trim()}
+              className="rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Crear rol
+            </button>
+          </div>
         </div>
-        <h3 className="text-base font-bold text-slate-800">Espacio de Trabajo: Matriz RBAC de Permisos</h3>
-        <p className="text-xs text-slate-500 max-w-md">
-          Los desarrolladores asignados a la US-30 pueden implementar sus componentes dentro de <code className="bg-slate-100 px-2 py-0.5 rounded text-amber-600">src/pages/admin/AdminRolesPage.tsx</code>.
-        </p>
+      )}
+
+      <div>
+        <div className="mb-4">
+          <h2 className="font-bold text-slate-800">
+            Roles del sistema
+          </h2>
+
+          <p className="mt-1 text-sm text-slate-500">
+            Consulta los roles disponibles y su configuración.
+          </p>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {roles.map((role) => (
+            <div
+              key={role.id}
+              className="rounded-2xl bg-white p-5 shadow-sm"
+            >
+              <div className="flex items-start justify-between">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-700">
+                  {getRoleIcon(role.name)}
+                </div>
+
+                <span
+                  className={`rounded-full px-3 py-1 text-xs font-medium ${
+                    role.isCustom
+                      ? 'bg-blue-100 text-blue-700'
+                      : 'bg-slate-100 text-slate-600'
+                  }`}
+                >
+                  {role.isCustom ? 'Personalizado' : 'Rol del sistema'}
+                </span>
+              </div>
+
+              <h3 className="mt-4 text-lg font-bold text-slate-800">
+                {role.name}
+              </h3>
+
+              <p className="mt-2 text-sm text-slate-500">
+                {role.description}
+              </p>
+
+              <div className="mt-5">
+                <h4 className="mb-3 text-sm font-semibold text-slate-700">
+                  Permisos
+                </h4>
+
+                <div className="space-y-2">
+                  {availablePermissions.map((permission) => {
+                    const isAssigned =
+                      role.permissions.includes(permission);
+
+                    return (
+                      <button
+                        key={permission}
+                        type="button"
+                        onClick={() =>
+                          togglePermission(role.id, permission)
+                        }
+                        className="flex w-full items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-left transition hover:bg-slate-100"
+                      >
+                        <span className="text-sm text-slate-600">
+                          {permission}
+                        </span>
+
+                        <span
+                          className={`rounded-full px-2 py-1 text-xs font-medium ${
+                            isAssigned
+                              ? 'bg-green-100 text-green-700'
+                              : 'bg-slate-200 text-slate-500'
+                          }`}
+                        >
+                          {isAssigned
+                            ? 'Asignado'
+                            : 'No asignado'}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="mt-5 flex gap-2">
+                <button
+                  type="button"
+                  className="flex-1 rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                >
+                  Gestionar permisos
+                </button>
+
+                {role.isCustom && (
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteRole(role.id)}
+                    className="flex items-center justify-center rounded-lg border border-red-200 px-3 py-2 text-red-600 transition hover:bg-red-50"
+                    aria-label={`Eliminar rol ${role.name}`}
+                    title="Eliminar rol"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
