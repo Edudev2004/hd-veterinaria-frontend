@@ -2,11 +2,14 @@ import React, { useEffect, useState } from "react";
 import { PawPrint, Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { PetForm } from "../components/PetForm";
+import { PetCard } from "../components/PetCard";
+import { PetDetailModal } from "../components/PetDetailModal";
 import { getMyPets, Mascota } from "@/services/petService";
 
 export const PetsPage: React.FC = () => {
   const [mascotas, setMascotas] = useState<Mascota[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [selectedMascota, setSelectedMascota] = useState<Mascota | null>(null);
 
   useEffect(() => {
     setMascotas(getMyPets());
@@ -55,17 +58,20 @@ export const PetsPage: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {mascotas.map((mascota) => (
-            <div
+            <PetCard
               key={mascota.id}
-              className="p-5 rounded-2xl border border-slate-200 bg-white"
-            >
-              <h3 className="font-bold text-slate-900">{mascota.nombre}</h3>
-              <p className="text-xs text-slate-500 capitalize">
-                {mascota.especie} · {mascota.raza || "Sin raza especificada"}
-              </p>
-            </div>
+              mascota={mascota}
+              onClick={() => setSelectedMascota(mascota)}
+            />
           ))}
         </div>
+      )}
+
+      {selectedMascota && (
+        <PetDetailModal
+          mascota={selectedMascota}
+          onClose={() => setSelectedMascota(null)}
+        />
       )}
     </div>
   );
