@@ -130,6 +130,23 @@ export const AdminReportsPage: React.FC = () => {
   const [startDate, setStartDate] = useState('2026-09-01');
   const [endDate, setEndDate] = useState('2026-09-30');
 
+  const filteredAppointments = mockAppointments.filter((appointment) => {
+    const appointmentDate = new Date(`${appointment.date}T00:00:00`);
+
+    const start = startDate
+      ? new Date(`${startDate}T00:00:00`)
+      : null;
+
+    const end = endDate
+      ? new Date(`${endDate}T23:59:59`)
+      : null;
+
+    return (
+      (!start || appointmentDate >= start) &&
+      (!end || appointmentDate <= end)
+    );
+  });
+
   return (
     <div className="flex flex-col gap-6">
       <div>
@@ -249,12 +266,109 @@ export const AdminReportsPage: React.FC = () => {
       </div>
 
       <div className="rounded-2xl bg-white p-6 shadow-sm">
+        <div className="mb-5 flex flex-col gap-1">
+          <h2 className="text-lg font-bold text-slate-800">
+            Citas por período
+          </h2>
+
+          <p className="text-sm text-slate-500">
+            Citas registradas entre {startDate} y {endDate}.
+          </p>
+
+          <p className="mt-2 text-sm font-medium text-slate-700">
+            Citas encontradas: {filteredAppointments.length}
+          </p>
+        </div>
+
+        {filteredAppointments.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[900px] text-left text-sm">
+              <thead>
+                <tr className="border-b border-slate-200">
+                  <th className="px-4 py-3 font-semibold text-slate-700">
+                    Fecha
+                  </th>
+
+                  <th className="px-4 py-3 font-semibold text-slate-700">
+                    Propietario
+                  </th>
+
+                  <th className="px-4 py-3 font-semibold text-slate-700">
+                    Mascota
+                  </th>
+
+                  <th className="px-4 py-3 font-semibold text-slate-700">
+                    Veterinario
+                  </th>
+
+                  <th className="px-4 py-3 font-semibold text-slate-700">
+                    Especialidad
+                  </th>
+
+                  <th className="px-4 py-3 font-semibold text-slate-700">
+                    Estado
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {filteredAppointments.map((appointment) => (
+                  <tr
+                    key={appointment.id}
+                    className="border-b border-slate-100 last:border-b-0"
+                  >
+                    <td className="px-4 py-4 text-slate-600">
+                      {appointment.date}
+                    </td>
+
+                    <td className="px-4 py-4 text-slate-600">
+                      {appointment.owner}
+                    </td>
+
+                    <td className="px-4 py-4 font-medium text-slate-800">
+                      {appointment.pet}
+                    </td>
+
+                    <td className="px-4 py-4 text-slate-600">
+                      {appointment.veterinarian}
+                    </td>
+
+                    <td className="px-4 py-4 text-slate-600">
+                      {appointment.specialty}
+                    </td>
+
+                    <td className="px-4 py-4">
+                      <span
+                        className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                          appointment.status === 'Atendida'
+                            ? 'bg-slate-100 text-slate-700'
+                            : 'bg-amber-100 text-amber-700'
+                        }`}
+                      >
+                        {appointment.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="rounded-xl border border-dashed border-slate-200 p-8 text-center">
+            <p className="text-sm text-slate-500">
+              No se encontraron citas para el período seleccionado.
+            </p>
+          </div>
+        )}
+      </div>
+
+      <div className="rounded-2xl bg-white p-6 shadow-sm">
         <h2 className="text-lg font-bold text-slate-800">
           Panel de reportes
         </h2>
 
         <p className="mt-1 text-sm text-slate-500">
-          Los reportes y estadísticas estarán disponibles en este panel.
+          Los demás reportes y estadísticas estarán disponibles en este panel.
         </p>
       </div>
     </div>
