@@ -1,8 +1,13 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/Button';
-import { UnderlineInput } from '@/components/ui/UnderlineInput';
-import { AlertCircle, PawPrint } from 'lucide-react';
-import { registerPet, Especie, Sexo, RegisterPetPayload } from '@/services/petService';
+import React, { useState } from "react";
+import { Button } from "@/components/ui/Button";
+import { UnderlineInput } from "@/components/ui/UnderlineInput";
+import { AlertCircle, PawPrint } from "lucide-react";
+import {
+  registerPet,
+  Especie,
+  Sexo,
+  RegisterPetPayload,
+} from "@/services/petService";
 
 interface PetFormProps {
   onSuccess: () => void;
@@ -10,11 +15,12 @@ interface PetFormProps {
 
 export const PetForm: React.FC<PetFormProps> = ({ onSuccess }) => {
   const [formData, setFormData] = useState<RegisterPetPayload>({
-    nombre: '',
-    especie: 'perro',
-    raza: '',
-    sexo: 'macho',
-    fechaNacimiento: ''
+    nombre: "",
+    especie: "perro",
+    raza: "",
+    sexo: "macho",
+    fechaNacimiento: "",
+    fotoUrl: "",
   });
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -28,7 +34,7 @@ export const PetForm: React.FC<PetFormProps> = ({ onSuccess }) => {
     e.preventDefault();
 
     if (!formData.nombre.trim()) {
-      setError('El nombre de la mascota es obligatorio.');
+      setError("El nombre de la mascota es obligatorio.");
       return;
     }
 
@@ -38,7 +44,7 @@ export const PetForm: React.FC<PetFormProps> = ({ onSuccess }) => {
       await registerPet(formData);
       onSuccess();
     } catch (err: any) {
-      setError(err?.message || 'Ocurrió un error al registrar la mascota.');
+      setError(err?.message || "Ocurrió un error al registrar la mascota.");
     } finally {
       setIsSubmitting(false);
     }
@@ -65,14 +71,19 @@ export const PetForm: React.FC<PetFormProps> = ({ onSuccess }) => {
       />
 
       <div className="space-y-1 w-full text-left">
-        <label htmlFor="especie" className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+        <label
+          htmlFor="especie"
+          className="block text-xs font-bold uppercase tracking-wider text-slate-700"
+        >
           Especie
         </label>
         <select
           id="especie"
           name="especie"
           value={formData.especie}
-          onChange={(e) => setFormData({ ...formData, especie: e.target.value as Especie })}
+          onChange={(e) =>
+            setFormData({ ...formData, especie: e.target.value as Especie })
+          }
           className="w-full bg-transparent text-sm text-slate-900 font-medium border-b-2 border-slate-200 focus:outline-none focus:border-[#0D7C84] py-2"
         >
           <option value="perro">Perro</option>
@@ -91,14 +102,19 @@ export const PetForm: React.FC<PetFormProps> = ({ onSuccess }) => {
       />
 
       <div className="space-y-1 w-full text-left">
-        <label htmlFor="sexo" className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+        <label
+          htmlFor="sexo"
+          className="block text-xs font-bold uppercase tracking-wider text-slate-700"
+        >
           Sexo
         </label>
         <select
           id="sexo"
           name="sexo"
           value={formData.sexo}
-          onChange={(e) => setFormData({ ...formData, sexo: e.target.value as Sexo })}
+          onChange={(e) =>
+            setFormData({ ...formData, sexo: e.target.value as Sexo })
+          }
           className="w-full bg-transparent text-sm text-slate-900 font-medium border-b-2 border-slate-200 focus:outline-none focus:border-[#0D7C84] py-2"
         >
           <option value="macho">Macho</option>
@@ -113,8 +129,20 @@ export const PetForm: React.FC<PetFormProps> = ({ onSuccess }) => {
         value={formData.fechaNacimiento}
         onChange={handleChange}
       />
-
-      <Button type="submit" isLoading={isSubmitting} variant="primary" fullWidth>
+      <UnderlineInput
+        label="URL de Foto (Opcional)"
+        name="fotoUrl"
+        type="url"
+        value={formData.fotoUrl}
+        onChange={handleChange}
+        placeholder="https://ejemplo.com/foto-mascota.jpg"
+      />
+      <Button
+        type="submit"
+        isLoading={isSubmitting}
+        variant="primary"
+        fullWidth
+      >
         Registrar Mascota
       </Button>
     </form>
