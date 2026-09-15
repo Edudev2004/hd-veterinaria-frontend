@@ -5,13 +5,15 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { StepVetSelection } from "./StepVetSelection";
 import { StepAvailabilitySelection } from "./StepAvailabilitySelection";
 import { StepPetSelection } from "./StepPetSelection";
+import { StepMotivo } from "./StepMotivo";
 
 const steps = [
   { number: 1, label: "Especialidad" },
   { number: 2, label: "Veterinario" },
   { number: 3, label: "Horario" },
   { number: 4, label: "Mascota" },
-  { number: 5, label: "Resumen" },
+  { number: 5, label: "Motivo" },
+  { number: 6, label: "Resumen" },
 ];
 
 interface StepperAppointmentProps {
@@ -26,6 +28,7 @@ function StepperAppointment({ onBack }: StepperAppointmentProps) {
     selectedVet,
     selectedSlot,
     selectedPet,
+    motivo,
   } = useStepperContext();
 
   const canNext = () => {
@@ -33,6 +36,7 @@ function StepperAppointment({ onBack }: StepperAppointmentProps) {
     if (currentStep === 2) return selectedVet !== null;
     if (currentStep === 3) return selectedSlot !== null;
     if (currentStep === 4) return selectedPet !== null;
+    if (currentStep === 5) return motivo.trim().length >= 3;
     return false;
   };
 
@@ -46,6 +50,8 @@ function StepperAppointment({ onBack }: StepperAppointmentProps) {
         return <StepAvailabilitySelection />;
       case 4:
         return <StepPetSelection />;
+      case 5:
+        return <StepMotivo />;
       default:
         return null;
     }
@@ -91,7 +97,7 @@ function StepperAppointment({ onBack }: StepperAppointmentProps) {
           Anterior
         </button>
 
-        {currentStep < 5 ? (
+        {currentStep < 6 ? (
           <button
             onClick={() => goToStep(currentStep + 1)}
             disabled={!canNext()}
