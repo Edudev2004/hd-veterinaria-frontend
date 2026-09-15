@@ -18,7 +18,7 @@ const reducer = (state, action) => {
   switch (action.type) {
     case "SET_SPECIALTY":
       return { ...state, selectedSpecialty: action.payload, currentStep: 2 };
-    case "SET_VER":
+    case "SET_VET":
       return { ...state, selectedVet: action.payload, currentStep: 3 };
     case "SET_SLOT":
       return { ...state, selectedSlot: action.payload, currentStep: 4 };
@@ -29,7 +29,6 @@ const reducer = (state, action) => {
     default:
       return state;
   }
-  return state;
 };
 
 export const AppointmentStepperProvider = ({ children }) => {
