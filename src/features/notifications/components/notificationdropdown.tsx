@@ -60,7 +60,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ role
       {isOpen && (
         <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-white shadow-xl border border-gray-100 py-3 z-50">
           <div className="flex items-center justify-between px-4 pb-3 border-b border-gray-100">
-            <h3 className="font-semibold text-gray-800">Notificaciones ({role})</h3>
+            <h3 className="font-semibold text-gray-800">Notificaciones</h3>
             {noLeidasCount > 0 && (
               <button
                 onClick={handleMarcarTodas}
