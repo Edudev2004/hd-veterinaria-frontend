@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
-import { BarChart3, CalendarDays, PawPrint, Stethoscope } from 'lucide-react';
+import {
+  BarChart3,
+  CalendarDays,
+  PawPrint,
+  Stethoscope,
+} from 'lucide-react';
 
 interface AppointmentReport {
   id: string;
@@ -146,6 +151,89 @@ export const AdminReportsPage: React.FC = () => {
       (!end || appointmentDate <= end)
     );
   });
+
+  const downloadCsv = (filename: string, content: string) => {
+    const blob = new Blob([content], {
+      type: 'text/csv;charset=utf-8;',
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.download = filename;
+    link.click();
+
+    URL.revokeObjectURL(url);
+  };
+
+  const exportAppointments = () => {
+    const headers = [
+      'Fecha',
+      'Propietario',
+      'Mascota',
+      'Veterinario',
+      'Especialidad',
+      'Estado',
+    ];
+
+    const rows = filteredAppointments.map((appointment) => [
+      appointment.date,
+      appointment.owner,
+      appointment.pet,
+      appointment.veterinarian,
+      appointment.specialty,
+      appointment.status,
+    ]);
+
+    const csv = [
+      headers.join(','),
+      ...rows.map((row) => row.map((value) => `"${value}"`).join(',')),
+    ].join('\n');
+
+    downloadCsv('reporte-citas.csv', csv);
+  };
+
+  const exportVeterinarians = () => {
+    const headers = [
+      'Posición',
+      'Veterinario',
+      'Especialidad',
+      'Atenciones',
+    ];
+
+    const rows = [...mockVeterinarians]
+      .sort((a, b) => b.appointments - a.appointments)
+      .map((veterinarian, index) => [
+        index + 1,
+        veterinarian.name,
+        veterinarian.specialty,
+        veterinarian.appointments,
+      ]);
+
+    const csv = [
+      headers.join(','),
+      ...rows.map((row) => row.map((value) => `"${value}"`).join(',')),
+    ].join('\n');
+
+    downloadCsv('ranking-veterinarios.csv', csv);
+  };
+
+  const exportSpecies = () => {
+    const headers = ['Especie', 'Mascotas atendidas'];
+
+    const rows = mockSpecies.map((item) => [
+      item.species,
+      item.count,
+    ]);
+
+    const csv = [
+      headers.join(','),
+      ...rows.map((row) => row.map((value) => `"${value}"`).join(',')),
+    ].join('\n');
+
+    downloadCsv('estadisticas-especies.csv', csv);
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -396,7 +484,7 @@ export const AdminReportsPage: React.FC = () => {
             </thead>
 
             <tbody>
-              {mockVeterinarians
+              {[...mockVeterinarians]
                 .sort((a, b) => b.appointments - a.appointments)
                 .map((veterinarian, index) => (
                   <tr
@@ -528,7 +616,9 @@ export const AdminReportsPage: React.FC = () => {
                   />
 
                   <span className="w-full truncate text-center text-xs text-slate-500">
-                    {veterinarian.name.replace('Dr. ', '').replace('Dra. ', '')}
+                    {veterinarian.name
+                      .replace('Dr. ', '')
+                      .replace('Dra. ', '')}
                   </span>
                 </div>
               );
@@ -582,13 +672,59 @@ export const AdminReportsPage: React.FC = () => {
       </div>
 
       <div className="rounded-2xl bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-bold text-slate-800">
-          Panel de reportes
-        </h2>
+        <div className="mb-5">
+          <h2 className="text-lg font-bold text-slate-800">
+            Exportar reportes
+          </h2>
 
-        <p className="mt-1 text-sm text-slate-500">
-          Los demás reportes y estadísticas estarán disponibles en este panel.
-        </p>
+          <p className="mt-1 text-sm text-slate-500">
+            Descarga los reportes generados en formato CSV.
+          </p>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-3">
+          <button
+            type="button"
+            onClick={exportAppointments}
+            className="rounded-xl border border-slate-200 p-4 text-left transition hover:bg-slate-50"
+          >
+            <p className="font-semibold text-slate-800">
+              Exportar citas
+            </p>
+
+            <p className="mt-1 text-sm text-slate-500">
+              Descargar las citas del período seleccionado.
+            </p>
+          </button>
+
+          <button
+            type="button"
+            onClick={exportVeterinarians}
+            className="rounded-xl border border-slate-200 p-4 text-left transition hover:bg-slate-50"
+          >
+            <p className="font-semibold text-slate-800">
+              Exportar veterinarios
+            </p>
+
+            <p className="mt-1 text-sm text-slate-500">
+              Descargar el ranking de veterinarios.
+            </p>
+          </button>
+
+          <button
+            type="button"
+            onClick={exportSpecies}
+            className="rounded-xl border border-slate-200 p-4 text-left transition hover:bg-slate-50"
+          >
+            <p className="font-semibold text-slate-800">
+              Exportar especies
+            </p>
+
+            <p className="mt-1 text-sm text-slate-500">
+              Descargar las estadísticas por especie.
+            </p>
+          </button>
+        </div>
       </div>
     </div>
   );
