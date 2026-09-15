@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, Users, Stethoscope, Settings } from 'lucide-react';
+import { Shield, Users, Stethoscope, Settings, Plus, X } from 'lucide-react';
 
 interface Role {
   id: string;
@@ -58,6 +58,10 @@ const getRoleIcon = (roleName: string) => {
 
 export const AdminRolesPage: React.FC = () => {
   const [roles, setRoles] = useState<Role[]>(initialRoles);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [roleName, setRoleName] = useState('');
+  const [roleDescription, setRoleDescription] = useState('');
+  const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
 
   const togglePermission = (roleId: string, permission: string) => {
     setRoles((currentRoles) =>
@@ -80,17 +84,188 @@ export const AdminRolesPage: React.FC = () => {
     );
   };
 
+  const toggleSelectedPermission = (permission: string) => {
+    setSelectedPermissions((currentPermissions) =>
+      currentPermissions.includes(permission)
+        ? currentPermissions.filter(
+            (currentPermission) => currentPermission !== permission
+          )
+        : [...currentPermissions, permission]
+    );
+  };
+
+  const resetForm = () => {
+    setRoleName('');
+    setRoleDescription('');
+    setSelectedPermissions([]);
+    setIsFormOpen(false);
+  };
+
+  const handleCreateRole = () => {
+    if (!roleName.trim()) {
+      return;
+    }
+
+    const newRole: Role = {
+      id: Date.now().toString(),
+      name: roleName.trim(),
+      description: roleDescription.trim(),
+      permissions: selectedPermissions,
+      isCustom: true,
+    };
+
+    setRoles((currentRoles) => [...currentRoles, newRole]);
+    resetForm();
+  };
+
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-800">
-          Gestión de Roles y Permisos
-        </h1>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800">
+            Gestión de Roles y Permisos
+          </h1>
 
-        <p className="mt-1 text-sm text-slate-500">
-          Administración de roles y permisos del sistema
-        </p>
+          <p className="mt-1 text-sm text-slate-500">
+            Administración de roles y permisos del sistema
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setIsFormOpen(true)}
+          className="flex items-center gap-2 rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
+        >
+          <Plus size={18} />
+          Nuevo rol
+        </button>
       </div>
+
+      {isFormOpen && (
+        <div className="rounded-2xl bg-white p-6 shadow-sm">
+          <div className="mb-5 flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-slate-800">
+                Crear rol personalizado
+              </h2>
+
+              <p className="mt-1 text-sm text-slate-500">
+                Define el nombre, descripción y permisos del nuevo rol.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={resetForm}
+              className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100"
+              aria-label="Cerrar formulario"
+            >
+              <X size={20} />
+            </button>
+          </div>
+
+          <div className="grid gap-5 md:grid-cols-2">
+            <div>
+              <label
+                htmlFor="roleName"
+                className="mb-2 block text-sm font-medium text-slate-700"
+              >
+                Nombre del rol
+              </label>
+
+              <input
+                id="roleName"
+                type="text"
+                value={roleName}
+                onChange={(event) => setRoleName(event.target.value)}
+                placeholder="Ej. RECEPCIONISTA"
+                className="w-full rounded-lg border border-slate-200 px-4 py-2 text-sm outline-none transition focus:border-slate-400"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="roleDescription"
+                className="mb-2 block text-sm font-medium text-slate-700"
+              >
+                Descripción
+              </label>
+
+              <input
+                id="roleDescription"
+                type="text"
+                value={roleDescription}
+                onChange={(event) =>
+                  setRoleDescription(event.target.value)
+                }
+                placeholder="Describe las funciones del rol"
+                className="w-full rounded-lg border border-slate-200 px-4 py-2 text-sm outline-none transition focus:border-slate-400"
+              />
+            </div>
+          </div>
+
+          <div className="mt-5">
+            <h3 className="mb-3 text-sm font-semibold text-slate-700">
+              Seleccionar permisos
+            </h3>
+
+            <div className="grid gap-2 md:grid-cols-2">
+              {availablePermissions.map((permission) => {
+                const isSelected =
+                  selectedPermissions.includes(permission);
+
+                return (
+                  <button
+                    key={permission}
+                    type="button"
+                    onClick={() =>
+                      toggleSelectedPermission(permission)
+                    }
+                    className={`flex items-center justify-between rounded-lg border px-3 py-2 text-left transition ${
+                      isSelected
+                        ? 'border-green-200 bg-green-50'
+                        : 'border-slate-200 bg-white hover:bg-slate-50'
+                    }`}
+                  >
+                    <span className="text-sm text-slate-600">
+                      {permission}
+                    </span>
+
+                    <span
+                      className={`text-xs font-medium ${
+                        isSelected
+                          ? 'text-green-700'
+                          : 'text-slate-400'
+                      }`}
+                    >
+                      {isSelected ? 'Seleccionado' : 'Seleccionar'}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="mt-6 flex justify-end gap-3">
+            <button
+              type="button"
+              onClick={resetForm}
+              className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+            >
+              Cancelar
+            </button>
+
+            <button
+              type="button"
+              onClick={handleCreateRole}
+              disabled={!roleName.trim()}
+              className="rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Crear rol
+            </button>
+          </div>
+        </div>
+      )}
 
       <div>
         <div className="mb-4">
@@ -114,8 +289,14 @@ export const AdminRolesPage: React.FC = () => {
                   {getRoleIcon(role.name)}
                 </div>
 
-                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
-                  Rol del sistema
+                <span
+                  className={`rounded-full px-3 py-1 text-xs font-medium ${
+                    role.isCustom
+                      ? 'bg-blue-100 text-blue-700'
+                      : 'bg-slate-100 text-slate-600'
+                  }`}
+                >
+                  {role.isCustom ? 'Personalizado' : 'Rol del sistema'}
                 </span>
               </div>
 
@@ -134,7 +315,8 @@ export const AdminRolesPage: React.FC = () => {
 
                 <div className="space-y-2">
                   {availablePermissions.map((permission) => {
-                    const isAssigned = role.permissions.includes(permission);
+                    const isAssigned =
+                      role.permissions.includes(permission);
 
                     return (
                       <button
