@@ -41,6 +41,16 @@ const initialSpecialties: Specialty[] = [
 
 export const AdminSpecialtiesPage: React.FC = () => {
   const [specialties] = useState<Specialty[]>(initialSpecialties);
+  const [query, setQuery] = useState('');
+
+  const filteredSpecialties = specialties.filter((specialty) => {
+  const search = query.toLowerCase();
+
+  return (
+    specialty.name.toLowerCase().includes(search) ||
+    specialty.description.toLowerCase().includes(search)
+  );
+});
 
   return (
     <div className="flex flex-col gap-6">
@@ -55,12 +65,21 @@ export const AdminSpecialtiesPage: React.FC = () => {
       </div>
 
       <div className="bg-white rounded-2xl p-6">
+        <div className="mb-4">
+         <input
+           type="text"
+           value={query}
+           onChange={(event) => setQuery(event.target.value)}
+           placeholder="Buscar especialidad..."
+           className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-slate-400"
+           />
+       </div>
         <h2 className="font-bold mb-4">
           Especialidades
         </h2>
 
         <div className="grid gap-4 md:grid-cols-2">
-          {specialties.map((specialty) => (
+          {filteredSpecialties.map((specialty) => (
             <div
               key={specialty.id}
               className="border border-slate-200 rounded-xl p-4"
