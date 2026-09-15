@@ -491,6 +491,96 @@ export const AdminReportsPage: React.FC = () => {
         </div>
       </div>
 
+      <div className="grid gap-6 lg:grid-cols-2">
+        <div className="rounded-2xl bg-white p-6 shadow-sm">
+          <div className="mb-5">
+            <h2 className="text-lg font-bold text-slate-800">
+              Atenciones por veterinario
+            </h2>
+
+            <p className="mt-1 text-sm text-slate-500">
+              Visualización de las atenciones registradas por veterinario.
+            </p>
+          </div>
+
+          <div className="flex h-64 items-end gap-4 border-b border-l border-slate-200 px-4 pb-0">
+            {mockVeterinarians.map((veterinarian) => {
+              const maxAppointments = Math.max(
+                ...mockVeterinarians.map((item) => item.appointments)
+              );
+
+              const height =
+                (veterinarian.appointments / maxAppointments) * 100;
+
+              return (
+                <div
+                  key={veterinarian.id}
+                  className="flex h-full flex-1 flex-col items-center justify-end gap-2"
+                >
+                  <span className="text-xs font-semibold text-slate-700">
+                    {veterinarian.appointments}
+                  </span>
+
+                  <div
+                    className="w-full rounded-t-lg bg-slate-500"
+                    style={{ height: `${height}%` }}
+                    title={`${veterinarian.name}: ${veterinarian.appointments} atenciones`}
+                  />
+
+                  <span className="w-full truncate text-center text-xs text-slate-500">
+                    {veterinarian.name.replace('Dr. ', '').replace('Dra. ', '')}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="rounded-2xl bg-white p-6 shadow-sm">
+          <div className="mb-5">
+            <h2 className="text-lg font-bold text-slate-800">
+              Mascotas por especie
+            </h2>
+
+            <p className="mt-1 text-sm text-slate-500">
+              Visualización de mascotas atendidas agrupadas por especie.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-5">
+            {mockSpecies.map((item) => {
+              const total = mockSpecies.reduce(
+                (sum, species) => sum + species.count,
+                0
+              );
+
+              const percentage = (item.count / total) * 100;
+
+              return (
+                <div key={item.species}>
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="text-sm font-medium text-slate-700">
+                      {item.species}
+                    </span>
+
+                    <span className="text-sm font-semibold text-slate-800">
+                      {item.count} ({percentage.toFixed(1)}%)
+                    </span>
+                  </div>
+
+                  <div className="h-3 overflow-hidden rounded-full bg-slate-100">
+                    <div
+                      className="h-full rounded-full bg-slate-500"
+                      style={{ width: `${percentage}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
       <div className="rounded-2xl bg-white p-6 shadow-sm">
         <h2 className="text-lg font-bold text-slate-800">
           Panel de reportes
