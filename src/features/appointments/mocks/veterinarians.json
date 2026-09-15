@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "name": "Dr. Carlos López",
+    "specialty": "Cardiología",
+    "averageRating": 4.8
+  },
+  {
+    "id": 2,
+    "name": "Dra. María García",
+    "specialty": "Cardiología",
+    "averageRating": 4.9
+  },
+  {
+    "id": 3,
+    "name": "Dr. Javier Martínez",
+    "specialty": "Dermatología",
+    "averageRating": 4.7
+  },
+  {
+    "id": 4,
+    "name": "Dra. Ana Rodríguez",
+    "specialty": "Dermatología",
+    "averageRating": 4.6
+  },
+  {
+    "id": 5,
+    "name": "Dr. Luis Hernández",
+    "specialty": "Oftalmología",
+    "averageRating": 4.9
+  },
+  {
+    "id": 6,
+    "name": "Dra. Sofía Díaz",
+    "specialty": "Oftalmología",
+    "averageRating": 4.8
+  },
+  {
+    "id": 7,
+    "name": "Dr. Roberto Sánchez",
+    "specialty": "Traumatología",
+    "averageRating": 4.7
+  },
+  {
+    "id": 8,
+    "name": "Dra. Laura Torres",
+    "specialty": "Traumatología",
+    "averageRating": 4.5
+  },
+  {
+    "id": 9,
+    "name": "Dr. Miguel Ángel Ramírez",
+    "specialty": "Odontología",
+    "averageRating": 4.8
+  },
+  {
+    "id": 10,
+    "name": "Dra. Isabella Moreno",
+    "specialty": "Odontología",
+    "averageRating": 4.9
+  }
+]
