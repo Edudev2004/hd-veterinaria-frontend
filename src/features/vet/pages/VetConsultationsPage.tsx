@@ -203,9 +203,17 @@ export const VetConsultationsPage: React.FC = () => {
 
       <div className="grid gap-6 sm:grid-cols-2">
         <div className="flex items-start gap-4 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-tertiary text-primary">
-            <PawPrint className="h-8 w-8" />
-          </div>
+          {cita.mascota.fotoUrl ? (
+  <img
+    src={cita.mascota.fotoUrl}
+    alt={cita.mascota.nombre}
+    className="h-16 w-16 shrink-0 rounded-2xl border border-slate-200 object-cover"
+  />
+) : (
+  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-tertiary text-primary">
+    <PawPrint className="h-8 w-8" />
+  </div>
+)}
           <div>
             <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
               Paciente
@@ -220,9 +228,17 @@ export const VetConsultationsPage: React.FC = () => {
         </div>
 
         <div className="flex items-start gap-4 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-secondary/10 text-secondary-hover">
-            <User className="h-8 w-8" />
-          </div>
+          {cita.propietario.fotoUrl ? (
+  <img
+    src={cita.propietario.fotoUrl}
+    alt={cita.propietario.nombre}
+    className="h-16 w-16 shrink-0 rounded-full border border-slate-200 object-cover"
+  />
+) : (
+  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-secondary/10 text-secondary-hover">
+    <User className="h-8 w-8" />
+  </div>
+)}
           <div>
             <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
               Propietario
