@@ -1,23 +1,51 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Stethoscope } from 'lucide-react';
+import { vetScheduleService } from '../../appointments/services/vetScheduleService';
+import type { CitaAgenda } from '../../appointments/types/vetSchedule.types';
 
 export const VetConsultationsPage: React.FC = () => {
-  return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900 font-outfit">Atenciones y Consultas Médicas</h1>
-        <p className="text-sm text-slate-500">Mapeado desde Jira US-21, US-22, US-23 y US-24</p>
-      </div>
+  const { citaId } = useParams<{ citaId: string }>();
+  const navigate = useNavigate();
+  const [cita, setCita] = useState<CitaAgenda | null>(null);
+  const [cargando, setCargando] = useState(true);
 
-      <div className="p-8 rounded-2xl border-2 border-dashed border-slate-200 bg-white text-center flex flex-col items-center justify-center gap-3">
-        <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center">
-          <Stethoscope className="w-6 h-6" />
+  useEffect(() => {
+    if (!citaId) {
+      setCargando(false);
+      return;
+    }
+    setCargando(true);
+    vetScheduleService.getCitaById(citaId).then((data) => {
+      setCita(data);
+      setCargando(false);
+    });
+  }, [citaId]);
+
+  if (!citaId) {
+    return (
+      <div className="flex flex-col gap-6">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 font-outfit">Atenciones y Consultas Médicas</h1>
+          <p className="text-sm text-slate-500">Selecciona una cita desde tu agenda diaria para ver su detalle</p>
         </div>
-        <h3 className="text-base font-bold text-slate-800">Espacio de Trabajo: Registro de Diagnósticos y Atenciones</h3>
-        <p className="text-xs text-slate-500 max-w-md">
-          Los desarrolladores asignados a la US-21, US-22, US-23 y US-24 pueden implementar sus componentes dentro de <code className="bg-slate-100 px-2 py-0.5 rounded text-amber-600">src/pages/vet/VetConsultationsPage.tsx</code>.
-        </p>
+
+        <div className="p-8 rounded-2xl border-2 border-dashed border-slate-200 bg-white text-center flex flex-col items-center justify-center gap-3">
+          <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center">
+            <Stethoscope className="w-6 h-6" />
+          </div>
+          <h3 className="text-base font-bold text-slate-800">Ninguna cita seleccionada</h3>
+          <p className="text-xs text-slate-500 max-w-md">
+            Ve a "Agenda Diaria" y haz clic sobre una cita para revisar su información.
+          </p>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  if (cargando) {
+    return <p className="text-center text-sm text-slate-400 py-12">Cargando cita...</p>;
+  }
+
+  return null;
 };
