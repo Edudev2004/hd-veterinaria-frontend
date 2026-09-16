@@ -12,11 +12,13 @@ import {
   Hash,
   Mail,
   HelpCircle,
-  Tag
+  Tag,
+  ClipboardList
 } from 'lucide-react';
 import { CitaDetallada, ModalDetalleCitaProps } from '../../../types/cita.types';
 import { getCitaById, normalizarEstado } from '../../../services/citaService';
 import { CitaEstadoBadge } from './CitaEstadoBadge';
+import { HistorialClinicoModal } from '../../pets/components/HistorialClinicoModal';
 
 export const ModalDetalleCita: React.FC<ModalDetalleCitaProps> = ({
   citaId,
@@ -27,6 +29,7 @@ export const ModalDetalleCita: React.FC<ModalDetalleCitaProps> = ({
 }) => {
   const [cita, setCita] = useState<CitaDetallada | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [historialMascotaOpen, setHistorialMascotaOpen] = useState<boolean>(false);
 
   // Consulta directa de la cita por su ID desde el array 'appointments' en localStorage
   useEffect(() => {
@@ -215,6 +218,16 @@ export const ModalDetalleCita: React.FC<ModalDetalleCitaProps> = ({
                         </p>
                       </div>
                     </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setHistorialMascotaOpen(true)}
+                      className="mt-3 flex items-center justify-center gap-1.5 w-full py-1.5 px-3 text-xs font-bold text-[#0d9488] hover:text-white bg-white hover:bg-[#0d9488] border border-teal-200 hover:border-[#0d9488] rounded-xl transition-all shadow-xs active:scale-95 cursor-pointer"
+                      title={`Consultar historial clínico y antecedentes de ${cita.mascota.nombre}`}
+                    >
+                      <ClipboardList className="w-3.5 h-3.5" />
+                      <span>Ver Historial Clínico</span>
+                    </button>
                   </div>
 
                   {/* Tarjeta de Veterinario y Especialidad */}
@@ -346,6 +359,15 @@ export const ModalDetalleCita: React.FC<ModalDetalleCitaProps> = ({
           </div>
         </motion.div>
       </div>
+
+      {cita && historialMascotaOpen && (
+        <HistorialClinicoModal
+          isOpen={historialMascotaOpen}
+          onClose={() => setHistorialMascotaOpen(false)}
+          mascotaId={cita.mascota.id}
+          mascotaNombre={cita.mascota.nombre}
+        />
+      )}
     </AnimatePresence>
   );
 };
