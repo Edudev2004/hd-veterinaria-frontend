@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Plus, Calendar, Clock, RefreshCw, XCircle } from "lucide-react";
+import { Plus, Calendar, Clock, RefreshCw, XCircle, CheckCircle2 } from "lucide-react";
 import {
   AppointmentStepperProvider,
   useStepperContext,
@@ -7,7 +7,7 @@ import {
 import { useSearchParams } from "react-router-dom";
 import StepperAppointment from "../components/StepperAppointment";
 import { CitasList } from "../components/CitasList";
-import { getCitas } from "../../../services/citaService";
+import { getCitas, normalizarEstado } from "../../../services/citaService";
 import { CitaDetallada } from "../../../types/cita.types";
 
 export const AppointmentsPage: React.FC = () => {
@@ -53,9 +53,10 @@ const AppointmentsContent: React.FC = () => {
     );
   };
 
-  // Contadores rápidos para la cabecera
-  const pendientesCount = citas.filter((c) => c.estado === "pendiente").length;
-  const canceladasCount = citas.filter((c) => c.estado === "cancelada").length;
+  // Contadores rápidos para la cabecera basados en normalizarEstado (US-17)
+  const pendientesCount = citas.filter((c) => normalizarEstado(c.estado) === "pendiente").length;
+  const confirmadasCount = citas.filter((c) => normalizarEstado(c.estado) === "confirmada").length;
+  const canceladasCount = citas.filter((c) => normalizarEstado(c.estado) === "cancelada").length;
 
   return (
     <div className="flex flex-col gap-6 max-w-7xl mx-auto w-full pb-10">
@@ -75,18 +76,26 @@ const AppointmentsContent: React.FC = () => {
                     Gestión de Citas Médicas
                   </h1>
                   <p className="text-xs text-slate-500">
-                    Visualiza, reprograma, modifica y cancela las atenciones médicas de tus mascotas (US-15 y US-16)
+                    Visualiza tus citas, filtra por estado (PENDIENTE, CONFIRMADA, CANCELADA), reprograma y gestiona atenciones médicas (US-17)
                   </p>
                 </div>
               </div>
             </div>
 
             <div className="flex items-center gap-2.5">
-              {/* Contador de citas pendientes modificables */}
+              {/* Contador de citas pendientes */}
               {pendientesCount > 0 && (
-                <div className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold">
+                <div className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold">
                   <Clock className="w-3.5 h-3.5 text-amber-600" />
                   <span>{pendientesCount} pendiente{pendientesCount > 1 ? "s" : ""}</span>
+                </div>
+              )}
+
+              {/* Contador de citas confirmadas */}
+              {confirmadasCount > 0 && (
+                <div className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-teal-50 border border-teal-200 text-teal-800 text-xs font-semibold">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#0d9488]" />
+                  <span>{confirmadasCount} confirmada{confirmadasCount > 1 ? "s" : ""}</span>
                 </div>
               )}
 
