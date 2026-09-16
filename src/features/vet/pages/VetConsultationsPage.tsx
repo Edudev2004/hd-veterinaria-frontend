@@ -9,6 +9,7 @@ import { VetConsultationSummary } from "../components/VetConsultationSummary";
 import { vetConsultationService } from "../services/vetConsultationService";
 import type { RegistroAtencion } from "../types/vetConsultation.types";
 import { MarkAsAttendedDialog } from "../components/MarkAsAttendedDialog";
+import { MarkAsNotAttendedDialog } from "../components/MarkAsNotAttendedDialog";
 
 export const VetConsultationsPage: React.FC = () => {
   const { citaId } = useParams<{ citaId: string }>();
@@ -25,11 +26,16 @@ export const VetConsultationsPage: React.FC = () => {
     {},
   );
 
-  const [citaPorConfirmar, setCitaPorConfirmar] = useState<CitaAgenda | null>(
+    const [citaPorConfirmar, setCitaPorConfirmar] = useState<CitaAgenda | null>(
     null,
   );
   const [marcandoAtendida, setMarcandoAtendida] = useState(false);
   const [mensajeAccion, setMensajeAccion] = useState("");
+
+  const [citaPorNoAtender, setCitaPorNoAtender] = useState<CitaAgenda | null>(
+    null,
+  );
+  const [marcandoNoAtendida, setMarcandoNoAtendida] = useState(false);
 
   useEffect(() => {
     if (!user) {
