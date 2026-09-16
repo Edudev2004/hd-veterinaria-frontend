@@ -1,10 +1,11 @@
 import React from "react";
-import { X, PawPrint } from "lucide-react";
+import { X, PawPrint, ClipboardList } from "lucide-react";
 import { Mascota } from "@/services/petService";
 
 interface PetDetailModalProps {
   mascota: Mascota;
   onClose: () => void;
+  onVerHistorial?: (mascota: Mascota) => void;
 }
 
 const especieLabel: Record<string, string> = {
@@ -17,6 +18,7 @@ const sexoLabel: Record<string, string> = { macho: "Macho", hembra: "Hembra" };
 export const PetDetailModal: React.FC<PetDetailModalProps> = ({
   mascota,
   onClose,
+  onVerHistorial,
 }) => {
   return (
     <div className="fixed inset-0 z-[9990] flex items-center justify-center p-4">
@@ -75,6 +77,22 @@ export const PetDetailModal: React.FC<PetDetailModalProps> = ({
             </span>
           </div>
         </div>
+
+        {onVerHistorial && (
+          <div className="mt-6 pt-4 border-t border-slate-100">
+            <button
+              type="button"
+              onClick={() => {
+                onClose();
+                onVerHistorial(mascota);
+              }}
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-bold text-white bg-[#0d9488] hover:bg-[#0f766e] transition-all shadow-md shadow-[#0d9488]/20 active:scale-95 cursor-pointer"
+            >
+              <ClipboardList className="w-4 h-4" />
+              <span>Consultar Historial Clínico</span>
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
