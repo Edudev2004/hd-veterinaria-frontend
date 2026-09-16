@@ -1,5 +1,5 @@
-
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Calendar, Clock } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { useAuth } from '@/context/AuthContext';
@@ -24,6 +24,7 @@ const cumpleFiltro = (cita: CitaAgenda, filtro: Filtro): boolean => {
 
 export const VetSchedulePage: React.FC = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [citas, setCitas] = useState<CitaAgenda[]>([]);
   const [filtro, setFiltro] = useState<Filtro>('todas');
   const [cargando, setCargando] = useState(true);
@@ -94,7 +95,8 @@ export const VetSchedulePage: React.FC = () => {
               return (
                 <li
                   key={cita.id}
-                  className="flex items-center gap-4 rounded-xl border border-slate-100 p-3 hover:border-primary/40 transition-colors"
+                  onClick={() => navigate(`/veterinario/atenciones/${cita.id}`)}
+                  className="flex items-center gap-4 rounded-xl border border-slate-100 p-3 hover:border-primary/40 transition-colors cursor-pointer"
                 >
                   <div className="flex flex-col items-center justify-center w-16 text-primary font-bold">
                     <Clock className="w-4 h-4 mb-1" />
