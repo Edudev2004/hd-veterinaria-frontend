@@ -12,6 +12,8 @@
       "nombre": "Bella",
       "especie": "Perro",
       "raza": "Golden Retriever",
+      "edad": "4 años",
+      "descripcion": "Paciente activa y sociable. Su propietario no reporta alergias conocidas.",
       "fotoUrl": "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=160&h=160&q=80"
     },
     "propietario": {
@@ -34,6 +36,8 @@
       "nombre": "Milo",
       "especie": "Gato",
       "raza": "Siamés",
+      "edad": "2 años",
+"descripcion": "Gato tranquilo. Acude para control posterior a su esterilización.",
       "fotoUrl": "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?auto=format&fit=crop&w=160&h=160&q=80"
     },
     "propietario": {
@@ -56,6 +60,8 @@
       "nombre": "Toby",
       "especie": "Perro",
       "raza": "Beagle",
+      "edad": "6 años",
+"descripcion": "Paciente dócil y acostumbrado a los controles preventivos.",
       "fotoUrl": "https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?auto=format&fit=crop&w=160&h=160&q=80"
     },
     "propietario": {
@@ -78,6 +84,8 @@
       "nombre": "Rocky",
       "especie": "Perro",
       "raza": "Bulldog",
+      "edad": "3 años",
+"descripcion": "Perro activo con sensibilidad cutánea reportada por su propietario.",
       "fotoUrl": "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=160&h=160&q=80"
     },
     "propietario": {

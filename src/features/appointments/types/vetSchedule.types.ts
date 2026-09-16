@@ -5,6 +5,8 @@ export interface MascotaResumen {
   nombre: string;
   especie: string;
   raza: string;
+  edad: string;
+  descripcion: string;
   fotoUrl?: string;
 }
 
