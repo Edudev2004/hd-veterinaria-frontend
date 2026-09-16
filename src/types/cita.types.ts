@@ -112,3 +112,48 @@ export interface CitasFilterParams {
   fecha?: string;
 }
 
+/**
+ * Categorías o motivos predefinidos comunes para la cancelación de una cita (US-16)
+ */
+export type MotivoCancelacionCategoria =
+  | 'emergencia_personal'
+  | 'mejoria_mascota'
+  | 'imposibilidad_traslado'
+  | 'cambio_horario_incompatible'
+  | 'error_agendamiento'
+  | 'otro';
+
+export interface MotivoCancelacionOpcion {
+  id: MotivoCancelacionCategoria;
+  titulo: string;
+  descripcion: string;
+}
+
+/**
+ * Payload para procesar la cancelación de una cita existente (US-16)
+ * Estado destino: 'cancelada' según constraint check en bd-veterinaria-hd.sql:
+ * check (estado in ('pendiente', 'atendida', 'no_atendida', 'cancelada'))
+ */
+export interface CancelarCitaPayload {
+  id: string; // UUID de la cita a cancelar
+  motivo_cancelacion: string; // Justificación de la cancelación
+  categoria_motivo?: MotivoCancelacionCategoria; // Categoría seleccionada
+}
+
+/**
+ * Errores de validación para el formulario y modal de cancelación
+ */
+export interface CancelarCitaValidationErrors {
+  motivo_cancelacion?: string;
+  general?: string;
+}
+
+/**
+ * Resultado devuelto tras la cancelación exitosa de una cita
+ */
+export interface CancelarCitaResult {
+  cita: CitaDetallada;
+  mensaje: string;
+  fecha_cancelacion: string;
+}
+

@@ -1,257 +1,185 @@
 import {
-  Cita,
   CitaDetallada,
   ModificarCitaPayload,
+  CancelarCitaPayload,
+  CancelarCitaResult,
+  MotivoCancelacionOpcion,
   VeterinarioDetallado,
   FranjaHorariaDisponible,
-  MascotaCita
+  MascotaCita,
+  EstadoCita
 } from '../types/cita.types';
-import { getCurrentUser } from './authService';
+import {
+  getAppointments,
+  cancelAppointment,
+  updateAppointment,
+  Appointment,
+  APPOINTMENTS_STORAGE_KEY
+} from '../features/appointments/services/appointmentService';
+import petsMock from '../features/appointments/mocks/pets.json';
+import vetsMock from '../features/appointments/mocks/veterinarians.json';
 
-const STORAGE_CITAS_KEY = 'vethd_db_citas';
-const STORAGE_MASCOTAS_KEY = 'vethd_db_mascotas';
+// Clave unificada de almacenamiento compartida con US-14
+export const STORAGE_CITAS_KEY = APPOINTMENTS_STORAGE_KEY;
 
-// Catálogo de veterinarios con datos relacionales acordes a bd-veterinaria-hd.sql
-const DEFAULT_VETERINARIOS: VeterinarioDetallado[] = [
+/**
+ * Catálogo de motivos predefinidos comunes para la cancelación (US-16)
+ */
+export const MOTIVOS_CANCELACION_PRESET: MotivoCancelacionOpcion[] = [
   {
-    id: 'vet-uuid-001',
-    usuario_id: 'usr-seed-vet-01',
-    especialidad_id: 'esp-uuid-001',
-    activo: true,
-    nombre: 'Dra. Laura Veterinario',
-    email: 'veterinario@vethd.com',
-    especialidad_nombre: 'Medicina General y Preventiva'
+    id: 'emergencia_personal',
+    titulo: 'Emergencia personal o familiar',
+    descripcion: 'Surgió un imprevisto y no podré asistir a la hora pautada.'
   },
   {
-    id: 'vet-uuid-002',
-    usuario_id: 'usr-seed-vet-02',
-    especialidad_id: 'esp-uuid-002',
-    activo: true,
-    nombre: 'Dr. Carlos Mendoza',
-    email: 'carlos.mendoza@vethd.com',
-    especialidad_nombre: 'Cardiología'
+    id: 'mejoria_mascota',
+    titulo: 'Mejoría notable en la mascota',
+    descripcion: 'La mascota ya no presenta síntomas y no requiere atención inmediata.'
   },
   {
-    id: 'vet-uuid-003',
-    usuario_id: 'usr-seed-vet-03',
-    especialidad_id: 'esp-uuid-003',
-    activo: true,
-    nombre: 'Dra. Andrea Morales',
-    email: 'andrea.morales@vethd.com',
-    especialidad_nombre: 'Dermatología'
+    id: 'imposibilidad_traslado',
+    titulo: 'Problemas de transporte o traslado',
+    descripcion: 'Dificultad logística para llevar a la mascota a la veterinaria.'
   },
   {
-    id: 'vet-uuid-004',
-    usuario_id: 'usr-seed-vet-04',
-    especialidad_id: 'esp-uuid-004',
-    activo: true,
-    nombre: 'Dr. Roberto Gómez',
-    email: 'roberto.gomez@vethd.com',
-    especialidad_nombre: 'Cirugía y Traumatología'
-  }
-];
-
-// Semillas de mascotas de prueba por si no existen en localStorage
-const DEFAULT_SEED_MASCOTAS: MascotaCita[] = [
-  {
-    id: 'pet-seed-001',
-    propietario_id: 'prop-seed-01',
-    nombre: 'Rocky',
-    especie: 'perro',
-    raza: 'Golden Retriever',
-    foto_url: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&q=80&w=300'
+    id: 'cambio_horario_incompatible',
+    titulo: 'Horario incompatible',
+    descripcion: 'Deseo cancelar para agendar en otra fecha u horario disponible.'
   },
   {
-    id: 'pet-seed-002',
-    propietario_id: 'prop-seed-01',
-    nombre: 'Milo',
-    especie: 'gato',
-    raza: 'Siamés',
-    foto_url: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&q=80&w=300'
+    id: 'error_agendamiento',
+    titulo: 'Error involuntario al agendar',
+    descripcion: 'Se eligió una mascota, veterinario o fecha equivocada.'
   },
   {
-    id: 'pet-seed-003',
-    propietario_id: 'prop-seed-01',
-    nombre: 'Luna',
-    especie: 'perro',
-    raza: 'Beagle',
-    foto_url: 'https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?auto=format&fit=crop&q=80&w=300'
-  }
-];
-
-// Semillas iniciales de citas respetando bd-veterinaria-hd.sql
-const DEFAULT_SEED_CITAS: Cita[] = [
-  {
-    id: 'cita-uuid-001',
-    mascota_id: 'pet-seed-001',
-    veterinario_id: 'vet-uuid-001',
-    fecha_hora: new Date(Date.now() + 86400000 * 2).toISOString().split('T')[0] + 'T09:00:00.000Z',
-    estado: 'pendiente',
-    motivo: 'Vacunación anual y desparasitación preventiva de rutina',
-    created_at: new Date('2026-03-01T10:00:00.000Z').toISOString()
-  },
-  {
-    id: 'cita-uuid-002',
-    mascota_id: 'pet-seed-002',
-    veterinario_id: 'vet-uuid-002',
-    fecha_hora: new Date(Date.now() + 86400000 * 4).toISOString().split('T')[0] + 'T11:30:00.000Z',
-    estado: 'pendiente',
-    motivo: 'Control cardiológico por fatiga leve tras paseos',
-    created_at: new Date('2026-03-02T11:15:00.000Z').toISOString()
-  },
-  {
-    id: 'cita-uuid-003',
-    mascota_id: 'pet-seed-003',
-    veterinario_id: 'vet-uuid-003',
-    fecha_hora: '2026-02-15T15:00:00.000Z',
-    estado: 'atendida',
-    motivo: 'Revisión por alergia dermatológica en la piel',
-    created_at: new Date('2026-02-10T08:00:00.000Z').toISOString()
-  },
-  {
-    id: 'cita-uuid-004',
-    mascota_id: 'pet-seed-001',
-    veterinario_id: 'vet-uuid-004',
-    fecha_hora: '2026-02-20T16:00:00.000Z',
-    estado: 'cancelada',
-    motivo: 'Consulta ortopédica preventiva',
-    created_at: new Date('2026-02-18T14:00:00.000Z').toISOString()
+    id: 'otro',
+    titulo: 'Otro motivo particular',
+    descripcion: 'Se detallará la razón específica en el formulario.'
   }
 ];
 
 /**
- * Obtiene las citas brutas almacenadas en LocalStorage
+ * Transforma un registro Appointment de la clave 'appointments' a CitaDetallada para la UI
  */
-export const getStoredCitas = (): Cita[] => {
-  const data = localStorage.getItem(STORAGE_CITAS_KEY);
-  if (!data) {
-    localStorage.setItem(STORAGE_CITAS_KEY, JSON.stringify(DEFAULT_SEED_CITAS));
-    return DEFAULT_SEED_CITAS;
-  }
-  try {
-    return JSON.parse(data);
-  } catch {
-    return DEFAULT_SEED_CITAS;
-  }
-};
+const appointmentToCitaDetallada = (a: Appointment): CitaDetallada => {
+  // Normalización de estados: CANCELADA -> cancelada; PENDIENTE / CONFIRMADA -> pendiente
+  const estado: EstadoCita = a.status === 'CANCELADA' ? 'cancelada' : 'pendiente';
 
-/**
- * Guarda las citas en LocalStorage
- */
-const saveStoredCitas = (citas: Cita[]): void => {
-  localStorage.setItem(STORAGE_CITAS_KEY, JSON.stringify(citas));
-};
+  // Combinación y formateo de fecha y hora a formato ISO 8601
+  const fechaHoraIso = (() => {
+    try {
+      const d = new Date(`${a.date}T${a.startTime}:00`);
+      return isNaN(d.getTime()) ? (a.createdAt || new Date().toISOString()) : d.toISOString();
+    } catch {
+      return a.createdAt || new Date().toISOString();
+    }
+  })();
 
-/**
- * Obtiene las mascotas almacenadas o las semillas por defecto
- */
-const getMascotasRegistradas = (): MascotaCita[] => {
-  const data = localStorage.getItem(STORAGE_MASCOTAS_KEY);
-  if (!data) return DEFAULT_SEED_MASCOTAS;
-  try {
-    const parsed = JSON.parse(data);
-    if (!Array.isArray(parsed) || parsed.length === 0) return DEFAULT_SEED_MASCOTAS;
-    return parsed.map((m: any) => ({
-      id: m.id,
-      propietario_id: m.propietarioId || m.propietario_id || 'prop-seed-01',
-      nombre: m.nombre,
-      especie: m.especie,
-      raza: m.raza,
-      foto_url: m.fotoUrl || m.foto_url
-    }));
-  } catch {
-    return DEFAULT_SEED_MASCOTAS;
-  }
-};
+  // Búsqueda de mascota en mock para enriquecer especie, raza y foto
+  const petFound = (petsMock as any[]).find(
+    (p) => p.id === a.petId || (a.petName && p.name.toLowerCase() === a.petName.toLowerCase())
+  );
 
-/**
- * Une un registro Cita con su Mascota y su Veterinario
- */
-const enriquecerCita = (cita: Cita): CitaDetallada => {
-  const mascotas = getMascotasRegistradas();
-  const mascota = mascotas.find((m) => m.id === cita.mascota_id) || {
-    id: cita.mascota_id,
-    propietario_id: 'desconocido',
-    nombre: 'Mascota no identificada',
-    especie: 'otro'
+  const mascota: MascotaCita = {
+    id: String(a.petId),
+    propietario_id: 'prop-seed-01',
+    nombre: a.petName || petFound?.name || 'Mascota',
+    especie: petFound?.species?.toLowerCase() || 'canino',
+    raza: petFound?.breed,
+    foto_url: petFound?.image
   };
 
-  const veterinario = DEFAULT_VETERINARIOS.find((v) => v.id === cita.veterinario_id) || {
-    id: cita.veterinario_id,
-    usuario_id: 'usr-unknown',
-    especialidad_id: 'esp-unknown',
+  // Búsqueda de veterinario en mock
+  const vetFound = (vetsMock as any[]).find(
+    (v) => v.id === a.vetId || (a.vetName && v.name.toLowerCase() === a.vetName.toLowerCase())
+  );
+
+  const veterinario: VeterinarioDetallado = {
+    id: String(a.vetId),
+    usuario_id: `usr-vet-${a.vetId}`,
+    especialidad_id: `esp-${a.vetId}`,
     activo: true,
-    nombre: 'Veterinario asignado',
-    email: 'contacto@vethd.com',
-    especialidad_nombre: 'Medicina General'
+    nombre: a.vetName || vetFound?.name || 'Veterinario Asignado',
+    email: `veterinario${a.vetId}@vethd.com`,
+    especialidad_nombre: a.specialty || vetFound?.specialty || 'Medicina General'
   };
 
   return {
-    ...cita,
+    id: a.id,
+    mascota_id: String(a.petId),
+    veterinario_id: String(a.vetId),
+    fecha_hora: fechaHoraIso,
+    estado,
+    motivo: a.motivo || null,
+    created_at: a.createdAt || new Date().toISOString(),
     mascota,
     veterinario
   };
 };
 
 /**
- * Obtiene el listado de veterinarios activos
+ * Obtiene el listado de veterinarios activos disponibles para agendamiento o modificación
  */
 export const getVeterinarios = (): VeterinarioDetallado[] => {
-  return DEFAULT_VETERINARIOS.filter((v) => v.activo);
+  return (vetsMock as any[]).map((v) => ({
+    id: String(v.id),
+    usuario_id: `usr-vet-${v.id}`,
+    especialidad_id: `esp-${v.specialty.toLowerCase().replace(/\s+/g, '-')}`,
+    activo: true,
+    nombre: v.name,
+    email: `${v.name.toLowerCase().replace(/[^a-z0-9]/g, '.')}@vethd.com`,
+    especialidad_nombre: v.specialty
+  }));
 };
 
 /**
- * Obtiene todas las citas detalladas, opcionalmente filtradas por propietario
+ * Obtiene todas las citas leyendo directamente de la clave 'appointments' en localStorage
  */
-export const getCitas = (propietarioId?: string): CitaDetallada[] => {
-  const currentUser = getCurrentUser();
-  const targetPropietarioId = propietarioId || currentUser?.propietarioId || 'prop-seed-01';
-
-  const citas = getStoredCitas();
-  const mascotas = getMascotasRegistradas();
-  const idsMascotasPropietario = mascotas
-    .filter((m) => m.propietario_id === targetPropietarioId)
-    .map((m) => m.id);
-
-  return citas
-    .filter((c) => idsMascotasPropietario.includes(c.mascota_id))
-    .map(enriquecerCita)
+export const getCitas = (): CitaDetallada[] => {
+  const appointments = getAppointments();
+  return appointments
+    .map(appointmentToCitaDetallada)
     .sort((a, b) => new Date(b.fecha_hora).getTime() - new Date(a.fecha_hora).getTime());
 };
 
 /**
- * Obtiene una cita por su ID
+ * Obtiene una cita específica por su identificador
  */
 export const getCitaById = (id: string): CitaDetallada | null => {
-  const citas = getStoredCitas();
-  const cita = citas.find((c) => c.id === id);
-  if (!cita) return null;
-  return enriquecerCita(cita);
+  const appointments = getAppointments();
+  const found = appointments.find((a) => a.id === id);
+  if (!found) return null;
+  return appointmentToCitaDetallada(found);
 };
 
 /**
- * Verifica si un horario específico está disponible para un veterinario determinado
+ * Verifica la disponibilidad de franja horaria para un veterinario
  */
 export const isHorarioDisponible = (
   veterinarioId: string,
   fechaHoraIso: string,
   excludeCitaId?: string
 ): boolean => {
-  const citas = getStoredCitas();
-  const targetTime = new Date(fechaHoraIso).getTime();
+  const appointments = getAppointments();
+  const targetDate = new Date(fechaHoraIso);
+  const dateStr = fechaHoraIso.split('T')[0];
+  const hours = String(targetDate.getHours()).padStart(2, '0');
+  const minutes = String(targetDate.getMinutes()).padStart(2, '0');
+  const timeStr = `${hours}:${minutes}`;
 
-  return !citas.some((c) => {
-    if (excludeCitaId && c.id === excludeCitaId) return false;
-    if (c.estado === 'cancelada') return false;
-    if (c.veterinario_id !== veterinarioId) return false;
+  const vetNum = Number(veterinarioId);
 
-    const citaTime = new Date(c.fecha_hora).getTime();
-    return Math.abs(citaTime - targetTime) < 30 * 60 * 1000; // Franjas de 30 minutos
+  return !appointments.some((a) => {
+    if (excludeCitaId && a.id === excludeCitaId) return false;
+    if (a.status === 'CANCELADA') return false;
+    if (a.vetId !== vetNum) return false;
+
+    return a.date === dateStr && a.startTime === timeStr;
   });
 };
 
 /**
- * Genera franjas horarias disponibles para una fecha y veterinario específicos
+ * Obtiene las franjas horarias disponibles para una fecha y veterinario específicos
  */
 export const getHorariosDisponibles = (
   veterinarioId: string,
@@ -264,43 +192,47 @@ export const getHorariosDisponibles = (
     '16:00', '16:30', '17:00'
   ];
 
+  const appointments = getAppointments();
+  const vetNum = Number(veterinarioId);
+
   return horasPosibles.map((hora) => {
     const fechaHoraIso = new Date(`${fecha}T${hora}:00`).toISOString();
     const esFuturo = new Date(fechaHoraIso).getTime() > Date.now();
-    const libre = isHorarioDisponible(veterinarioId, fechaHoraIso, excludeCitaId);
+    const ocupado = appointments.some(
+      (a) =>
+        a.vetId === vetNum &&
+        a.date === fecha &&
+        a.startTime === hora &&
+        a.status !== 'CANCELADA' &&
+        a.id !== excludeCitaId
+    );
 
     return {
       hora,
-      disponible: esFuturo && libre
+      disponible: esFuturo && !ocupado
     };
   });
 };
 
 /**
- * US-15: Modificar Cita
- * Valida reglas de negocio y actualiza los campos permitidos de la cita
+ * Modifica una cita actualizando directamente el array 'appointments' en localStorage (US-15)
  */
 export const modificarCita = async (payload: ModificarCitaPayload): Promise<CitaDetallada> => {
-  // Simulación de latencia de red realista
+  // Simulación de latencia de red
   await new Promise((resolve) => setTimeout(resolve, 400));
 
-  const citas = getStoredCitas();
-  const index = citas.findIndex((c) => c.id === payload.id);
-
-  if (index === -1) {
+  const appointments = getAppointments();
+  const citaOriginal = appointments.find((c) => c.id === payload.id);
+  if (!citaOriginal) {
     throw new Error('La cita solicitada no fue encontrada en el sistema.');
   }
 
-  const citaOriginal = citas[index];
-
-  // Regla 1: Solo citas pendientes pueden ser modificadas
-  if (citaOriginal.estado !== 'pendiente') {
-    throw new Error(
-      `No es posible modificar esta cita porque se encuentra en estado '${citaOriginal.estado}'. Solo se pueden modificar citas en estado 'pendiente'.`
-    );
+  // Regla: No modificar citas canceladas
+  if (citaOriginal.status === 'CANCELADA') {
+    throw new Error('No es posible modificar una cita que ya ha sido cancelada.');
   }
 
-  // Regla 2: La nueva fecha_hora debe ser válida y estar en el futuro
+  // Regla: Fecha futura válida
   const nuevaFechaHora = new Date(payload.fecha_hora);
   if (isNaN(nuevaFechaHora.getTime())) {
     throw new Error('La fecha y hora seleccionadas no son válidas.');
@@ -309,32 +241,70 @@ export const modificarCita = async (payload: ModificarCitaPayload): Promise<Cita
     throw new Error('La nueva fecha y hora de la cita debe ser posterior al momento actual.');
   }
 
-  // Regla 3: El motivo debe ser válido y tener al menos 5 caracteres
+  // Regla: Motivo mínimo 5 caracteres
   const motivoLimpio = payload.motivo ? payload.motivo.trim() : '';
   if (motivoLimpio.length < 5) {
     throw new Error('El motivo de la cita debe contener al menos 5 caracteres.');
   }
 
-  // Regla 4: Disponibilidad del veterinario
-  const veterinarioDestinoId = payload.veterinario_id || citaOriginal.veterinario_id;
-  const disponible = isHorarioDisponible(veterinarioDestinoId, payload.fecha_hora, citaOriginal.id);
-  if (!disponible) {
-    throw new Error('El veterinario ya cuenta con una cita programada en ese horario. Por favor, selecciona otra hora.');
+  const dateStr = nuevaFechaHora.toISOString().split('T')[0];
+  const hours = String(nuevaFechaHora.getHours()).padStart(2, '0');
+  const minutes = String(nuevaFechaHora.getMinutes()).padStart(2, '0');
+  const startTime = `${hours}:${minutes}`;
+
+  const vetIdTarget = payload.veterinario_id ? Number(payload.veterinario_id) : citaOriginal.vetId;
+  const vetInfo = (vetsMock as any[]).find((v) => v.id === vetIdTarget);
+
+  const updatedAppt = updateAppointment({
+    id: payload.id,
+    date: dateStr,
+    startTime,
+    motivo: motivoLimpio,
+    vetId: vetIdTarget,
+    vetName: vetInfo ? vetInfo.name : citaOriginal.vetName,
+    specialty: vetInfo ? vetInfo.specialty : citaOriginal.specialty
+  });
+
+  return appointmentToCitaDetallada(updatedAppt);
+};
+
+/**
+ * Cancela una cita actualizando su campo status a "CANCELADA" en 'appointments' (US-16)
+ */
+export const cancelarCita = async (payload: CancelarCitaPayload): Promise<CancelarCitaResult> => {
+  // Simulación de latencia de red
+  await new Promise((resolve) => setTimeout(resolve, 400));
+
+  const motivoLimpio = (payload.motivo_cancelacion || '').trim();
+  if (motivoLimpio.length < 5) {
+    throw new Error('Debes indicar un motivo de cancelación con al menos 5 caracteres.');
   }
 
-  // Actualización de campos de acuerdo a la tabla citas
-  const citaActualizada: Cita = {
-    ...citaOriginal,
-    fecha_hora: nuevaFechaHora.toISOString(),
-    motivo: motivoLimpio,
-    veterinario_id: veterinarioDestinoId,
-    mascota_id: payload.mascota_id || citaOriginal.mascota_id
+  // cancelAppointment valida estado y actualiza status a 'CANCELADA' en localStorage("appointments")
+  const apptCancelada = cancelAppointment(payload.id, motivoLimpio);
+  const citaDetallada = appointmentToCitaDetallada(apptCancelada);
+
+  // Notificación emulada en localStorage
+  try {
+    const STORAGE_NOTIF_KEY = 'vethd_db_notificaciones';
+    const notifs = JSON.parse(localStorage.getItem(STORAGE_NOTIF_KEY) || '[]');
+    notifs.push({
+      id: `notif-${Date.now()}`,
+      usuario_id: String(apptCancelada.vetId),
+      mensaje: `La cita para ${apptCancelada.petName} programada para el ${apptCancelada.date} ${apptCancelada.startTime} ha sido cancelada. Motivo: ${motivoLimpio}`,
+      leido: false,
+      created_at: new Date().toISOString()
+    });
+    localStorage.setItem(STORAGE_NOTIF_KEY, JSON.stringify(notifs));
+  } catch {
+    // Continuar si localStorage no está disponible
+  }
+
+  return {
+    cita: citaDetallada,
+    mensaje: `La cita para "${citaDetallada.mascota.nombre}" ha sido cancelada exitosamente.`,
+    fecha_cancelacion: new Date().toISOString()
   };
-
-  citas[index] = citaActualizada;
-  saveStoredCitas(citas);
-
-  return enriquecerCita(citaActualizada);
 };
 
 export const citaService = {
@@ -343,6 +313,7 @@ export const citaService = {
   getVeterinarios,
   getHorariosDisponibles,
   isHorarioDisponible,
-  modificarCita
+  modificarCita,
+  cancelarCita,
+  MOTIVOS_CANCELACION_PRESET
 };
-
