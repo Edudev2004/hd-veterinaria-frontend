@@ -9,6 +9,7 @@ import { getMyPets, Mascota } from "@/services/petService";
 export const PetsPage: React.FC = () => {
   const [mascotas, setMascotas] = useState<Mascota[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [editingMascota, setEditingMascota] = useState<Mascota | null>(null);
   const [selectedMascota, setSelectedMascota] = useState<Mascota | null>(null);
 
   useEffect(() => {
@@ -18,6 +19,18 @@ export const PetsPage: React.FC = () => {
   const handleSuccess = () => {
     setMascotas(getMyPets());
     setShowForm(false);
+    setEditingMascota(null);
+  };
+
+  const handleAddClick = () => {
+    setEditingMascota(null);
+    setShowForm(!showForm);
+  };
+
+  const handleEditClick = () => {
+    setEditingMascota(selectedMascota);
+    setSelectedMascota(null);
+    setShowForm(true);
   };
 
   return (
@@ -31,7 +44,7 @@ export const PetsPage: React.FC = () => {
             Gestión de expedientes y registros de pacientes
           </p>
         </div>
-        <Button variant="primary" onClick={() => setShowForm(!showForm)}>
+        <Button variant="primary" onClick={handleAddClick}>
           <Plus className="w-4 h-4" />
           {showForm ? "Cancelar" : "Añadir Mascota"}
         </Button>
@@ -39,7 +52,10 @@ export const PetsPage: React.FC = () => {
 
       {showForm && (
         <div className="p-6 rounded-2xl border border-slate-200 bg-white max-w-md">
-          <PetForm onSuccess={handleSuccess} />
+          <PetForm
+            mascota={editingMascota ?? undefined}
+            onSuccess={handleSuccess}
+          />
         </div>
       )}
 
@@ -71,6 +87,7 @@ export const PetsPage: React.FC = () => {
         <PetDetailModal
           mascota={selectedMascota}
           onClose={() => setSelectedMascota(null)}
+          onEdit={handleEditClick}
         />
       )}
     </div>

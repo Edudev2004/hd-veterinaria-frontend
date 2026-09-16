@@ -4,23 +4,26 @@ import { UnderlineInput } from "@/components/ui/UnderlineInput";
 import { AlertCircle, PawPrint } from "lucide-react";
 import {
   registerPet,
+  updatePet,
   Especie,
   Sexo,
   RegisterPetPayload,
+  Mascota,
 } from "@/services/petService";
 
 interface PetFormProps {
+  mascota?: Mascota;
   onSuccess: () => void;
 }
 
-export const PetForm: React.FC<PetFormProps> = ({ onSuccess }) => {
+export const PetForm: React.FC<PetFormProps> = ({ mascota, onSuccess }) => {
   const [formData, setFormData] = useState<RegisterPetPayload>({
-    nombre: "",
-    especie: "perro",
-    raza: "",
-    sexo: "macho",
-    fechaNacimiento: "",
-    fotoUrl: "",
+    nombre: mascota?.nombre ?? "",
+    especie: mascota?.especie ?? "perro",
+    raza: mascota?.raza ?? "",
+    sexo: mascota?.sexo ?? "macho",
+    fechaNacimiento: mascota?.fechaNacimiento ?? "",
+    fotoUrl: mascota?.fotoUrl ?? "",
   });
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -41,10 +44,14 @@ export const PetForm: React.FC<PetFormProps> = ({ onSuccess }) => {
     try {
       setIsSubmitting(true);
       setError(null);
-      await registerPet(formData);
+      if (mascota) {
+        await updatePet(mascota.id, formData);
+      } else {
+        await registerPet(formData);
+      }
       onSuccess();
     } catch (err: any) {
-      setError(err?.message || "Ocurrió un error al registrar la mascota.");
+      setError(err?.message || "Ocurrió un error al guardar la mascota.");
     } finally {
       setIsSubmitting(false);
     }
@@ -143,7 +150,7 @@ export const PetForm: React.FC<PetFormProps> = ({ onSuccess }) => {
         variant="primary"
         fullWidth
       >
-        Registrar Mascota
+        {mascota ? "Guardar Cambios" : "Registrar Mascota"}
       </Button>
     </form>
   );
