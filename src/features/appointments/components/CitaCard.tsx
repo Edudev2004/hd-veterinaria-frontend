@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, Clock, Stethoscope, Edit3, ChevronRight, CalendarX } from 'lucide-react';
+import { Calendar, Clock, Stethoscope, Edit3, ChevronRight, CalendarX, Eye } from 'lucide-react';
 import { CitaDetallada } from '../../../types/cita.types';
 import { CitaEstadoBadge } from './CitaEstadoBadge';
 
@@ -7,9 +7,10 @@ interface CitaCardProps {
   cita: CitaDetallada;
   onModificar: (cita: CitaDetallada) => void;
   onCancelar?: (cita: CitaDetallada) => void;
+  onVerDetalle?: (cita: CitaDetallada) => void;
 }
 
-export const CitaCard: React.FC<CitaCardProps> = ({ cita, onModificar, onCancelar }) => {
+export const CitaCard: React.FC<CitaCardProps> = ({ cita, onModificar, onCancelar, onVerDetalle }) => {
   const estadoNormalizado = (cita.estado ? String(cita.estado).toLowerCase() : 'pendiente');
   const esModificable = estadoNormalizado === 'pendiente';
   const esCancelable = estadoNormalizado === 'pendiente' || estadoNormalizado === 'confirmada';
@@ -109,8 +110,21 @@ export const CitaCard: React.FC<CitaCardProps> = ({ cita, onModificar, onCancela
 
       {/* Pie de Tarjeta y Botones de Acción */}
       <div className="pt-2 border-t border-slate-100/80 flex flex-wrap items-center justify-between gap-2.5">
-        <div className="text-[11px] text-slate-400 font-mono">
-          ID: {cita.id.slice(0, 8)}
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] text-slate-400 font-mono">
+            ID: {cita.id.slice(0, 8)}
+          </span>
+          {onVerDetalle && (
+            <button
+              type="button"
+              onClick={() => onVerDetalle(cita)}
+              className="flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-slate-700 hover:text-teal-800 bg-slate-100 hover:bg-teal-50 border border-slate-200 hover:border-teal-300 rounded-xl transition-all shadow-xs active:scale-95"
+              title="Consultar detalle completo de la cita médica"
+            >
+              <Eye className="w-3.5 h-3.5 text-[#0d9488]" />
+              <span>Detalle</span>
+            </button>
+          )}
         </div>
 
         {esModificable ? (
