@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, Clock, Stethoscope, Edit3, User, ChevronRight } from 'lucide-react';
+import { Calendar, Clock, Stethoscope, Edit3, ChevronRight } from 'lucide-react';
 import { CitaDetallada } from '../../../types/cita.types';
 import { CitaEstadoBadge } from './CitaEstadoBadge';
 

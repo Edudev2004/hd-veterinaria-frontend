@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Filter, CalendarX, CheckCircle, Clock } from 'lucide-react';
+import { Search, CalendarX, CheckCircle, Clock } from 'lucide-react';
 import { CitaDetallada, EstadoCita } from '../../../types/cita.types';
 import { CitaCard } from './CitaCard';
 import { ModalModificarCita } from './ModalModificarCita';
