@@ -16,13 +16,19 @@ const getStoredCitas = (): CitaAgenda[] => {
   }
 };
 
-// US-20: Visualizar agenda diaria del veterinario autenticado
 export const getAgendaDiaria = async (veterinarioId: string): Promise<CitaAgenda[]> => {
   await new Promise((resolve) => setTimeout(resolve, 250));
   const citas = getStoredCitas();
   return citas.filter((c) => c.veterinario_id === veterinarioId);
 };
 
+export const getCitaById = async (citaId: string): Promise<CitaAgenda | null> => {
+  await new Promise((resolve) => setTimeout(resolve, 200));
+  const citas = getStoredCitas();
+  return citas.find((c) => c.id === citaId) ?? null;
+};
+
 export const vetScheduleService = {
-  getAgendaDiaria
+  getAgendaDiaria,
+  getCitaById
 };
