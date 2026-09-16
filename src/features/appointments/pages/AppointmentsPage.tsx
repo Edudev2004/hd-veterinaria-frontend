@@ -1,11 +1,14 @@
-import React from "react";
-import { Calendar, Plus } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Plus, Calendar, Clock, RefreshCw } from "lucide-react";
 import {
   AppointmentStepperProvider,
   useStepperContext,
 } from "../context/AppointmentStepperContext";
 import { useSearchParams } from "react-router-dom";
 import StepperAppointment from "../components/StepperAppointment";
+import { CitasList } from "../components/CitasList";
+import { getCitas } from "../../../services/citaService";
+import { CitaDetallada } from "../../../types/cita.types";
 
 export const AppointmentsPage: React.FC = () => {
   return (
@@ -20,53 +23,98 @@ const AppointmentsContent: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const isCreating = searchParams.get("action") === "new";
 
-  const handleBack = () => {
-    setSearchParams({});
+  const [citas, setCitas] = useState<CitaDetallada[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const cargarCitas = () => {
+    setIsLoading(true);
+    try {
+      const data = getCitas();
+      setCitas(data);
+    } catch (err) {
+      console.error("Error al cargar las citas:", err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
+  useEffect(() => {
+    cargarCitas();
+  }, [isCreating]);
+
+  const handleBack = () => {
+    setSearchParams({});
+    cargarCitas();
+  };
+
+  const handleCitaActualizada = (citaModificada: CitaDetallada) => {
+    setCitas((prev) =>
+      prev.map((c) => (c.id === citaModificada.id ? citaModificada : c))
+    );
+  };
+
+  // Contadores rápidos para la cabecera
+  const pendientesCount = citas.filter((c) => c.estado === "pendiente").length;
+
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 max-w-7xl mx-auto w-full pb-10">
       {isCreating ? (
         <StepperAppointment onBack={handleBack} />
       ) : (
         <div className="flex flex-col gap-6">
-          <div className="flex items-center justify-between">
+          {/* Header Principal de la Página */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm">
             <div>
-              <h1 className="text-2xl font-bold text-slate-900 font-outfit">
-                Mis Citas
-              </h1>
-              <p className="text-sm text-slate-500">
-                Historial y agendamiento de atenciones médicas
-              </p>
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-2xl bg-teal-50 border border-teal-200 text-[#0d9488] flex items-center justify-center">
+                  <Calendar className="w-5 h-5" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-black text-slate-900 font-outfit tracking-tight">
+                    Gestión de Citas Médicas
+                  </h1>
+                  <p className="text-xs text-slate-500">
+                    Visualiza, reprograma y modifica las atenciones médicas de tus mascotas (US-15)
+                  </p>
+                </div>
+              </div>
             </div>
-            <button
-              onClick={() => {
-                resetStepper();
-                setSearchParams({ action: "new" });
-              }}
-              className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-[#0d9488] hover:bg-[#0f766e] rounded-xl transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              Nueva Cita
-            </button>
+
+            <div className="flex items-center gap-2.5">
+              {/* Contador de citas pendientes modificables */}
+              {pendientesCount > 0 && (
+                <div className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold">
+                  <Clock className="w-3.5 h-3.5 text-amber-600" />
+                  <span>{pendientesCount} pendiente{pendientesCount > 1 ? "s" : ""}</span>
+                </div>
+              )}
+
+              <button
+                onClick={cargarCitas}
+                className="p-2.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-colors border border-slate-200"
+                title="Actualizar listado de citas"
+              >
+                <RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`} />
+              </button>
+
+              <button
+                onClick={() => {
+                  resetStepper();
+                  setSearchParams({ action: "new" });
+                }}
+                className="flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-[#0d9488] hover:bg-[#0f766e] rounded-xl transition-all shadow-md shadow-[#0d9488]/20 active:scale-95"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Nueva Cita</span>
+              </button>
+            </div>
           </div>
 
-          <div className="p-8 rounded-2xl border-2 border-dashed border-slate-200 bg-white text-center flex flex-col items-center justify-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center">
-              <Calendar className="w-6 h-6" />
-            </div>
-            <h3 className="text-base font-bold text-slate-800">
-              Espacio de Trabajo: Módulo de Citas
-            </h3>
-            <p className="text-xs text-slate-500 max-w-md">
-              Los desarrolladores asignados a la US-14 a US-18 pueden
-              implementar sus componentes dentro de{" "}
-              <code className="bg-slate-100 px-2 py-0.5 rounded text-amber-600">
-                src/pages/AppointmentsPage.tsx
-              </code>
-              .
-            </p>
-          </div>
+          {/* Listado de Citas con capacidad de filtrado y modificación (US-15) */}
+          <CitasList
+            citas={citas}
+            onCitaActualizada={handleCitaActualizada}
+          />
         </div>
       )}
     </div>
