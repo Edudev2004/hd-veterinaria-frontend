@@ -1,8 +1,9 @@
 import React, { useState, useMemo } from 'react';
-import { Search, CalendarX, CheckCircle, Clock } from 'lucide-react';
+import { Search, CalendarX, CheckCircle, Clock, XCircle } from 'lucide-react';
 import { CitaDetallada, EstadoCita } from '../../../types/cita.types';
 import { CitaCard } from './CitaCard';
 import { ModalModificarCita } from './ModalModificarCita';
+import { ModalCancelarCita } from './ModalCancelarCita';
 
 interface CitasListProps {
   citas: CitaDetallada[];
@@ -12,9 +13,17 @@ interface CitasListProps {
 export const CitasList: React.FC<CitasListProps> = ({ citas, onCitaActualizada }) => {
   const [filtroEstado, setFiltroEstado] = useState<EstadoCita | 'todas'>('todas');
   const [busqueda, setBusqueda] = useState<string>('');
+  
+  // Modales y citas seleccionadas
   const [citaSeleccionadaParaEditar, setCitaSeleccionadaParaEditar] = useState<CitaDetallada | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isModalModificarOpen, setIsModalModificarOpen] = useState<boolean>(false);
+  
+  const [citaSeleccionadaParaCancelar, setCitaSeleccionadaParaCancelar] = useState<CitaDetallada | null>(null);
+  const [isModalCancelarOpen, setIsModalCancelarOpen] = useState<boolean>(false);
+
+  // Banners de confirmación
   const [mensajeExito, setMensajeExito] = useState<string | null>(null);
+  const [mensajeCancelacion, setMensajeCancelacion] = useState<string | null>(null);
 
   // Filtrado reactivo por estado y término de búsqueda
   const citasFiltradas = useMemo(() => {
@@ -48,16 +57,28 @@ export const CitasList: React.FC<CitasListProps> = ({ citas, onCitaActualizada }
 
   // Contadores por estado
   const conteoPendientes = citas.filter((c) => c.estado === 'pendiente').length;
+  const conteoCanceladas = citas.filter((c) => c.estado === 'cancelada').length;
 
   const handleAbrirModificar = (cita: CitaDetallada) => {
     setCitaSeleccionadaParaEditar(cita);
-    setIsModalOpen(true);
+    setIsModalModificarOpen(true);
   };
 
-  const handleCitaGuardada = (citaActualizada: CitaDetallada) => {
+  const handleAbrirCancelar = (cita: CitaDetallada) => {
+    setCitaSeleccionadaParaCancelar(cita);
+    setIsModalCancelarOpen(true);
+  };
+
+  const handleCitaModificada = (citaActualizada: CitaDetallada) => {
     onCitaActualizada(citaActualizada);
     setMensajeExito(`¡La cita para "${citaActualizada.mascota.nombre}" fue modificada con éxito!`);
     setTimeout(() => setMensajeExito(null), 5000);
+  };
+
+  const handleCitaCancelada = (citaActualizada: CitaDetallada, mensaje: string) => {
+    onCitaActualizada(citaActualizada);
+    setMensajeCancelacion(mensaje);
+    setTimeout(() => setMensajeCancelacion(null), 6000);
   };
 
   return (
@@ -72,6 +93,22 @@ export const CitasList: React.FC<CitasListProps> = ({ citas, onCitaActualizada }
           <button
             onClick={() => setMensajeExito(null)}
             className="text-xs font-bold text-teal-700 hover:text-teal-900 underline ml-3"
+          >
+            Cerrar
+          </button>
+        </div>
+      )}
+
+      {/* Banner de notificación al cancelar */}
+      {mensajeCancelacion && (
+        <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-sm flex items-center justify-between shadow-sm animate-fadeIn">
+          <div className="flex items-center gap-2.5">
+            <XCircle className="w-5 h-5 text-rose-600 shrink-0" />
+            <span className="font-semibold">{mensajeCancelacion}</span>
+          </div>
+          <button
+            onClick={() => setMensajeCancelacion(null)}
+            className="text-xs font-bold text-rose-700 hover:text-rose-900 underline ml-3"
           >
             Cerrar
           </button>
@@ -122,13 +159,14 @@ export const CitasList: React.FC<CitasListProps> = ({ citas, onCitaActualizada }
           <button
             type="button"
             onClick={() => setFiltroEstado('cancelada')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 ${
               filtroEstado === 'cancelada'
-                ? 'bg-slate-600 text-white shadow-sm'
-                : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
+                ? 'bg-rose-600 text-white shadow-sm shadow-rose-600/20'
+                : 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200/60'
             }`}
           >
-            Canceladas
+            <XCircle className="w-3.5 h-3.5" />
+            Canceladas ({conteoCanceladas})
           </button>
         </div>
 
@@ -161,6 +199,7 @@ export const CitasList: React.FC<CitasListProps> = ({ citas, onCitaActualizada }
               key={cita.id}
               cita={cita}
               onModificar={handleAbrirModificar}
+              onCancelar={handleAbrirCancelar}
             />
           ))}
         </div>
@@ -194,12 +233,23 @@ export const CitasList: React.FC<CitasListProps> = ({ citas, onCitaActualizada }
       {/* Modal de Modificación */}
       <ModalModificarCita
         cita={citaSeleccionadaParaEditar}
-        isOpen={isModalOpen}
+        isOpen={isModalModificarOpen}
         onClose={() => {
-          setIsModalOpen(false);
+          setIsModalModificarOpen(false);
           setCitaSeleccionadaParaEditar(null);
         }}
-        onCitaModificada={handleCitaGuardada}
+        onCitaModificada={handleCitaModificada}
+      />
+
+      {/* Modal de Cancelación (US-16) */}
+      <ModalCancelarCita
+        cita={citaSeleccionadaParaCancelar}
+        isOpen={isModalCancelarOpen}
+        onClose={() => {
+          setIsModalCancelarOpen(false);
+          setCitaSeleccionadaParaCancelar(null);
+        }}
+        onCitaCancelada={handleCitaCancelada}
       />
     </div>
   );
