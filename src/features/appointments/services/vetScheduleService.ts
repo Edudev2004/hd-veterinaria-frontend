@@ -18,7 +18,13 @@ const getStoredCitas = (): CitaAgenda[] => {
   }
 };
 
-export const getAgendaDiaria = async (veterinarioId: string): Promise<CitaAgenda[]> => {
+const saveStoredCitas = (citas: CitaAgenda[]): void => {
+  localStorage.setItem(STORAGE_CITAS_KEY, JSON.stringify(citas));
+};
+
+export const getAgendaDiaria = async (
+  veterinarioId: string
+): Promise<CitaAgenda[]> => {
   await new Promise((resolve) => setTimeout(resolve, 250));
 
   return getStoredCitas().filter(
@@ -34,12 +40,41 @@ export const getCitaById = async (
 
   return (
     getStoredCitas().find(
-      (cita) => cita.id === citaId && cita.veterinario_id === veterinarioId
+      (cita) =>
+        cita.id === citaId && cita.veterinario_id === veterinarioId
     ) ?? null
   );
 };
 
+export const marcarCitaComoAtendida = async (
+  citaId: string,
+  veterinarioId: string
+): Promise<CitaAgenda | null> => {
+  await new Promise((resolve) => setTimeout(resolve, 200));
+
+  const citas = getStoredCitas();
+  const indice = citas.findIndex(
+    (cita) =>
+      cita.id === citaId && cita.veterinario_id === veterinarioId
+  );
+
+  if (indice < 0) {
+    return null;
+  }
+
+  const citaActualizada: CitaAgenda = {
+    ...citas[indice],
+    estado: 'atendida'
+  };
+
+  citas[indice] = citaActualizada;
+  saveStoredCitas(citas);
+
+  return citaActualizada;
+};
+
 export const vetScheduleService = {
   getAgendaDiaria,
-  getCitaById
+  getCitaById,
+  marcarCitaComoAtendida
 };
