@@ -10,6 +10,8 @@ export interface Appointment {
   motivo: string;
   status: "PENDIENTE" | "CONFIRMADA" | "CANCELADA";
   createdAt: string;
+  motivoOriginal?: string;
+  motivoCancelacion?: string;
 }
 
 export const APPOINTMENTS_STORAGE_KEY = "appointments";
@@ -28,6 +30,7 @@ export const DEFAULT_INITIAL_APPOINTMENTS: Appointment[] = [
     motivo: "Control cardiológico y vacunación preventiva anual",
     status: "PENDIENTE",
     createdAt: new Date("2026-09-14T10:00:00.000Z").toISOString(),
+    motivoOriginal: "Control cardiológico y vacunación preventiva anual",
   },
   {
     id: "APT-20260922-002",
@@ -41,6 +44,7 @@ export const DEFAULT_INITIAL_APPOINTMENTS: Appointment[] = [
     motivo: "Revisión por alergia cutánea y picazón persistente",
     status: "PENDIENTE",
     createdAt: new Date("2026-09-15T11:15:00.000Z").toISOString(),
+    motivoOriginal: "Revisión por alergia cutánea y picazón persistente",
   },
   {
     id: "APT-20260910-003",
@@ -54,6 +58,7 @@ export const DEFAULT_INITIAL_APPOINTMENTS: Appointment[] = [
     motivo: "Limpieza dental preventiva",
     status: "CONFIRMADA",
     createdAt: new Date("2026-09-08T08:00:00.000Z").toISOString(),
+    motivoOriginal: "Limpieza dental preventiva",
   },
   {
     id: "APT-20260912-004",
@@ -67,6 +72,8 @@ export const DEFAULT_INITIAL_APPOINTMENTS: Appointment[] = [
     motivo: "[Cancelada: Dificultad para trasladar a la mascota] | Motivo original: Consulta ortopédica",
     status: "CANCELADA",
     createdAt: new Date("2026-09-11T14:00:00.000Z").toISOString(),
+    motivoCancelacion: "Dificultad para trasladar a la mascota",
+    motivoOriginal: "Consulta ortopédica",
   },
 ];
 
@@ -83,6 +90,7 @@ export const saveAppointment = (data: Omit<Appointment, "id" | "status" | "creat
     id: generateId(data.date),
     status: "PENDIENTE",
     createdAt: new Date().toISOString(),
+    motivoOriginal: data.motivo,
   };
 
   const appointments = getAppointments();
@@ -110,6 +118,11 @@ export const getAppointments = (): Appointment[] => {
   }
 };
 
+export const getAppointmentById = (id: string): Appointment | null => {
+  const appointments = getAppointments();
+  return appointments.find((a) => a.id === id) || null;
+};
+
 export const cancelAppointment = (id: string, motivoCancelacion: string): Appointment => {
   const appointments = getAppointments();
   const index = appointments.findIndex((a) => a.id === id);
@@ -123,11 +136,16 @@ export const cancelAppointment = (id: string, motivoCancelacion: string): Appoin
     throw new Error("La cita ya se encuentra cancelada.");
   }
 
-  const motivoOriginal = citaOriginal.motivo ? ` | Motivo inicial: ${citaOriginal.motivo}` : "";
+  const textoMotivoCancelacion = motivoCancelacion.trim();
+  const motivoOriginalLimpio = citaOriginal.motivoOriginal || citaOriginal.motivo || "";
+  const motivoOriginalFormateado = motivoOriginalLimpio ? ` | Motivo inicial: ${motivoOriginalLimpio}` : "";
+
   const citaActualizada: Appointment = {
     ...citaOriginal,
     status: "CANCELADA",
-    motivo: `[Cancelada: ${motivoCancelacion.trim()}]${motivoOriginal}`,
+    motivo: `[Cancelada: ${textoMotivoCancelacion}]${motivoOriginalFormateado}`,
+    motivoCancelacion: textoMotivoCancelacion,
+    motivoOriginal: motivoOriginalLimpio,
   };
 
   appointments[index] = citaActualizada;

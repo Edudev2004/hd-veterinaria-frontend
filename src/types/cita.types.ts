@@ -23,6 +23,8 @@ export interface Cita {
   estado: EstadoCita; // varchar(20) not null default 'pendiente'
   motivo: string | null; // text
   created_at: string; // timestamptz not null default now()
+  motivo_original?: string | null; // Motivo original inicial de la solicitud médica (US-18)
+  motivo_cancelacion?: string | null; // Justificación o razón registrada de cancelación si aplica (US-18)
 }
 
 /**
@@ -172,5 +174,16 @@ export interface CancelarCitaResult {
   cita: CitaDetallada;
   mensaje: string;
   fecha_cancelacion: string;
+}
+
+/**
+ * Propiedades del componente ModalDetalleCita (US-18)
+ */
+export interface ModalDetalleCitaProps {
+  citaId: string | null;
+  isOpen: boolean;
+  onClose: () => void;
+  onModificar?: (cita: CitaDetallada) => void;
+  onCancelar?: (cita: CitaDetallada) => void;
 }
 

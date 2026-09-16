@@ -73,6 +73,64 @@ export const normalizarEstado = (status?: string): EstadoCita => {
 };
 
 /**
+ * Extrae y desglosa con precisión el motivo original y la justificación de cancelación (US-18)
+ * Admite lectura de campos directos (motivoOriginal, motivoCancelacion)
+ * y parseo robusto de cadenas compuestas tipo '[Cancelada: ...] | Motivo inicial/original: ...'
+ */
+export const extraerMotivosCita = (
+  motivoRaw?: string | null,
+  estado?: EstadoCita,
+  motivoOriginalDirect?: string,
+  motivoCancelacionDirect?: string
+): { motivoOriginal: string | null; motivoCancelacion: string | null } => {
+  const estadoNormalizado = normalizarEstado(estado);
+  const raw = motivoRaw ? motivoRaw.trim() : '';
+
+  // Si no está cancelada, el motivo original es el texto directo o motivo general
+  if (estadoNormalizado !== 'cancelada') {
+    return {
+      motivoOriginal: motivoOriginalDirect || (raw.length > 0 ? raw : null),
+      motivoCancelacion: null,
+    };
+  }
+
+  // Caso: Cita Cancelada
+  // 1. Si ya tiene campos explícitos guardados
+  if (motivoCancelacionDirect || motivoOriginalDirect) {
+    return {
+      motivoOriginal: motivoOriginalDirect || null,
+      motivoCancelacion: motivoCancelacionDirect || (raw.length > 0 ? raw : null),
+    };
+  }
+
+  // 2. Parseo de string compuesto [Cancelada: Justificación] | Motivo original/inicial: Motivo
+  const matchCompuesto = raw.match(/^\[Cancelada:\s*(.*?)(?:\]\s*\|\s*Motivo\s*(?:inicial|original):\s*(.*)|\]\s*$)/i);
+  if (matchCompuesto) {
+    const cancelacion = matchCompuesto[1] ? matchCompuesto[1].trim() : null;
+    const original = matchCompuesto[2] ? matchCompuesto[2].trim() : null;
+    return {
+      motivoOriginal: original && original.length > 0 ? original : null,
+      motivoCancelacion: cancelacion && cancelacion.length > 0 ? cancelacion : raw,
+    };
+  }
+
+  // 3. Si no cumple el patrón exacto pero empieza por [Cancelada:
+  if (raw.startsWith('[Cancelada:')) {
+    const sinPrefijo = raw.replace(/^\[Cancelada:\s*/i, '').replace(/\]$/, '').trim();
+    return {
+      motivoOriginal: null,
+      motivoCancelacion: sinPrefijo,
+    };
+  }
+
+  // 4. Si es cancelada pero solo tiene un string de texto
+  return {
+    motivoOriginal: null,
+    motivoCancelacion: raw.length > 0 ? raw : 'Cancelación registrada sin justificación adicional',
+  };
+};
+
+/**
  * Transforma un registro de la clave 'appointments' a CitaDetallada para la UI
  * garantizando compatibilidad con bd-veterinaria-hd.sql y el formato Appointment
  */
@@ -125,6 +183,13 @@ const appointmentToCitaDetallada = (a: Appointment | any): CitaDetallada => {
     especialidad_nombre: a.specialty || vetFound?.specialty || 'Medicina General'
   };
 
+  const { motivoOriginal, motivoCancelacion } = extraerMotivosCita(
+    a.motivo,
+    estado,
+    a.motivoOriginal,
+    a.motivoCancelacion
+  );
+
   return {
     id: a.id,
     mascota_id: mascota.id,
@@ -134,7 +199,9 @@ const appointmentToCitaDetallada = (a: Appointment | any): CitaDetallada => {
     motivo: a.motivo || null,
     created_at: a.createdAt || a.created_at || new Date().toISOString(),
     mascota,
-    veterinario
+    veterinario,
+    motivo_original: motivoOriginal,
+    motivo_cancelacion: motivoCancelacion,
   };
 };
 
@@ -336,5 +403,6 @@ export const citaService = {
   isHorarioDisponible,
   modificarCita,
   cancelarCita,
+  extraerMotivosCita,
   MOTIVOS_CANCELACION_PRESET
 };

@@ -5,15 +5,23 @@ import { normalizarEstado } from '../../../services/citaService';
 import { CitaCard } from './CitaCard';
 import { ModalModificarCita } from './ModalModificarCita';
 import { ModalCancelarCita } from './ModalCancelarCita';
+import { ModalDetalleCita } from './ModalDetalleCita';
 
 interface CitasListProps {
   citas: CitaDetallada[];
   onCitaActualizada: (citaActualizada: CitaDetallada) => void;
+  citaIdParaDetalleInicial?: string | null;
+  onCerrarDetalle?: () => void;
 }
 
 const ITEMS_POR_PAGINA = 6;
 
-export const CitasList: React.FC<CitasListProps> = ({ citas, onCitaActualizada }) => {
+export const CitasList: React.FC<CitasListProps> = ({
+  citas,
+  onCitaActualizada,
+  citaIdParaDetalleInicial,
+  onCerrarDetalle,
+}) => {
   const [filtroEstado, setFiltroEstado] = useState<FiltroEstadoCita>('TODAS');
   const [busqueda, setBusqueda] = useState<string>('');
   const [paginaActual, setPaginaActual] = useState<number>(1);
@@ -24,6 +32,22 @@ export const CitasList: React.FC<CitasListProps> = ({ citas, onCitaActualizada }
   
   const [citaSeleccionadaParaCancelar, setCitaSeleccionadaParaCancelar] = useState<CitaDetallada | null>(null);
   const [isModalCancelarOpen, setIsModalCancelarOpen] = useState<boolean>(false);
+
+  // Modal de Detalle de Cita (US-18)
+  const [citaIdParaDetalle, setCitaIdParaDetalle] = useState<string | null>(citaIdParaDetalleInicial || null);
+  const [isModalDetalleOpen, setIsModalDetalleOpen] = useState<boolean>(Boolean(citaIdParaDetalleInicial));
+
+  useEffect(() => {
+    if (citaIdParaDetalleInicial) {
+      setCitaIdParaDetalle(citaIdParaDetalleInicial);
+      setIsModalDetalleOpen(true);
+    }
+  }, [citaIdParaDetalleInicial]);
+
+  const handleAbrirDetalle = (cita: CitaDetallada) => {
+    setCitaIdParaDetalle(cita.id);
+    setIsModalDetalleOpen(true);
+  };
 
   // Banners de confirmación
   const [mensajeExito, setMensajeExito] = useState<string | null>(null);
@@ -243,6 +267,7 @@ export const CitasList: React.FC<CitasListProps> = ({ citas, onCitaActualizada }
                 cita={cita}
                 onModificar={handleAbrirModificar}
                 onCancelar={handleAbrirCancelar}
+                onVerDetalle={handleAbrirDetalle}
               />
             ))}
           </div>
@@ -342,6 +367,25 @@ export const CitasList: React.FC<CitasListProps> = ({ citas, onCitaActualizada }
           setCitaSeleccionadaParaCancelar(null);
         }}
         onCitaCancelada={handleCitaCancelada}
+      />
+
+      {/* Modal de Detalle de Cita (US-18) */}
+      <ModalDetalleCita
+        citaId={citaIdParaDetalle}
+        isOpen={isModalDetalleOpen}
+        onClose={() => {
+          setIsModalDetalleOpen(false);
+          setCitaIdParaDetalle(null);
+          onCerrarDetalle?.();
+        }}
+        onModificar={(citaParaModificar) => {
+          setIsModalDetalleOpen(false);
+          handleAbrirModificar(citaParaModificar);
+        }}
+        onCancelar={(citaParaCancelar) => {
+          setIsModalDetalleOpen(false);
+          handleAbrirCancelar(citaParaCancelar);
+        }}
       />
     </div>
   );
