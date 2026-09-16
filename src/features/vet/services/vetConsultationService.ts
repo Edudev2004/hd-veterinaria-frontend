@@ -3,7 +3,14 @@ import type {
   RegistroAtencion
 } from '../types/vetConsultation.types';
 
+interface AtencionActiva {
+  citaId: string;
+  veterinarioId: string;
+  iniciadaAt: string;
+}
+
 const STORAGE_ATENCIONES_KEY = 'vethd_db_atenciones_veterinarias';
+const STORAGE_ATENCION_ACTIVA_KEY = 'vethd_db_atencion_activa';
 
 const getStoredAtenciones = (): RegistroAtencion[] => {
   const data = localStorage.getItem(STORAGE_ATENCIONES_KEY);
@@ -21,6 +28,58 @@ const getStoredAtenciones = (): RegistroAtencion[] => {
 
 const saveStoredAtenciones = (atenciones: RegistroAtencion[]): void => {
   localStorage.setItem(STORAGE_ATENCIONES_KEY, JSON.stringify(atenciones));
+};
+
+const getStoredAtencionActiva = (): AtencionActiva | null => {
+  const data = localStorage.getItem(STORAGE_ATENCION_ACTIVA_KEY);
+
+  if (!data) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(data) as AtencionActiva;
+  } catch {
+    return null;
+  }
+};
+
+const iniciarAtencion = (
+  citaId: string,
+  veterinarioId: string
+): AtencionActiva => {
+  const atencionActiva: AtencionActiva = {
+    citaId,
+    veterinarioId,
+    iniciadaAt: new Date().toISOString()
+  };
+
+  localStorage.setItem(
+    STORAGE_ATENCION_ACTIVA_KEY,
+    JSON.stringify(atencionActiva)
+  );
+
+  return atencionActiva;
+};
+
+const getAtencionActiva = (
+  veterinarioId: string
+): AtencionActiva | null => {
+  const atencionActiva = getStoredAtencionActiva();
+
+  if (atencionActiva?.veterinarioId !== veterinarioId) {
+    return null;
+  }
+
+  return atencionActiva;
+};
+
+const limpiarAtencionActiva = (veterinarioId: string): void => {
+  const atencionActiva = getStoredAtencionActiva();
+
+  if (atencionActiva?.veterinarioId === veterinarioId) {
+    localStorage.removeItem(STORAGE_ATENCION_ACTIVA_KEY);
+  }
 };
 
 const getAtencionByCita = async (
@@ -77,6 +136,9 @@ const guardarAtencion = async (
 };
 
 export const vetConsultationService = {
+  iniciarAtencion,
+  getAtencionActiva,
+  limpiarAtencionActiva,
   getAtencionByCita,
   guardarAtencion
 };
