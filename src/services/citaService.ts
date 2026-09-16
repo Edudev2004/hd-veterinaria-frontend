@@ -2,6 +2,9 @@ import {
   Cita,
   CitaDetallada,
   ModificarCitaPayload,
+  CancelarCitaPayload,
+  CancelarCitaResult,
+  MotivoCancelacionOpcion,
   VeterinarioDetallado,
   FranjaHorariaDisponible,
   MascotaCita
@@ -337,12 +340,126 @@ export const modificarCita = async (payload: ModificarCitaPayload): Promise<Cita
   return enriquecerCita(citaActualizada);
 };
 
+/**
+ * Catálogo de motivos predefinidos comunes para la cancelación
+ */
+export const MOTIVOS_CANCELACION_PRESET: MotivoCancelacionOpcion[] = [
+  {
+    id: 'emergencia_personal',
+    titulo: 'Emergencia personal o familiar',
+    descripcion: 'Surgió un imprevisto y no podré asistir a la hora pautada.'
+  },
+  {
+    id: 'mejoria_mascota',
+    titulo: 'Mejoría notable en la mascota',
+    descripcion: 'La mascota ya no presenta síntomas y no requiere atención inmediata.'
+  },
+  {
+    id: 'imposibilidad_traslado',
+    titulo: 'Problemas de transporte o traslado',
+    descripcion: 'Dificultad logística para llevar a la mascota a la veterinaria.'
+  },
+  {
+    id: 'cambio_horario_incompatible',
+    titulo: 'Horario incompatible',
+    descripcion: 'Deseo cancelar para agendar en otra fecha u horario disponible.'
+  },
+  {
+    id: 'error_agendamiento',
+    titulo: 'Error involuntario al agendar',
+    descripcion: 'Se eligió una mascota, veterinario o fecha equivocada.'
+  },
+  {
+    id: 'otro',
+    titulo: 'Otro motivo particular',
+    descripcion: 'Se detallará la razón específica en el formulario.'
+  }
+];
+
+/**
+ * US-16: Cancelar Cita
+ * Valida que la cita exista y esté en estado 'pendiente' (según constraint check en bd-veterinaria-hd.sql:
+ * check (estado in ('pendiente', 'atendida', 'no_atendida', 'cancelada'))).
+ * Actualiza el estado a 'cancelada' y preserva el motivo documentado.
+ */
+export const cancelarCita = async (payload: CancelarCitaPayload): Promise<CancelarCitaResult> => {
+  // Simulación de latencia de red
+  await new Promise((resolve) => setTimeout(resolve, 400));
+
+  const citas = getStoredCitas();
+  const index = citas.findIndex((c) => c.id === payload.id);
+
+  if (index === -1) {
+    throw new Error('La cita que intentas cancelar no fue encontrada en el sistema.');
+  }
+
+  const citaOriginal = citas[index];
+
+  // Regla 1: Validar si ya está cancelada
+  if (citaOriginal.estado === 'cancelada') {
+    throw new Error('La cita ya se encuentra en estado cancelada.');
+  }
+
+  // Regla 2: Solo citas en estado 'pendiente' pueden ser canceladas
+  if (citaOriginal.estado !== 'pendiente') {
+    throw new Error(
+      `No es posible cancelar una cita con estado '${citaOriginal.estado}'. Solo se permite cancelar citas en estado 'pendiente'.`
+    );
+  }
+
+  // Regla 3: El motivo de cancelación es obligatorio y debe tener al menos 5 caracteres
+  const motivoLimpio = (payload.motivo_cancelacion || '').trim();
+  if (motivoLimpio.length < 5) {
+    throw new Error('Debes indicar un motivo de cancelación con al menos 5 caracteres.');
+  }
+
+  // Registro del motivo respetando la columna 'motivo' de bd-veterinaria-hd.sql
+  const motivoOriginal = citaOriginal.motivo ? ` | Motivo original: ${citaOriginal.motivo}` : '';
+  const motivoActualizado = `[Cancelada: ${motivoLimpio}]${motivoOriginal}`;
+
+  // Actualización de estado según restricción CHECK ('cancelada')
+  const citaCancelada: Cita = {
+    ...citaOriginal,
+    estado: 'cancelada',
+    motivo: motivoActualizado
+  };
+
+  citas[index] = citaCancelada;
+  saveStoredCitas(citas);
+
+  const citaEnriquecida = enriquecerCita(citaCancelada);
+
+  // Notificación simulada para el veterinario según tabla notificaciones de bd-veterinaria-hd.sql
+  try {
+    const STORAGE_NOTIF_KEY = 'vethd_db_notificaciones';
+    const notifs = JSON.parse(localStorage.getItem(STORAGE_NOTIF_KEY) || '[]');
+    notifs.push({
+      id: `notif-${Date.now()}`,
+      usuario_id: citaOriginal.veterinario_id,
+      mensaje: `La cita para ${citaEnriquecida.mascota.nombre} programada para el ${new Date(citaOriginal.fecha_hora).toLocaleDateString('es-ES')} ha sido cancelada. Motivo: ${motivoLimpio}`,
+      leido: false,
+      created_at: new Date().toISOString()
+    });
+    localStorage.setItem(STORAGE_NOTIF_KEY, JSON.stringify(notifs));
+  } catch {
+    // Si localStorage falla en entornos restringidos, continúa la operación
+  }
+
+  return {
+    cita: citaEnriquecida,
+    mensaje: `La cita para "${citaEnriquecida.mascota.nombre}" ha sido cancelada exitosamente.`,
+    fecha_cancelacion: new Date().toISOString()
+  };
+};
+
 export const citaService = {
   getCitas,
   getCitaById,
   getVeterinarios,
   getHorariosDisponibles,
   isHorarioDisponible,
-  modificarCita
+  modificarCita,
+  cancelarCita,
+  MOTIVOS_CANCELACION_PRESET
 };
 
