@@ -1,4 +1,3 @@
-import React from 'react';
 import { AlertTriangle, X } from 'lucide-react';
 
 interface MarkAsNotAttendedDialogProps {
@@ -9,15 +8,15 @@ interface MarkAsNotAttendedDialogProps {
   onConfirmar: () => void;
 }
 
-export const MarkAsNotAttendedDialog: React.FC
-  MarkAsNotAttendedDialogProps
-> = ({
-  abierto,
-  nombreMascota,
-  cargando = false,
-  onCancelar,
-  onConfirmar
-}) => {
+function MarkAsNotAttendedDialog(props: MarkAsNotAttendedDialogProps) {
+  const {
+    abierto,
+    nombreMascota,
+    cargando = false,
+    onCancelar,
+    onConfirmar
+  } = props;
+
   if (!abierto) {
     return null;
   }
@@ -83,4 +82,6 @@ export const MarkAsNotAttendedDialog: React.FC
       </div>
     </div>
   );
-};
+}
+
+export { MarkAsNotAttendedDialog };
