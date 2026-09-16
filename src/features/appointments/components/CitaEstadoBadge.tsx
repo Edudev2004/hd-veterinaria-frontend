@@ -23,6 +23,12 @@ const ESTADOS_CONFIG: Record<EstadoCita, EstadoConfig> = {
     dotColor: 'bg-amber-500 animate-pulse',
     icon: <Clock className="w-3.5 h-3.5 text-amber-600" />
   },
+  confirmada: {
+    label: 'Confirmada',
+    classes: 'bg-teal-50 text-teal-800 border-teal-200/90 shadow-sm',
+    dotColor: 'bg-teal-600',
+    icon: <CheckCircle2 className="w-3.5 h-3.5 text-[#0d9488]" />
+  },
   atendida: {
     label: 'Atendida',
     classes: 'bg-emerald-50 text-emerald-800 border-emerald-200/90 shadow-sm',
@@ -49,11 +55,12 @@ export const CitaEstadoBadge: React.FC<CitaEstadoBadgeProps> = ({
   className = '',
   size = 'md'
 }) => {
-  const config = ESTADOS_CONFIG[estado] || ESTADOS_CONFIG.pendiente;
+  const estadoNormalizado = (estado ? String(estado).toLowerCase() : 'pendiente') as EstadoCita;
+  const config = ESTADOS_CONFIG[estadoNormalizado] || ESTADOS_CONFIG.pendiente;
   const paddingClasses = size === 'sm' ? 'px-2 py-0.5 text-[11px]' : 'px-2.5 py-1 text-xs';
 
   const tooltipText =
-    estado === 'cancelada' && motivo
+    estadoNormalizado === 'cancelada' && motivo
       ? `Cita Cancelada: ${motivo}`
       : `Estado de la cita: ${config.label}`;
 

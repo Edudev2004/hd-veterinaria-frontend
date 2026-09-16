@@ -3,9 +3,14 @@
  * Basado estrictamente en el esquema relacional de bd-veterinaria-hd.sql
  */
 
-// Estados permitidos según check constraint en bd-veterinaria-hd.sql:
-// check (estado in ('pendiente', 'atendida', 'no_atendida', 'cancelada'))
-export type EstadoCita = 'pendiente' | 'atendida' | 'no_atendida' | 'cancelada';
+// Estados permitidos en bd-veterinaria-hd.sql y el flujo del frontend:
+// check (estado in ('pendiente', 'atendida', 'no_atendida', 'cancelada')) + 'confirmada'
+export type EstadoCita = 'pendiente' | 'confirmada' | 'atendida' | 'no_atendida' | 'cancelada';
+
+/**
+ * Opciones de filtro por estado según requerimientos de la historia US-17
+ */
+export type FiltroEstadoCita = 'TODAS' | 'PENDIENTE' | 'CONFIRMADA' | 'CANCELADA';
 
 /**
  * Representa un registro de la tabla 'citas' en la base de datos
@@ -104,12 +109,24 @@ export interface ModificarCitaValidationErrors {
 }
 
 /**
- * Filtros para el listado de citas
+ * Filtros para el listado de citas (US-17)
  */
 export interface CitasFilterParams {
-  estado?: EstadoCita | 'todos';
+  estado?: EstadoCita | FiltroEstadoCita | 'todos' | 'todas';
   terminoBusqueda?: string;
   fecha?: string;
+  pagina?: number;
+  elementosPorPagina?: number;
+}
+
+/**
+ * Estado y control de paginación para el listado de citas (US-17)
+ */
+export interface CitasPaginationState {
+  paginaActual: number;
+  elementosPorPagina: number;
+  totalElementos: number;
+  totalPaginas: number;
 }
 
 /**

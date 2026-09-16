@@ -59,30 +59,50 @@ export const MOTIVOS_CANCELACION_PRESET: MotivoCancelacionOpcion[] = [
 ];
 
 /**
- * Transforma un registro Appointment de la clave 'appointments' a CitaDetallada para la UI
+ * Normaliza los estados provenientes de 'appointments' (mayúsculas o minúsculas)
+ * al tipo EstadoCita respetando bd-veterinaria-hd.sql y los requerimientos de US-17
  */
-const appointmentToCitaDetallada = (a: Appointment): CitaDetallada => {
-  // Normalización de estados: CANCELADA -> cancelada; PENDIENTE / CONFIRMADA -> pendiente
-  const estado: EstadoCita = a.status === 'CANCELADA' ? 'cancelada' : 'pendiente';
+export const normalizarEstado = (status?: string): EstadoCita => {
+  if (!status) return 'pendiente';
+  const normalizado = status.toLowerCase().trim();
+  if (normalizado === 'cancelada') return 'cancelada';
+  if (normalizado === 'confirmada') return 'confirmada';
+  if (normalizado === 'atendida') return 'atendida';
+  if (normalizado === 'no_atendida') return 'no_atendida';
+  return 'pendiente';
+};
+
+/**
+ * Transforma un registro de la clave 'appointments' a CitaDetallada para la UI
+ * garantizando compatibilidad con bd-veterinaria-hd.sql y el formato Appointment
+ */
+const appointmentToCitaDetallada = (a: Appointment | any): CitaDetallada => {
+  // Normalización fiel de estados: PENDIENTE -> pendiente, CONFIRMADA -> confirmada, CANCELADA -> cancelada
+  const estado: EstadoCita = normalizarEstado(a.status || a.estado);
 
   // Combinación y formateo de fecha y hora a formato ISO 8601
   const fechaHoraIso = (() => {
+    if (a.fecha_hora) return a.fecha_hora;
     try {
-      const d = new Date(`${a.date}T${a.startTime}:00`);
-      return isNaN(d.getTime()) ? (a.createdAt || new Date().toISOString()) : d.toISOString();
+      if (a.date && a.startTime) {
+        const d = new Date(`${a.date}T${a.startTime}:00`);
+        return isNaN(d.getTime()) ? (a.createdAt || new Date().toISOString()) : d.toISOString();
+      }
+      return a.createdAt || new Date().toISOString();
     } catch {
       return a.createdAt || new Date().toISOString();
     }
   })();
 
   // Búsqueda de mascota en mock para enriquecer especie, raza y foto
+  const petIdNum = a.petId ? Number(a.petId) : (a.mascota_id ? Number(a.mascota_id) : 1);
   const petFound = (petsMock as any[]).find(
-    (p) => p.id === a.petId || (a.petName && p.name.toLowerCase() === a.petName.toLowerCase())
+    (p) => p.id === petIdNum || (a.petName && p.name.toLowerCase() === String(a.petName).toLowerCase())
   );
 
   const mascota: MascotaCita = {
-    id: String(a.petId),
-    propietario_id: 'prop-seed-01',
+    id: String(a.mascota_id || a.petId || (petFound ? petFound.id : '1')),
+    propietario_id: a.propietario_id || 'prop-seed-01',
     nombre: a.petName || petFound?.name || 'Mascota',
     especie: petFound?.species?.toLowerCase() || 'canino',
     raza: petFound?.breed,
@@ -90,28 +110,29 @@ const appointmentToCitaDetallada = (a: Appointment): CitaDetallada => {
   };
 
   // Búsqueda de veterinario en mock
+  const vetIdNum = a.vetId ? Number(a.vetId) : (a.veterinario_id ? Number(a.veterinario_id) : 1);
   const vetFound = (vetsMock as any[]).find(
-    (v) => v.id === a.vetId || (a.vetName && v.name.toLowerCase() === a.vetName.toLowerCase())
+    (v) => v.id === vetIdNum || (a.vetName && v.name.toLowerCase() === String(a.vetName).toLowerCase())
   );
 
   const veterinario: VeterinarioDetallado = {
-    id: String(a.vetId),
-    usuario_id: `usr-vet-${a.vetId}`,
-    especialidad_id: `esp-${a.vetId}`,
+    id: String(a.veterinario_id || a.vetId || (vetFound ? vetFound.id : '1')),
+    usuario_id: `usr-vet-${vetIdNum}`,
+    especialidad_id: `esp-${vetIdNum}`,
     activo: true,
     nombre: a.vetName || vetFound?.name || 'Veterinario Asignado',
-    email: `veterinario${a.vetId}@vethd.com`,
+    email: `veterinario${vetIdNum}@vethd.com`,
     especialidad_nombre: a.specialty || vetFound?.specialty || 'Medicina General'
   };
 
   return {
     id: a.id,
-    mascota_id: String(a.petId),
-    veterinario_id: String(a.vetId),
+    mascota_id: mascota.id,
+    veterinario_id: veterinario.id,
     fecha_hora: fechaHoraIso,
     estado,
     motivo: a.motivo || null,
-    created_at: a.createdAt || new Date().toISOString(),
+    created_at: a.createdAt || a.created_at || new Date().toISOString(),
     mascota,
     veterinario
   };
