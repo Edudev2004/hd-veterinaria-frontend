@@ -26,6 +26,18 @@ const AppointmentsContent: React.FC = () => {
   const [citas, setCitas] = useState<CitaDetallada[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  // Parámetro para apertura directa de detalle por ID en la URL (?detalle=ID o ?citaId=ID) (US-18)
+  const citaIdDetalleParam = searchParams.get("detalle") || searchParams.get("citaId");
+
+  const handleCerrarDetalle = () => {
+    if (searchParams.has("detalle") || searchParams.has("citaId")) {
+      const nextParams = new URLSearchParams(searchParams);
+      nextParams.delete("detalle");
+      nextParams.delete("citaId");
+      setSearchParams(nextParams);
+    }
+  };
+
   const cargarCitas = () => {
     setIsLoading(true);
     try {
@@ -128,10 +140,12 @@ const AppointmentsContent: React.FC = () => {
             </div>
           </div>
 
-          {/* Listado de Citas con capacidad de filtrado, modificación (US-15) y cancelación (US-16) */}
+          {/* Listado de Citas con capacidad de filtrado, modificación (US-15), cancelación (US-16) y detalle (US-18) */}
           <CitasList
             citas={citas}
             onCitaActualizada={handleCitaActualizada}
+            citaIdParaDetalleInicial={citaIdDetalleParam}
+            onCerrarDetalle={handleCerrarDetalle}
           />
         </div>
       )}
