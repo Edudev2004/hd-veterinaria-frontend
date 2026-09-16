@@ -5,12 +5,14 @@ export interface MascotaResumen {
   nombre: string;
   especie: string;
   raza: string;
+  fotoUrl?: string;
 }
 
 export interface PropietarioResumen {
   id: string;
   nombre: string;
   telefono: string;
+  fotoUrl?: string;
 }
 
 export interface CitaAgenda {
