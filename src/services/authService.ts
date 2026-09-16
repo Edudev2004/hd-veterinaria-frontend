@@ -1,4 +1,4 @@
-export type UserRole = 'propietario' | 'veterinario' | 'admin';
+export type UserRole = "propietario" | "veterinario" | "admin";
 
 export interface User {
   id: string; // usuario_id (UUID)
@@ -7,6 +7,7 @@ export interface User {
   email: string;
   telefono?: string;
   direccion?: string;
+  fotoUrl?: string;
   rol: UserRole;
   activo: boolean;
   createdAt: string;
@@ -28,9 +29,9 @@ export interface LoginPayload {
   password: string;
 }
 
-const STORAGE_USERS_KEY = 'vethd_db_usuarios';
-const STORAGE_PROPIETARIOS_KEY = 'vethd_db_propietarios';
-const STORAGE_CURRENT_USER_KEY = 'vethd_session_usuario';
+const STORAGE_USERS_KEY = "vethd_db_usuarios";
+const STORAGE_PROPIETARIOS_KEY = "vethd_db_propietarios";
+const STORAGE_CURRENT_USER_KEY = "vethd_session_usuario";
 
 interface DBUsuario {
   id: string;
@@ -47,46 +48,47 @@ interface DBPropietario {
   usuario_id: string;
   telefono: string;
   direccion: string;
+  foto_url?: string;
 }
 
 // Cuentas iniciales de prueba para evaluar los 3 roles del sistema
 const DEFAULT_SEED_USERS: DBUsuario[] = [
   {
-    id: 'usr-seed-prop-01',
-    nombre: 'Carlos Propietario',
-    email: 'propietario@vethd.com',
-    password_hash: '12345678',
-    rol: 'propietario',
+    id: "usr-seed-prop-01",
+    nombre: "Carlos Propietario",
+    email: "propietario@vethd.com",
+    password_hash: "12345678",
+    rol: "propietario",
     activo: true,
-    created_at: new Date('2026-01-01').toISOString()
+    created_at: new Date("2026-01-01").toISOString(),
   },
   {
-    id: 'usr-seed-vet-01',
-    nombre: 'Dra. Laura Veterinario',
-    email: 'veterinario@vethd.com',
-    password_hash: '12345678',
-    rol: 'veterinario',
+    id: "usr-seed-vet-01",
+    nombre: "Dra. Laura Veterinario",
+    email: "veterinario@vethd.com",
+    password_hash: "12345678",
+    rol: "veterinario",
     activo: true,
-    created_at: new Date('2026-01-01').toISOString()
+    created_at: new Date("2026-01-01").toISOString(),
   },
   {
-    id: 'usr-seed-admin-01',
-    nombre: 'Administrador VetHD',
-    email: 'admin@vethd.com',
-    password_hash: '12345678',
-    rol: 'admin',
+    id: "usr-seed-admin-01",
+    nombre: "Administrador VetHD",
+    email: "admin@vethd.com",
+    password_hash: "12345678",
+    rol: "admin",
     activo: true,
-    created_at: new Date('2026-01-01').toISOString()
-  }
+    created_at: new Date("2026-01-01").toISOString(),
+  },
 ];
 
 const DEFAULT_SEED_PROPIETARIOS: DBPropietario[] = [
   {
-    id: 'prop-seed-01',
-    usuario_id: 'usr-seed-prop-01',
-    telefono: '987654321',
-    direccion: 'Av. Las Palmeras 450, Lima'
-  }
+    id: "prop-seed-01",
+    usuario_id: "usr-seed-prop-01",
+    telefono: "987654321",
+    direccion: "Av. Las Palmeras 450, Lima",
+  },
 ];
 
 const getStoredUsers = (): DBUsuario[] => {
@@ -101,7 +103,9 @@ const getStoredUsers = (): DBUsuario[] => {
     // Asegurar que las cuentas por defecto existan siempre para pruebas
     let modified = false;
     DEFAULT_SEED_USERS.forEach((seed) => {
-      if (!parsed.some((u) => u.email.toLowerCase() === seed.email.toLowerCase())) {
+      if (
+        !parsed.some((u) => u.email.toLowerCase() === seed.email.toLowerCase())
+      ) {
         parsed.push(seed);
         modified = true;
       }
@@ -118,7 +122,10 @@ const getStoredUsers = (): DBUsuario[] => {
 const getStoredPropietarios = (): DBPropietario[] => {
   const data = localStorage.getItem(STORAGE_PROPIETARIOS_KEY);
   if (!data) {
-    localStorage.setItem(STORAGE_PROPIETARIOS_KEY, JSON.stringify(DEFAULT_SEED_PROPIETARIOS));
+    localStorage.setItem(
+      STORAGE_PROPIETARIOS_KEY,
+      JSON.stringify(DEFAULT_SEED_PROPIETARIOS),
+    );
     return DEFAULT_SEED_PROPIETARIOS;
   }
   try {
@@ -134,36 +141,46 @@ const getStoredPropietarios = (): DBPropietario[] => {
   }
 };
 
-export const registerOwner = async (payload: RegisterPayload): Promise<User> => {
+export const registerOwner = async (
+  payload: RegisterPayload,
+): Promise<User> => {
   const users = getStoredUsers();
   const propietarios = getStoredPropietarios();
 
   const normalizedEmail = payload.email.trim().toLowerCase();
 
   // Validar duplicado de correo en localStorage (Criterio de Aceptación 5)
-  const existingUser = users.find((u) => u.email.toLowerCase() === normalizedEmail);
+  const existingUser = users.find(
+    (u) => u.email.toLowerCase() === normalizedEmail,
+  );
   if (existingUser) {
-    throw new Error('El correo electrónico ya se encuentra registrado en el sistema.');
+    throw new Error(
+      "El correo electrónico ya se encuentra registrado en el sistema.",
+    );
   }
 
-  const newUserId = crypto.randomUUID ? crypto.randomUUID() : `usr-${Date.now()}`;
-  const newPropietarioId = crypto.randomUUID ? crypto.randomUUID() : `prop-${Date.now()}`;
+  const newUserId = crypto.randomUUID
+    ? crypto.randomUUID()
+    : `usr-${Date.now()}`;
+  const newPropietarioId = crypto.randomUUID
+    ? crypto.randomUUID()
+    : `prop-${Date.now()}`;
 
   const newDBUser: DBUsuario = {
     id: newUserId,
     nombre: payload.nombre.trim(),
     email: normalizedEmail,
     password_hash: payload.password, // En backend real se usará BCrypt
-    rol: 'propietario',
+    rol: "propietario",
     activo: true,
-    created_at: new Date().toISOString()
+    created_at: new Date().toISOString(),
   };
 
   const newDBPropietario: DBPropietario = {
     id: newPropietarioId,
     usuario_id: newUserId,
     telefono: payload.telefono.trim(),
-    direccion: payload.direccion?.trim() || ''
+    direccion: payload.direccion?.trim() || "",
   };
 
   users.push(newDBUser);
@@ -179,9 +196,11 @@ export const registerOwner = async (payload: RegisterPayload): Promise<User> => 
     email: newDBUser.email,
     telefono: newDBPropietario.telefono,
     direccion: newDBPropietario.direccion,
+    fotoUrl: newDBPropietario.foto_url,
+
     rol: newDBUser.rol,
     activo: newDBUser.activo,
-    createdAt: newDBUser.created_at
+    createdAt: newDBUser.created_at,
   };
 
   localStorage.setItem(STORAGE_CURRENT_USER_KEY, JSON.stringify(sessionUser));
@@ -200,11 +219,15 @@ export const loginUser = async (payload: LoginPayload): Promise<User> => {
   const user = users.find((u) => u.email.toLowerCase() === normalizedEmail);
 
   if (!user || user.password_hash !== payload.password) {
-    throw new Error('Correo electrónico o contraseña incorrectos. Verifica tus credenciales.');
+    throw new Error(
+      "Correo electrónico o contraseña incorrectos. Verifica tus credenciales.",
+    );
   }
 
   if (!user.activo) {
-    throw new Error('Esta cuenta ha sido desactivada. Por favor, comunícate con la administración.');
+    throw new Error(
+      "Esta cuenta ha sido desactivada. Por favor, comunícate con la administración.",
+    );
   }
 
   const prop = propietarios.find((p) => p.usuario_id === user.id);
@@ -216,9 +239,10 @@ export const loginUser = async (payload: LoginPayload): Promise<User> => {
     email: user.email,
     telefono: prop?.telefono,
     direccion: prop?.direccion,
+    fotoUrl: prop?.foto_url,
     rol: user.rol,
     activo: user.activo,
-    createdAt: user.created_at
+    createdAt: user.created_at,
   };
 
   localStorage.setItem(STORAGE_CURRENT_USER_KEY, JSON.stringify(sessionUser));
@@ -240,7 +264,9 @@ export const logoutUser = (): void => {
 };
 
 // US-05: Solicitar recuperación de contraseña (simula envío de correo y genera token)
-export const requestPasswordReset = async (email: string): Promise<{ email: string; token: string }> => {
+export const requestPasswordReset = async (
+  email: string,
+): Promise<{ email: string; token: string }> => {
   await new Promise((resolve) => setTimeout(resolve, 400));
 
   const users = getStoredUsers();
@@ -248,7 +274,9 @@ export const requestPasswordReset = async (email: string): Promise<{ email: stri
   const user = users.find((u) => u.email.toLowerCase() === normalizedEmail);
 
   if (!user) {
-    throw new Error('No se encontró ninguna cuenta registrada con este correo electrónico.');
+    throw new Error(
+      "No se encontró ninguna cuenta registrada con este correo electrónico.",
+    );
   }
 
   const token = crypto.randomUUID ? crypto.randomUUID() : `reset-${Date.now()}`;
@@ -256,19 +284,24 @@ export const requestPasswordReset = async (email: string): Promise<{ email: stri
 };
 
 // US-05: Actualizar la contraseña en localStorage
-export const resetPassword = async (email: string, newPassword: string): Promise<boolean> => {
+export const resetPassword = async (
+  email: string,
+  newPassword: string,
+): Promise<boolean> => {
   await new Promise((resolve) => setTimeout(resolve, 400));
 
   if (newPassword.length < 8) {
-    throw new Error('La contraseña debe tener al menos 8 caracteres.');
+    throw new Error("La contraseña debe tener al menos 8 caracteres.");
   }
 
   const users = getStoredUsers();
   const normalizedEmail = email.trim().toLowerCase();
-  const userIndex = users.findIndex((u) => u.email.toLowerCase() === normalizedEmail);
+  const userIndex = users.findIndex(
+    (u) => u.email.toLowerCase() === normalizedEmail,
+  );
 
   if (userIndex === -1) {
-    throw new Error('No se encontró la cuenta para actualizar la contraseña.');
+    throw new Error("No se encontró la cuenta para actualizar la contraseña.");
   }
 
   users[userIndex].password_hash = newPassword;
@@ -276,12 +309,69 @@ export const resetPassword = async (email: string, newPassword: string): Promise
 
   return true;
 };
+export interface UpdateProfilePayload {
+  nombre: string;
+  telefono: string;
+  fotoUrl?: string;
+}
 
+export const updateProfile = async (
+  userId: string,
+  payload: UpdateProfilePayload,
+): Promise<User> => {
+  await new Promise((resolve) => setTimeout(resolve, 300));
+
+  if (!payload.nombre.trim()) {
+    throw new Error("El nombre es obligatorio.");
+  }
+  if (payload.telefono.trim().length < 7) {
+    throw new Error("Ingresa un número de teléfono válido.");
+  }
+
+  const users = getStoredUsers();
+  const propietarios = getStoredPropietarios();
+
+  const userIndex = users.findIndex((u) => u.id === userId);
+  if (userIndex === -1) {
+    throw new Error("No se encontró la cuenta a actualizar.");
+  }
+
+  const propIndex = propietarios.findIndex((p) => p.usuario_id === userId);
+
+  users[userIndex].nombre = payload.nombre.trim();
+  localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(users));
+
+  if (propIndex !== -1) {
+    propietarios[propIndex].telefono = payload.telefono.trim();
+    propietarios[propIndex].foto_url = payload.fotoUrl || undefined;
+    localStorage.setItem(
+      STORAGE_PROPIETARIOS_KEY,
+      JSON.stringify(propietarios),
+    );
+  }
+
+  const sessionUser: User = {
+    id: users[userIndex].id,
+    propietarioId: propietarios[propIndex]?.id,
+    nombre: users[userIndex].nombre,
+    email: users[userIndex].email,
+    telefono: propietarios[propIndex]?.telefono,
+    direccion: propietarios[propIndex]?.direccion,
+    fotoUrl: propietarios[propIndex]?.foto_url,
+    rol: users[userIndex].rol,
+    activo: users[userIndex].activo,
+    createdAt: users[userIndex].created_at,
+  };
+
+  localStorage.setItem(STORAGE_CURRENT_USER_KEY, JSON.stringify(sessionUser));
+  return sessionUser;
+};
 export const authService = {
   register: registerOwner,
   login: loginUser,
   getCurrentUser,
   logout: logoutUser,
   requestPasswordReset,
-  resetPassword
+  resetPassword,
+  updateProfile,
 };
