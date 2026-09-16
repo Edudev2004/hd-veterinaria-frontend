@@ -21,7 +21,7 @@ export const VetConsultationsPage: React.FC = () => {
   const [mensajeExito, setMensajeExito] = useState('');
 
   useEffect(() => {
-    if (!citaId || !user) {
+    if (!user) {
       setCita(null);
       setAtencionExistente(null);
       setCargando(false);
@@ -32,8 +32,18 @@ export const VetConsultationsPage: React.FC = () => {
       setCargando(true);
       setMensajeExito('');
 
+      const atencionActiva = vetConsultationService.getAtencionActiva(user.id);
+      const citaSeleccionadaId = citaId ?? atencionActiva?.citaId;
+
+      if (!citaSeleccionadaId) {
+        setCita(null);
+        setAtencionExistente(null);
+        setCargando(false);
+        return;
+      }
+
       const citaEncontrada = await vetScheduleService.getCitaById(
-        citaId,
+        citaSeleccionadaId,
         user.id
       );
 
@@ -41,11 +51,13 @@ export const VetConsultationsPage: React.FC = () => {
 
       if (citaEncontrada) {
         const registro = await vetConsultationService.getAtencionByCita(
-          citaId,
+          citaSeleccionadaId,
           user.id
         );
 
         setAtencionExistente(registro);
+      } else {
+        setAtencionExistente(null);
       }
 
       setCargando(false);
@@ -59,7 +71,7 @@ export const VetConsultationsPage: React.FC = () => {
     tratamiento: string;
     notas: string;
   }): Promise<void> => {
-    if (!citaId || !user) {
+    if (!cita || !user) {
       return;
     }
 
@@ -68,7 +80,7 @@ export const VetConsultationsPage: React.FC = () => {
 
     try {
       const registroGuardado = await vetConsultationService.guardarAtencion({
-        citaId,
+        citaId: cita.id,
         veterinarioId: user.id,
         ...values
       });
@@ -80,7 +92,15 @@ export const VetConsultationsPage: React.FC = () => {
     }
   };
 
-  if (!citaId) {
+  if (cargando) {
+    return (
+      <p className="py-12 text-center text-sm text-slate-400">
+        Cargando atención médica...
+      </p>
+    );
+  }
+
+  if (!cita) {
     return (
       <div className="flex flex-col gap-6">
         <div>
@@ -99,32 +119,14 @@ export const VetConsultationsPage: React.FC = () => {
 
           <div>
             <h2 className="text-lg font-bold text-slate-800">
-              No hay una cita seleccionada
+              No tienes una atención en curso
             </h2>
             <p className="mt-2 max-w-md text-sm text-slate-500">
-              El registro clínico se habilita al pulsar “Iniciar atención” en
-              una cita pendiente de la Agenda Diaria.
+              Inicia una atención desde una cita pendiente de la Agenda Diaria.
+              La cita quedará disponible aquí hasta que la finalices.
             </p>
           </div>
         </div>
-      </div>
-    );
-  }
-
-  if (cargando) {
-    return (
-      <p className="py-12 text-center text-sm text-slate-400">
-        Cargando atención médica...
-      </p>
-    );
-  }
-
-  if (!cita) {
-    return (
-      <div className="rounded-2xl border-2 border-dashed border-slate-200 bg-white p-8 text-center">
-        <p className="text-sm text-slate-500">
-          No se encontró la cita solicitada o no pertenece a tu agenda.
-        </p>
       </div>
     );
   }
