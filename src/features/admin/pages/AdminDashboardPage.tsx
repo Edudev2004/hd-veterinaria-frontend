@@ -1,10 +1,14 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   CalendarCheck,
   CalendarX,
   Stethoscope,
-  Users
+  Users,
+  ShieldCheck,
+  FileBarChart,
+  ArrowRight
 } from 'lucide-react';
 
 const MOCK_METRICS = {
@@ -27,6 +31,7 @@ const MOCK_CITAS_DIARIAS = [
 ];
 
 export const AdminDashboardPage: React.FC = () => {
+  const navigate = useNavigate();
   const maxCitas = Math.max(...MOCK_CITAS_DIARIAS.map((item) => item.cantidad));
 
   return (
@@ -126,6 +131,82 @@ export const AdminDashboardPage: React.FC = () => {
               </div>
             );
           })}
+        </div>
+
+      </div>
+      {/* 3. Accesos Rápidos a Módulos */}
+      <div className="bg-white rounded-xl border border-slate-200 p-6">
+        <h2 className="text-base font-bold text-slate-900 mb-1">Accesos Rápidos</h2>
+        <p className="text-xs text-slate-500 mb-4">Gestiona las diferentes secciones de administración</p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Veterinarios */}
+          <button
+            onClick={() => navigate('/admin/veterinarios')}
+            className="flex items-center justify-between p-4 rounded-xl border border-slate-100 bg-slate-50 hover:bg-slate-100 transition-colors text-left group cursor-pointer"
+          >
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-purple-100 text-purple-600 rounded-lg">
+                <Stethoscope className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-slate-900">Veterinarios</p>
+                <p className="text-xs text-slate-500">Gestión de personal</p>
+              </div>
+            </div>
+            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-hover:translate-x-0.5 transition-all" />
+          </button>
+
+          {/* Especialidades */}
+          <button
+            onClick={() => navigate('/admin/especialidades')}
+            className="flex items-center justify-between p-4 rounded-xl border border-slate-100 bg-slate-50 hover:bg-slate-100 transition-colors text-left group cursor-pointer"
+          >
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-100 text-blue-600 rounded-lg">
+                <LayoutDashboard className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-slate-900">Especialidades</p>
+                <p className="text-xs text-slate-500">Áreas de atención</p>
+              </div>
+            </div>
+            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-hover:translate-x-0.5 transition-all" />
+          </button>
+
+          {/* Roles y Permisos */}
+          <button
+            onClick={() => navigate('/admin/roles')}
+            className="flex items-center justify-between p-4 rounded-xl border border-slate-100 bg-slate-50 hover:bg-slate-100 transition-colors text-left group cursor-pointer"
+          >
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-amber-100 text-amber-600 rounded-lg">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-slate-900">Roles y Permisos</p>
+                <p className="text-xs text-slate-500">Control de accesos</p>
+              </div>
+            </div>
+            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-hover:translate-x-0.5 transition-all" />
+          </button>
+
+          {/* Reportes */}
+          <button
+            onClick={() => navigate('/admin/reportes')}
+            className="flex items-center justify-between p-4 rounded-xl border border-slate-100 bg-slate-50 hover:bg-slate-100 transition-colors text-left group cursor-pointer"
+          >
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-emerald-100 text-emerald-600 rounded-lg">
+                <FileBarChart className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-slate-900">Reportes</p>
+                <p className="text-xs text-slate-500">Métricas avanzadas</p>
+              </div>
+            </div>
+            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-hover:translate-x-0.5 transition-all" />
+          </button>
         </div>
       </div>
 
