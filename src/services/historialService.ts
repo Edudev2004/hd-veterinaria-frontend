@@ -13,7 +13,6 @@ import {
 } from '../types/historial.types';
 import petsMock from '../features/appointments/mocks/pets.json';
 import vetsMock from '../features/appointments/mocks/veterinarians.json';
-import { getAppointments, Appointment } from '../features/appointments/services/appointmentService';
 
 export const STORAGE_DIAGNOSTICOS_KEY = 'vethd_db_diagnosticos';
 
