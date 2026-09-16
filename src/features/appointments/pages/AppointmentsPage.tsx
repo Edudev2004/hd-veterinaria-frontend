@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Plus, Calendar, Clock, RefreshCw } from "lucide-react";
+import { Plus, Calendar, Clock, RefreshCw, XCircle } from "lucide-react";
 import {
   AppointmentStepperProvider,
   useStepperContext,
@@ -47,14 +47,15 @@ const AppointmentsContent: React.FC = () => {
     cargarCitas();
   };
 
-  const handleCitaActualizada = (citaModificada: CitaDetallada) => {
+  const handleCitaActualizada = (citaActualizada: CitaDetallada) => {
     setCitas((prev) =>
-      prev.map((c) => (c.id === citaModificada.id ? citaModificada : c))
+      prev.map((c) => (c.id === citaActualizada.id ? citaActualizada : c))
     );
   };
 
   // Contadores rápidos para la cabecera
   const pendientesCount = citas.filter((c) => c.estado === "pendiente").length;
+  const canceladasCount = citas.filter((c) => c.estado === "cancelada").length;
 
   return (
     <div className="flex flex-col gap-6 max-w-7xl mx-auto w-full pb-10">
@@ -74,7 +75,7 @@ const AppointmentsContent: React.FC = () => {
                     Gestión de Citas Médicas
                   </h1>
                   <p className="text-xs text-slate-500">
-                    Visualiza, reprograma y modifica las atenciones médicas de tus mascotas (US-15)
+                    Visualiza, reprograma, modifica y cancela las atenciones médicas de tus mascotas (US-15 y US-16)
                   </p>
                 </div>
               </div>
@@ -86,6 +87,14 @@ const AppointmentsContent: React.FC = () => {
                 <div className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold">
                   <Clock className="w-3.5 h-3.5 text-amber-600" />
                   <span>{pendientesCount} pendiente{pendientesCount > 1 ? "s" : ""}</span>
+                </div>
+              )}
+
+              {/* Contador de citas canceladas */}
+              {canceladasCount > 0 && (
+                <div className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold">
+                  <XCircle className="w-3.5 h-3.5 text-rose-600" />
+                  <span>{canceladasCount} cancelada{canceladasCount > 1 ? "s" : ""}</span>
                 </div>
               )}
 
@@ -110,7 +119,7 @@ const AppointmentsContent: React.FC = () => {
             </div>
           </div>
 
-          {/* Listado de Citas con capacidad de filtrado y modificación (US-15) */}
+          {/* Listado de Citas con capacidad de filtrado, modificación (US-15) y cancelación (US-16) */}
           <CitasList
             citas={citas}
             onCitaActualizada={handleCitaActualizada}
