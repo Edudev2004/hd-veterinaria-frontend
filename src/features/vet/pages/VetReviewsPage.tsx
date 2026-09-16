@@ -1,5 +1,3 @@
-// src/features/vet/pages/VetReviewsPage.tsx
-// US-25: Ver mis valoraciones — veterinario
 import React, { useEffect, useMemo, useState } from 'react';
 import { Star, Award, MessageSquare } from 'lucide-react';
 import { vetReviewsService } from '../services/vetReviewsService';
@@ -119,9 +117,17 @@ export const VetReviewsPage: React.FC = () => {
           <ul className="flex flex-col gap-3">
             {valoracionesFiltradas.map((v) => (
               <li key={v.id} className="flex gap-3 rounded-xl border border-slate-100 p-4">
-                <div className="w-10 h-10 shrink-0 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center text-sm">
-                  {inicialesDe(v.propietarioNombre)}
-                </div>
+                {v.mascotaFotoUrl ? (
+  <img
+    src={v.mascotaFotoUrl}
+    alt={v.mascotaNombre}
+    className="w-10 h-10 shrink-0 rounded-full object-cover"
+  />
+) : (
+  <div className="w-10 h-10 shrink-0 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center text-sm">
+    {inicialesDe(v.propietarioNombre)}
+  </div>
+)}
                 <div className="flex-1">
                   <div className="flex items-center justify-between flex-wrap gap-1">
                     <p className="font-semibold text-slate-800 text-sm">
