@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { X, PawPrint } from "lucide-react";
 import { Mascota } from "@/services/petService";
 
 interface PetDetailModalProps {
   mascota: Mascota;
   onClose: () => void;
+  onEdit?: () => void;
 }
 
 const especieLabel: Record<string, string> = {
@@ -17,7 +18,10 @@ const sexoLabel: Record<string, string> = { macho: "Macho", hembra: "Hembra" };
 export const PetDetailModal: React.FC<PetDetailModalProps> = ({
   mascota,
   onClose,
+  onEdit,
 }) => {
+  const [imgError, setImgError] = useState(false);
+
   return (
     <div className="fixed inset-0 z-[9990] flex items-center justify-center p-4">
       <div
@@ -34,11 +38,12 @@ export const PetDetailModal: React.FC<PetDetailModalProps> = ({
         </button>
 
         <div className="w-20 h-20 rounded-2xl bg-slate-100 overflow-hidden flex items-center justify-center mb-4 mx-auto">
-          {mascota.fotoUrl ? (
+          {mascota.fotoUrl && !imgError ? (
             <img
               src={mascota.fotoUrl}
               alt={mascota.nombre}
               className="w-full h-full object-cover"
+              onError={() => setImgError(true)}
             />
           ) : (
             <PawPrint className="w-8 h-8 text-slate-400" />
@@ -75,6 +80,14 @@ export const PetDetailModal: React.FC<PetDetailModalProps> = ({
             </span>
           </div>
         </div>
+
+        <button
+          type="button"
+          onClick={onEdit}
+          className="mt-6 w-full py-3 rounded-xl bg-[#0D7C84] text-white font-bold text-sm hover:bg-[#0b686f] transition-colors"
+        >
+          Editar Mascota
+        </button>
       </div>
     </div>
   );
