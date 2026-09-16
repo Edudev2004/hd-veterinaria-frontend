@@ -1,0 +1,62 @@
+[
+  {
+    "id": "val-001",
+    "cita_id": "cita-001",
+    "puntuacion": 5,
+    "comentario": "Excelente atención, muy cariñosa con Bella y explicó todo con calma.",
+    "created_at": "2026-09-16T09:00:00-05:00",
+    "mascotaNombre": "Bella",
+    "mascotaFotoUrl": "https://images.unsplash.com/photo-1552053831-71594a27632d?w=100&h=100&fit=crop",
+    "propietarioNombre": "Juan Pérez"
+  },
+  {
+    "id": "val-002",
+    "cita_id": "cita-002",
+    "puntuacion": 4,
+    "comentario": "Buena atención, aunque tuvimos que esperar un poco más de lo previsto.",
+    "created_at": "2026-09-10T16:00:00-05:00",
+    "mascotaNombre": "Milo",
+    "mascotaFotoUrl": "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?w=100&h=100&fit=crop",
+    "propietarioNombre": "Ana Gómez"
+  },
+  {
+    "id": "val-003",
+    "cita_id": "cita-004",
+    "puntuacion": 5,
+    "comentario": "Rocky quedó tranquilo después de la consulta, muy recomendable.",
+    "created_at": "2026-09-05T12:30:00-05:00",
+    "mascotaNombre": "Rocky",
+    "mascotaFotoUrl": "https://images.unsplash.com/photo-1583512603805-3cc6b41f3edb?w=100&h=100&fit=crop",
+    "propietarioNombre": "Carlos Ruiz"
+  },
+  {
+    "id": "val-004",
+    "cita_id": "cita-003",
+    "puntuacion": 3,
+    "comentario": "La atención fue correcta, pero me hubiera gustado más indicaciones sobre los cuidados en casa.",
+    "created_at": "2026-09-08T11:00:00-05:00",
+    "mascotaNombre": "Toby",
+    "mascotaFotoUrl": "https://images.unsplash.com/photo-1544568100-847a948585b9?w=100&h=100&fit=crop",
+    "propietarioNombre": "Lucía Fernández"
+  },
+  {
+    "id": "val-005",
+    "cita_id": "cita-001",
+    "puntuacion": 5,
+    "comentario": "Segunda vez que nos atiende y siempre es puntual y muy profesional.",
+    "created_at": "2026-08-20T10:15:00-05:00",
+    "mascotaNombre": "Bella",
+    "mascotaFotoUrl": "https://images.unsplash.com/photo-1552053831-71594a27632d?w=100&h=100&fit=crop",
+    "propietarioNombre": "Juan Pérez"
+  },
+  {
+    "id": "val-006",
+    "cita_id": "cita-002",
+    "puntuacion": 2,
+    "comentario": "El diagnóstico tardó en llegar y sentí que faltó comunicación durante el proceso.",
+    "created_at": "2026-07-15T14:00:00-05:00",
+    "mascotaNombre": "Milo",
+    "mascotaFotoUrl": "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?w=100&h=100&fit=crop",
+    "propietarioNombre": "Ana Gómez"
+  }
+]
