@@ -10,7 +10,9 @@ interface CitaCardProps {
 }
 
 export const CitaCard: React.FC<CitaCardProps> = ({ cita, onModificar, onCancelar }) => {
-  const esModificable = cita.estado === 'pendiente';
+  const estadoNormalizado = (cita.estado ? String(cita.estado).toLowerCase() : 'pendiente');
+  const esModificable = estadoNormalizado === 'pendiente';
+  const esCancelable = estadoNormalizado === 'pendiente' || estadoNormalizado === 'confirmada';
 
   // Formatear fecha y hora
   const { fechaTexto, horaTexto } = (() => {
@@ -91,11 +93,11 @@ export const CitaCard: React.FC<CitaCardProps> = ({ cita, onModificar, onCancela
       {cita.motivo && (
         <div className="text-xs text-slate-600">
           <span className="font-semibold text-slate-700 block mb-1">
-            {cita.estado === 'cancelada' ? 'Motivo de cancelación / registro:' : 'Motivo:'}
+            {estadoNormalizado === 'cancelada' ? 'Motivo de cancelación / registro:' : 'Motivo:'}
           </span>
           <p
             className={`p-2.5 rounded-xl border line-clamp-2 italic ${
-              cita.estado === 'cancelada'
+              estadoNormalizado === 'cancelada'
                 ? 'bg-rose-50/60 border-rose-100 text-rose-900'
                 : 'bg-slate-50/70 border-slate-100 text-slate-600'
             }`}
@@ -136,11 +138,23 @@ export const CitaCard: React.FC<CitaCardProps> = ({ cita, onModificar, onCancela
               <ChevronRight className="w-3 h-3" />
             </button>
           </div>
+        ) : esCancelable && onCancelar ? (
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => onCancelar(cita)}
+              className="flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-rose-600 hover:text-white bg-rose-50 hover:bg-rose-600 border border-rose-200 hover:border-rose-600 rounded-xl transition-all shadow-sm active:scale-95"
+              title="Cancelar esta cita médica confirmada"
+            >
+              <CalendarX className="w-3.5 h-3.5" />
+              <span>Cancelar</span>
+            </button>
+          </div>
         ) : (
           <span
             className="text-[11px] text-slate-400 italic px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-100"
             title={
-              cita.estado === 'cancelada'
+              estadoNormalizado === 'cancelada'
                 ? 'Esta cita ya fue cancelada y no permite acciones'
                 : `Las citas en estado '${cita.estado}' no permiten modificaciones ni cancelación`
             }
