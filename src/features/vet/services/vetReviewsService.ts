@@ -1,4 +1,4 @@
-// src/features/vet/services/vetReviewsService.ts
+
 import valoracionesSeed from '../mocks/valoracionesVeterinario.json';
 import type { ValoracionVeterinario } from '../types/valoracion.types';
 
@@ -22,6 +22,14 @@ export const getMisValoraciones = async (): Promise<ValoracionVeterinario[]> => 
   return getStoredValoraciones();
 };
 
+export const getPromedioValoraciones = async (): Promise<number> => {
+  const valoraciones = getStoredValoraciones();
+  if (valoraciones.length === 0) return 0;
+  const suma = valoraciones.reduce((acc, v) => acc + v.puntuacion, 0);
+  return Number((suma / valoraciones.length).toFixed(1));
+};
+
 export const vetReviewsService = {
-  getMisValoraciones
+  getMisValoraciones,
+  getPromedioValoraciones
 };
