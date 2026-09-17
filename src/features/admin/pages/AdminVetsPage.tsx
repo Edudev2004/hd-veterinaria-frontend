@@ -1,5 +1,19 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Star, ChevronLeft, ChevronRight, Stethoscope, Search, Users } from 'lucide-react';
+import {
+  Star,
+  ChevronLeft,
+  ChevronRight,
+  Stethoscope,
+  Search,
+  Users,
+  UserPlus,
+  X,
+  CheckCircle2,
+  Mail,
+  Phone,
+  Lock,
+  User,
+} from 'lucide-react';
 
 export interface Veterinario {
   id: string;
@@ -11,6 +25,8 @@ export interface Veterinario {
   valoracionPromedio: number;
   totalResenas?: number;
 }
+
+const STORAGE_KEY = 'hd_admin_veterinarios';
 
 export const VETS_INICIALES: Veterinario[] = [
   {
@@ -75,21 +91,61 @@ export const VETS_INICIALES: Veterinario[] = [
   },
 ];
 
+const ESPECIALIDADES = [
+  'Medicina General y Cirugía',
+  'Dermatología Veterinaria',
+  'Oftalmología',
+  'Traumatología y Ortopedia',
+  'Odontología Veterinaria',
+  'Cardiología',
+  'Oncología',
+  'Animales Exóticos',
+];
+
 const ITEMS_POR_PAGINA = 5;
 
 export const AdminVetsPage: React.FC = () => {
-  const [veterinarios] = useState<Veterinario[]>(VETS_INICIALES);
+  // Inicialización con persistencia en localStorage
+  const [veterinarios, setVeterinarios] = useState<Veterinario[]>(() => {
+    try {
+      const guardados = localStorage.getItem(STORAGE_KEY);
+      if (guardados) return JSON.parse(guardados);
+    } catch {
+      // Fallback a iniciales
+    }
+    return VETS_INICIALES;
+  });
+
   const [busqueda, setBusqueda] = useState('');
   const [paginaActual, setPaginaActual] = useState(1);
+  const [modalAbierto, setModalAbierto] = useState(false);
+  const [mensajeExito, setMensajeExito] = useState<string | null>(null);
 
-  // Filtrado reactivo por nombre
+  // Estado del formulario
+  const [formData, setFormData] = useState({
+    nombre: '',
+    correo: '',
+    password: '',
+    especialidad: ESPECIALIDADES[0],
+    telefono: '',
+  });
+
+  // Guardar en localStorage ante cualquier modificación
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(veterinarios));
+    } catch (e) {
+      console.error('Error guardando veterinarios:', e);
+    }
+  }, [veterinarios]);
+
+  // Filtrado reactivo
   const veterinariosFiltrados = useMemo(() => {
     return veterinarios.filter((vet) =>
       vet.nombre.toLowerCase().includes(busqueda.toLowerCase())
     );
   }, [veterinarios, busqueda]);
 
-  // Si busca algo, vuelve a la página 1
   useEffect(() => {
     setPaginaActual(1);
   }, [busqueda]);
@@ -101,19 +157,72 @@ export const AdminVetsPage: React.FC = () => {
     indiceInicio + ITEMS_POR_PAGINA
   );
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleRegistrar = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!formData.nombre.trim() || !formData.correo.trim() || !formData.password.trim() || !formData.telefono.trim()) {
+      return;
+    }
+
+    const nuevoVet: Veterinario = {
+      id: `vet-${Date.now()}`,
+      nombre: formData.nombre.trim(),
+      correo: formData.correo.trim(),
+      telefono: formData.telefono.trim(),
+      especialidad: formData.especialidad,
+      estado: 'activo', // Criterio Jira: estado activo por defecto
+      valoracionPromedio: 5.0,
+      totalResenas: 0,
+    };
+
+    setVeterinarios((prev) => [nuevoVet, ...prev]);
+    setFormData({
+      nombre: '',
+      correo: '',
+      password: '',
+      especialidad: ESPECIALIDADES[0],
+      telefono: '',
+    });
+    setModalAbierto(false);
+    setMensajeExito(`Veterinario ${nuevoVet.nombre} registrado exitosamente.`);
+    setTimeout(() => setMensajeExito(null), 3500);
+  };
+
   return (
     <div className="flex flex-col gap-6 p-1 md:p-2">
-      {/* Encabezado */}
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900 font-outfit">
-          Gestión de Personal Veterinario
-        </h1>
-        <p className="text-sm text-slate-500">
-          Listado y control del equipo médico de la clínica.
-        </p>
+      {/* Encabezado con Botón de Acción */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 font-outfit">
+            Gestión de Personal Veterinario
+          </h1>
+          <p className="text-sm text-slate-500">
+            Listado y control del equipo médico de la clínica.
+          </p>
+        </div>
+        <button
+          onClick={() => setModalAbierto(true)}
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl shadow-sm transition-all hover:shadow-md cursor-pointer"
+        >
+          <UserPlus className="w-4 h-4" />
+          Registrar Veterinario
+        </button>
       </div>
 
-      {/* Barra de Búsqueda y Filtro */}
+      {/* Alerta de Éxito */}
+      {mensajeExito && (
+        <div className="flex items-center gap-3 p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-sm">
+          <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+          <span>{mensajeExito}</span>
+        </div>
+      )}
+
+      {/* Barra de Filtro / Buscador */}
       <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row gap-3 items-center justify-between">
         <div className="relative w-full sm:w-80">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -234,6 +343,140 @@ export const AdminVetsPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal de Registro */}
+      {modalAbierto && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4 animate-fadeIn">
+          <div className="bg-white w-full max-w-lg rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg">
+                  <UserPlus className="w-5 h-5" />
+                </div>
+                <h2 className="text-lg font-bold text-slate-900 font-outfit">
+                  Registrar Nuevo Veterinario
+                </h2>
+              </div>
+              <button
+                onClick={() => setModalAbierto(false)}
+                className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleRegistrar} className="p-6 overflow-y-auto flex flex-col gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Nombre Completo *
+                </label>
+                <div className="relative">
+                  <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    name="nombre"
+                    required
+                    placeholder="Ej. Dra. Mariana Torres"
+                    value={formData.nombre}
+                    onChange={handleInputChange}
+                    className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Correo Electrónico *
+                </label>
+                <div className="relative">
+                  <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="email"
+                    name="correo"
+                    required
+                    placeholder="mariana.torres@hdveterinaria.com"
+                    value={formData.correo}
+                    onChange={handleInputChange}
+                    className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Contraseña Temporal *
+                </label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="password"
+                    name="password"
+                    required
+                    placeholder="••••••••"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    Especialidad *
+                  </label>
+                  <select
+                    name="especialidad"
+                    value={formData.especialidad}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
+                  >
+                    {ESPECIALIDADES.map((esp) => (
+                      <option key={esp} value={esp}>
+                        {esp}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    Teléfono *
+                  </label>
+                  <div className="relative">
+                    <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="tel"
+                      name="telefono"
+                      required
+                      placeholder="+51 999 888 777"
+                      value={formData.telefono}
+                      onChange={handleInputChange}
+                      className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setModalAbierto(false)}
+                  className="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-sm transition-all cursor-pointer"
+                >
+                  Guardar Veterinario
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
