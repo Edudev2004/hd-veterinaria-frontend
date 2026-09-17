@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Star, ChevronLeft, ChevronRight, Stethoscope } from 'lucide-react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { Star, ChevronLeft, ChevronRight, Stethoscope, Search, Users } from 'lucide-react';
 
 export interface Veterinario {
   id: string;
@@ -79,17 +79,31 @@ const ITEMS_POR_PAGINA = 5;
 
 export const AdminVetsPage: React.FC = () => {
   const [veterinarios] = useState<Veterinario[]>(VETS_INICIALES);
+  const [busqueda, setBusqueda] = useState('');
   const [paginaActual, setPaginaActual] = useState(1);
 
-  const totalPaginas = Math.ceil(veterinarios.length / ITEMS_POR_PAGINA) || 1;
+  // Filtrado reactivo por nombre
+  const veterinariosFiltrados = useMemo(() => {
+    return veterinarios.filter((vet) =>
+      vet.nombre.toLowerCase().includes(busqueda.toLowerCase())
+    );
+  }, [veterinarios, busqueda]);
+
+  // Si busca algo, vuelve a la página 1
+  useEffect(() => {
+    setPaginaActual(1);
+  }, [busqueda]);
+
+  const totalPaginas = Math.ceil(veterinariosFiltrados.length / ITEMS_POR_PAGINA) || 1;
   const indiceInicio = (paginaActual - 1) * ITEMS_POR_PAGINA;
-  const veterinariosPaginados = veterinarios.slice(
+  const veterinariosPaginados = veterinariosFiltrados.slice(
     indiceInicio,
     indiceInicio + ITEMS_POR_PAGINA
   );
 
   return (
     <div className="flex flex-col gap-6 p-1 md:p-2">
+      {/* Encabezado */}
       <div>
         <h1 className="text-2xl font-bold text-slate-900 font-outfit">
           Gestión de Personal Veterinario
@@ -99,6 +113,25 @@ export const AdminVetsPage: React.FC = () => {
         </p>
       </div>
 
+      {/* Barra de Búsqueda y Filtro */}
+      <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row gap-3 items-center justify-between">
+        <div className="relative w-full sm:w-80">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            placeholder="Buscar por nombre..."
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all text-slate-800 placeholder-slate-400"
+          />
+        </div>
+        <div className="text-xs text-slate-500 font-medium">
+          Mostrando {veterinariosFiltrados.length}{' '}
+          {veterinariosFiltrados.length === 1 ? 'médico' : 'médicos'}
+        </div>
+      </div>
+
+      {/* Tabla de Listado */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
@@ -112,59 +145,72 @@ export const AdminVetsPage: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-sm">
-              {veterinariosPaginados.map((vet) => (
-                <tr key={vet.id} className="hover:bg-slate-50/60 transition-colors">
-                  <td className="py-4 px-6">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm shrink-0">
-                        {vet.nombre
-                          .replace(/^(Dr\.|Dra\.)\s*/, '')
-                          .charAt(0)
-                          .toUpperCase()}
+              {veterinariosPaginados.length > 0 ? (
+                veterinariosPaginados.map((vet) => (
+                  <tr key={vet.id} className="hover:bg-slate-50/60 transition-colors">
+                    <td className="py-4 px-6">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm shrink-0">
+                          {vet.nombre
+                            .replace(/^(Dr\.|Dra\.)\s*/, '')
+                            .charAt(0)
+                            .toUpperCase()}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-slate-800">{vet.nombre}</p>
+                          <p className="text-xs text-slate-500">{vet.correo}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-semibold text-slate-800">{vet.nombre}</p>
-                        <p className="text-xs text-slate-500">{vet.correo}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="py-4 px-6 text-slate-700">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 text-slate-700 rounded-lg text-xs font-medium">
-                      <Stethoscope className="w-3.5 h-3.5 text-slate-500" />
-                      {vet.especialidad}
-                    </span>
-                  </td>
-                  <td className="py-4 px-6 text-slate-600 text-xs">
-                    <span>{vet.telefono}</span>
-                  </td>
-                  <td className="py-4 px-6 text-center">
-                    <span
-                      className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium capitalize ${
-                        vet.estado === 'activo'
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                          : 'bg-slate-100 text-slate-600 border border-slate-200'
-                      }`}
-                    >
-                      {vet.estado}
-                    </span>
-                  </td>
-                  <td className="py-4 px-6">
-                    <div className="flex items-center justify-center gap-1.5">
-                      <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                      <span className="font-bold text-slate-800 text-sm">
-                        {vet.valoracionPromedio.toFixed(1)}
+                    </td>
+                    <td className="py-4 px-6 text-slate-700">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 text-slate-700 rounded-lg text-xs font-medium">
+                        <Stethoscope className="w-3.5 h-3.5 text-slate-500" />
+                        {vet.especialidad}
                       </span>
-                      {vet.totalResenas !== undefined && (
-                        <span className="text-xs text-slate-400">({vet.totalResenas})</span>
-                      )}
-                    </div>
+                    </td>
+                    <td className="py-4 px-6 text-slate-600 text-xs">
+                      <span>{vet.telefono}</span>
+                    </td>
+                    <td className="py-4 px-6 text-center">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium capitalize ${
+                          vet.estado === 'activo'
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                            : 'bg-slate-100 text-slate-600 border border-slate-200'
+                        }`}
+                      >
+                        {vet.estado}
+                      </span>
+                    </td>
+                    <td className="py-4 px-6">
+                      <div className="flex items-center justify-center gap-1.5">
+                        <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                        <span className="font-bold text-slate-800 text-sm">
+                          {vet.valoracionPromedio.toFixed(1)}
+                        </span>
+                        {vet.totalResenas !== undefined && (
+                          <span className="text-xs text-slate-400">({vet.totalResenas})</span>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={5} className="py-12 text-center text-slate-500">
+                    <Users className="w-10 h-10 text-slate-300 mx-auto mb-2" />
+                    <p className="font-medium text-slate-700">No se encontraron veterinarios</p>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      Intenta con otro término de búsqueda.
+                    </p>
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
 
+        {/* Paginación */}
         <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t border-slate-100 gap-3">
           <span className="text-xs text-slate-500">
             Página <span className="font-semibold text-slate-700">{paginaActual}</span> de{' '}
