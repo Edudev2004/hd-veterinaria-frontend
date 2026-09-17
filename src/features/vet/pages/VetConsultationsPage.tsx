@@ -9,6 +9,7 @@ import { VetConsultationSummary } from "../components/VetConsultationSummary";
 import { vetConsultationService } from "../services/vetConsultationService";
 import type { RegistroAtencion } from "../types/vetConsultation.types";
 import { MarkAsAttendedDialog } from "../components/MarkAsAttendedDialog";
+import { MarkAsNotAttendedDialog } from "../components/MarkAsNotAttendedDialog";
 
 export const VetConsultationsPage: React.FC = () => {
   const { citaId } = useParams<{ citaId: string }>();
@@ -30,6 +31,11 @@ export const VetConsultationsPage: React.FC = () => {
   );
   const [marcandoAtendida, setMarcandoAtendida] = useState(false);
   const [mensajeAccion, setMensajeAccion] = useState("");
+
+  const [citaPorNoAtender, setCitaPorNoAtender] = useState<CitaAgenda | null>(
+    null,
+  );
+  const [marcandoNoAtendida, setMarcandoNoAtendida] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -113,6 +119,43 @@ export const VetConsultationsPage: React.FC = () => {
       setCitaPorConfirmar(null);
     } finally {
       setMarcandoAtendida(false);
+    }
+  };
+
+  const confirmarCitaNoAtendida = async (): Promise<void> => {
+    if (!user || !citaPorNoAtender) {
+      return;
+    }
+
+    setMarcandoNoAtendida(true);
+
+    try {
+      const citaActualizada =
+        await vetScheduleService.marcarCitaComoNoAtendida(
+          citaPorNoAtender.id,
+          user.id,
+        );
+
+      if (!citaActualizada) {
+        return;
+      }
+
+      vetConsultationService.limpiarAtencionActiva(
+        user.id,
+        citaPorNoAtender.id,
+      );
+
+      setCitasEnCurso((citas) =>
+        citas.filter((cita) => cita.id !== citaPorNoAtender.id),
+      );
+
+      setCitaExpandidaId(null);
+      setMensajeAccion(
+        `${citaPorNoAtender.mascota.nombre} fue marcada como no atendida.`,
+      );
+      setCitaPorNoAtender(null);
+    } finally {
+      setMarcandoNoAtendida(false);
     }
   };
 
@@ -276,7 +319,15 @@ export const VetConsultationsPage: React.FC = () => {
                       onSubmit={(values) => guardarRegistro(cita, values)}
                     />
                     {registro ? (
-                      <div className="flex justify-end border-t border-slate-200 pt-5">
+                      <div className="flex items-center justify-between border-t border-slate-200 pt-5">
+                        <button
+                          type="button"
+                          onClick={() => setCitaPorNoAtender(cita)}
+                          className="rounded-xl border border-rose-200 bg-rose-50 px-5 py-2.5 text-sm font-semibold text-rose-700 transition-colors hover:bg-rose-100"
+                        >
+                          Marcar como no atendida
+                        </button>
+
                         <button
                           type="button"
                           onClick={() => setCitaPorConfirmar(cita)}
@@ -286,10 +337,20 @@ export const VetConsultationsPage: React.FC = () => {
                         </button>
                       </div>
                     ) : (
-                      <p className="text-sm text-slate-500">
-                        Guarda el diagnóstico y tratamiento antes de finalizar
-                        la atención.
-                      </p>
+                      <div className="flex items-center justify-between border-t border-slate-200 pt-5">
+                        <button
+                          type="button"
+                          onClick={() => setCitaPorNoAtender(cita)}
+                          className="rounded-xl border border-rose-200 bg-rose-50 px-5 py-2.5 text-sm font-semibold text-rose-700 transition-colors hover:bg-rose-100"
+                        >
+                          Marcar como no atendida
+                        </button>
+
+                        <p className="text-sm text-slate-500">
+                          Guarda el diagnóstico y tratamiento antes de finalizar
+                          la atención.
+                        </p>
+                      </div>
                     )}
                   </div>
                 )}
@@ -315,6 +376,14 @@ export const VetConsultationsPage: React.FC = () => {
         cargando={marcandoAtendida}
         onCancelar={() => setCitaPorConfirmar(null)}
         onConfirmar={confirmarCitaAtendida}
+      />
+
+      <MarkAsNotAttendedDialog
+        abierto={Boolean(citaPorNoAtender)}
+        nombreMascota={citaPorNoAtender?.mascota.nombre ?? ""}
+        cargando={marcandoNoAtendida}
+        onCancelar={() => setCitaPorNoAtender(null)}
+        onConfirmar={confirmarCitaNoAtendida}
       />
     </div>
   );

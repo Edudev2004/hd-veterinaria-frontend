@@ -73,8 +73,36 @@ export const marcarCitaComoAtendida = async (
   return citaActualizada;
 };
 
+export const marcarCitaComoNoAtendida = async (
+  citaId: string,
+  veterinarioId: string
+): Promise<CitaAgenda | null> => {
+  await new Promise((resolve) => setTimeout(resolve, 200));
+
+  const citas = getStoredCitas();
+  const indice = citas.findIndex(
+    (cita) =>
+      cita.id === citaId && cita.veterinario_id === veterinarioId
+  );
+
+  if (indice < 0) {
+    return null;
+  }
+
+  const citaActualizada: CitaAgenda = {
+    ...citas[indice],
+    estado: 'no_atendida'
+  };
+
+  citas[indice] = citaActualizada;
+  saveStoredCitas(citas);
+
+  return citaActualizada;
+};
+
 export const vetScheduleService = {
   getAgendaDiaria,
   getCitaById,
-  marcarCitaComoAtendida
+  marcarCitaComoAtendida,
+  marcarCitaComoNoAtendida
 };
