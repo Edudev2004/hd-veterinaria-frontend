@@ -126,7 +126,7 @@ const getAtencionActiva = (
 ): AtencionEnCurso | null => {
   const atenciones = getAtencionesEnCurso(veterinarioId);
 
-  return atenciones.at(-1) ?? null;
+  return atenciones[atenciones.length - 1] ?? null;
 };
 
 const limpiarAtencionActiva = (
