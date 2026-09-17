@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Calendar,
   ChevronDown,
@@ -7,31 +7,32 @@ import {
   FileText,
   PawPrint,
   Stethoscope,
-  User
-} from 'lucide-react';
-import { Badge } from '@/components/ui/Badge';
-import { useAuth } from '@/context/AuthContext';
-import { vetScheduleService } from '../services/vetScheduleService';
-import type { CitaAgenda, EstadoCita } from '../types/vetSchedule.types';
+  User,
+} from "lucide-react";
+import { Badge } from "@/components/ui/Badge";
+import { useAuth } from "@/context/AuthContext";
+import { vetScheduleService } from "../services/vetScheduleService";
+import { vetConsultationService } from "../../vet/services/vetConsultationService";
+import type { CitaAgenda, EstadoCita } from "../types/vetSchedule.types";
 
-const FILTROS = ['todas', 'pendientes', 'completadas'] as const;
+const FILTROS = ["todas", "pendientes", "completadas"] as const;
 type Filtro = (typeof FILTROS)[number];
 
 const ESTADO_BADGE: Record<
   EstadoCita,
-  { texto: string; variant: 'healthy' | 'warning' | 'pending' | 'confirmed' }
+  { texto: string; variant: "healthy" | "warning" | "pending" | "confirmed" }
 > = {
-  atendida: { texto: 'Atendida', variant: 'healthy' },
-  no_atendida: { texto: 'No atendida', variant: 'warning' },
-  pendiente: { texto: 'Pendiente', variant: 'pending' },
-  cancelada: { texto: 'Cancelada', variant: 'warning' }
+  atendida: { texto: "Atendida", variant: "healthy" },
+  no_atendida: { texto: "No atendida", variant: "warning" },
+  pendiente: { texto: "Pendiente", variant: "pending" },
+  cancelada: { texto: "Cancelada", variant: "warning" },
 };
 
 const cumpleFiltro = (cita: CitaAgenda, filtro: Filtro): boolean => {
-  if (filtro === 'todas') return true;
-  if (filtro === 'pendientes') return cita.estado === 'pendiente';
+  if (filtro === "todas") return true;
+  if (filtro === "pendientes") return cita.estado === "pendiente";
 
-  return cita.estado === 'atendida' || cita.estado === 'no_atendida';
+  return cita.estado === "atendida" || cita.estado === "no_atendida";
 };
 
 export const VetSchedulePage: React.FC = () => {
@@ -39,7 +40,7 @@ export const VetSchedulePage: React.FC = () => {
   const navigate = useNavigate();
 
   const [citas, setCitas] = useState<CitaAgenda[]>([]);
-  const [filtro, setFiltro] = useState<Filtro>('todas');
+  const [filtro, setFiltro] = useState<Filtro>("todas");
   const [citaExpandidaId, setCitaExpandidaId] = useState<string | null>(null);
   const [cargando, setCargando] = useState(true);
 
@@ -55,18 +56,16 @@ export const VetSchedulePage: React.FC = () => {
   }, [user]);
 
   const citasFiltradas = citas.filter((cita) => cumpleFiltro(cita, filtro));
-  const atendidas = citas.filter((cita) => cita.estado === 'atendida').length;
-  const pendientes = citas.filter((cita) => cita.estado === 'pendiente').length;
+  const atendidas = citas.filter((cita) => cita.estado === "atendida").length;
+  const pendientes = citas.filter((cita) => cita.estado === "pendiente").length;
 
-  const hoy = new Date().toLocaleDateString('es-PE', {
-    day: '2-digit',
-    month: 'long'
+  const hoy = new Date().toLocaleDateString("es-PE", {
+    day: "2-digit",
+    month: "long",
   });
 
   const alternarDetalle = (citaId: string) => {
-    setCitaExpandidaId((citaActual) =>
-      citaActual === citaId ? null : citaId
-    );
+    setCitaExpandidaId((citaActual) => (citaActual === citaId ? null : citaId));
   };
 
   return (
@@ -104,8 +103,8 @@ export const VetSchedulePage: React.FC = () => {
               onClick={() => setFiltro(clave)}
               className={`rounded-lg px-3 py-1.5 text-sm font-semibold capitalize transition-colors ${
                 filtro === clave
-                  ? 'bg-tertiary text-primary'
-                  : 'text-slate-500 hover:bg-slate-50'
+                  ? "bg-tertiary text-primary"
+                  : "text-slate-500 hover:bg-slate-50"
               }`}
             >
               {clave}
@@ -125,11 +124,11 @@ export const VetSchedulePage: React.FC = () => {
           <ul className="flex flex-col gap-3">
             {citasFiltradas.map((cita) => {
               const hora = new Date(cita.fecha_hora).toLocaleTimeString(
-                'es-PE',
+                "es-PE",
                 {
-                  hour: '2-digit',
-                  minute: '2-digit'
-                }
+                  hour: "2-digit",
+                  minute: "2-digit",
+                },
               );
 
               const badge = ESTADO_BADGE[cita.estado];
@@ -150,7 +149,7 @@ export const VetSchedulePage: React.FC = () => {
                       <p className="font-semibold text-slate-800">
                         {cita.mascota.nombre}
                         <span className="text-xs font-normal text-slate-400">
-                          {' '}
+                          {" "}
                           · {cita.mascota.especie} - {cita.mascota.raza}
                         </span>
                       </p>
@@ -166,10 +165,10 @@ export const VetSchedulePage: React.FC = () => {
                       className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-primary hover:bg-tertiary"
                       aria-expanded={detalleVisible}
                     >
-                      {detalleVisible ? 'Ocultar' : 'Ver detalle'}
+                      {detalleVisible ? "Ocultar" : "Ver detalle"}
                       <ChevronDown
                         className={`h-4 w-4 transition-transform ${
-                          detalleVisible ? 'rotate-180' : ''
+                          detalleVisible ? "rotate-180" : ""
                         }`}
                       />
                     </button>
@@ -199,7 +198,7 @@ export const VetSchedulePage: React.FC = () => {
                               {cita.mascota.nombre}
                             </p>
                             <p className="text-sm text-slate-500">
-                              {cita.mascota.especie} · {cita.mascota.raza} ·{' '}
+                              {cita.mascota.especie} · {cita.mascota.raza} ·{" "}
                               {cita.mascota.edad}
                             </p>
                           </div>
@@ -254,12 +253,18 @@ export const VetSchedulePage: React.FC = () => {
                         </div>
                       </div>
 
-                      {cita.estado === 'pendiente' && (
+                      {cita.estado === "pendiente" && (
                         <div className="mt-4 flex justify-end">
                           <button
-                            onClick={() =>
-                              navigate(`/veterinario/atenciones/${cita.id}`)
-                            }
+                            onClick={() => {
+                              if (!user) return;
+
+                              vetConsultationService.iniciarAtencion(
+                                cita.id,
+                                user.id,
+                              );
+                              navigate(`/veterinario/atenciones/${cita.id}`);
+                            }}
                             className="flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary/90"
                           >
                             <Stethoscope className="h-4 w-4" />

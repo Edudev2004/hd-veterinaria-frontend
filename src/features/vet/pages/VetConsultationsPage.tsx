@@ -1,301 +1,254 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import {
-  AlertCircle,
-  ArrowLeft,
-  Calendar,
-  Clock,
-  FileText,
-  PawPrint,
-  Stethoscope,
-  User
-} from 'lucide-react';
-import { Badge } from '@/components/ui/Badge';
+import { ChevronDown, ClipboardPlus, Stethoscope } from 'lucide-react';
+import { useParams } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { vetScheduleService } from '../../appointments/services/vetScheduleService';
-import type { CitaAgenda, EstadoCita } from '../../appointments/types/vetSchedule.types';
-
-const ESTADO_BADGE: Record<
-  EstadoCita,
-  { texto: string; variant: 'healthy' | 'warning' | 'pending' | 'confirmed' }
-> = {
-  atendida: { texto: 'Atendida', variant: 'healthy' },
-  no_atendida: { texto: 'No atendida', variant: 'warning' },
-  pendiente: { texto: 'Pendiente', variant: 'pending' },
-  cancelada: { texto: 'Cancelada', variant: 'warning' }
-};
+import type { CitaAgenda } from '../../appointments/types/vetSchedule.types';
+import { VetConsultationForm } from '../components/VetConsultationForm';
+import { VetConsultationSummary } from '../components/VetConsultationSummary';
+import { vetConsultationService } from '../services/vetConsultationService';
+import type { RegistroAtencion } from '../types/vetConsultation.types';
 
 export const VetConsultationsPage: React.FC = () => {
   const { citaId } = useParams<{ citaId: string }>();
-  const navigate = useNavigate();
   const { user } = useAuth();
 
-  const [cita, setCita] = useState<CitaAgenda | null>(null);
-  const [citasPendientes, setCitasPendientes] = useState<CitaAgenda[]>([]);
+  const [citasEnCurso, setCitasEnCurso] = useState<CitaAgenda[]>([]);
+  const [registros, setRegistros] = useState<
+    Record<string, RegistroAtencion | null>
+  >({});
+  const [citaExpandidaId, setCitaExpandidaId] = useState<string | null>(
+    null
+  );
   const [cargando, setCargando] = useState(true);
-
-  const veterinarioId = user?.id;
+  const [citaGuardandoId, setCitaGuardandoId] = useState<string | null>(
+    null
+  );
+  const [mensajesExito, setMensajesExito] = useState<
+    Record<string, string>
+  >({});
 
   useEffect(() => {
-    if (!veterinarioId) {
+    if (!user) {
+      setCitasEnCurso([]);
+      setRegistros({});
       setCargando(false);
       return;
     }
 
-    setCargando(true);
+    const cargarAtencionesEnCurso = async (): Promise<void> => {
+      setCargando(true);
 
-    if (citaId) {
-      vetScheduleService.getCitaById(citaId, veterinarioId).then((data) => {
-        setCita(data);
-        setCargando(false);
+      const atencionesEnCurso =
+        vetConsultationService.getAtencionesEnCurso(user.id);
+
+      const citas = await Promise.all(
+        atencionesEnCurso.map((atencion) =>
+          vetScheduleService.getCitaById(atencion.citaId, user.id)
+        )
+      );
+
+      const citasEncontradas = citas.filter(
+        (cita): cita is CitaAgenda => cita !== null
+      );
+
+      const registrosCargados = await Promise.all(
+        citasEncontradas.map(async (cita) => [
+          cita.id,
+          await vetConsultationService.getAtencionByCita(cita.id, user.id)
+        ])
+      );
+
+      setCitasEnCurso(citasEncontradas);
+      setRegistros(Object.fromEntries(registrosCargados));
+
+      if (citaId && citasEncontradas.some((cita) => cita.id === citaId)) {
+        setCitaExpandidaId(citaId);
+      }
+
+      setCargando(false);
+    };
+
+    void cargarAtencionesEnCurso();
+  }, [citaId, user]);
+
+  const alternarDetalle = (id: string): void => {
+    setCitaExpandidaId((idActual) => (idActual === id ? null : id));
+  };
+
+  const guardarRegistro = async (
+    citaSeleccionada: CitaAgenda,
+    values: {
+      diagnostico: string;
+      tratamiento: string;
+      notas: string;
+    }
+  ): Promise<void> => {
+    if (!user) {
+      return;
+    }
+
+    setCitaGuardandoId(citaSeleccionada.id);
+    setMensajesExito((mensajes) => ({
+      ...mensajes,
+      [citaSeleccionada.id]: ''
+    }));
+
+    try {
+      const registroGuardado = await vetConsultationService.guardarAtencion({
+        citaId: citaSeleccionada.id,
+        veterinarioId: user.id,
+        ...values
       });
 
-      return;
+      setRegistros((registrosActuales) => ({
+        ...registrosActuales,
+        [citaSeleccionada.id]: registroGuardado
+      }));
+
+      setMensajesExito((mensajes) => ({
+        ...mensajes,
+        [citaSeleccionada.id]: 'Atención registrada correctamente.'
+      }));
+    } finally {
+      setCitaGuardandoId(null);
     }
-
-    vetScheduleService.getAgendaDiaria(veterinarioId).then((data) => {
-      setCitasPendientes(
-        data.filter((citaAgenda) => citaAgenda.estado === 'pendiente')
-      );
-      setCargando(false);
-    });
-  }, [citaId, veterinarioId]);
-
-  if (!citaId) {
-    return (
-      <div className="flex flex-col gap-6">
-        <div>
-          <h1 className="font-outfit text-2xl font-bold text-slate-900">
-            Atenciones Médicas
-          </h1>
-          <p className="text-sm text-slate-500">
-            Citas pendientes que requieren atención veterinaria.
-          </p>
-        </div>
-
-        {cargando ? (
-          <p className="py-12 text-center text-sm text-slate-400">
-            Cargando atenciones pendientes...
-          </p>
-        ) : citasPendientes.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-slate-200 bg-white p-8 text-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
-              <Stethoscope className="h-6 w-6" />
-            </div>
-            <h3 className="text-base font-bold text-slate-800">
-              No hay atenciones pendientes
-            </h3>
-            <p className="max-w-md text-xs text-slate-500">
-              Todas las citas de tu agenda diaria ya fueron atendidas o no tienes
-              citas programadas.
-            </p>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-3">
-            {citasPendientes.map((citaPendiente) => {
-              const hora = new Date(
-                citaPendiente.fecha_hora
-              ).toLocaleTimeString('es-PE', {
-                hour: '2-digit',
-                minute: '2-digit'
-              });
-
-              return (
-                <button
-                  key={citaPendiente.id}
-                  onClick={() =>
-                    navigate(`/veterinario/atenciones/${citaPendiente.id}`)
-                  }
-                  className="flex items-center gap-4 rounded-2xl border border-slate-100 bg-white p-4 text-left shadow-sm transition-colors hover:border-primary/40"
-                >
-                  <div className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-xl bg-tertiary text-primary">
-                    <Clock className="h-4 w-4" />
-                    <span className="text-xs font-bold">{hora}</span>
-                  </div>
-
-                  <div className="flex-1">
-                    <p className="font-semibold text-slate-800">
-                      {citaPendiente.mascota.nombre}
-                    </p>
-                    <p className="text-sm text-slate-500">
-                      {citaPendiente.mascota.especie} ·{' '}
-                      {citaPendiente.mascota.raza}
-                    </p>
-                    <p className="mt-1 text-xs text-slate-400">
-                      Propietario: {citaPendiente.propietario.nombre}
-                    </p>
-                  </div>
-
-                  <Badge variant="pending">Atender</Badge>
-                </button>
-              );
-            })}
-          </div>
-        )}
-      </div>
-    );
-  }
+  };
 
   if (cargando) {
     return (
       <p className="py-12 text-center text-sm text-slate-400">
-        Cargando detalle de la cita...
+        Cargando atenciones en curso...
       </p>
     );
   }
 
-  if (!cita) {
-    return (
-      <div className="flex flex-col gap-4">
-        <button
-          onClick={() => navigate('/veterinario/atenciones')}
-          className="flex w-fit items-center gap-2 text-sm font-semibold text-primary hover:underline"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Volver a atenciones
-        </button>
-
-        <div className="rounded-2xl border-2 border-dashed border-slate-200 bg-white p-8 text-center">
-          <p className="text-sm text-slate-500">
-            No se encontró la cita solicitada o no pertenece a tu agenda.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  const badge = ESTADO_BADGE[cita.estado];
-
-  const fecha = new Date(cita.fecha_hora).toLocaleDateString('es-PE', {
-    weekday: 'long',
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric'
-  });
-
-  const hora = new Date(cita.fecha_hora).toLocaleTimeString('es-PE', {
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-
   return (
     <div className="flex flex-col gap-6">
-      <button
-        onClick={() => navigate('/veterinario/atenciones')}
-        className="flex w-fit items-center gap-2 text-sm font-semibold text-primary hover:underline"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Volver a atenciones
-      </button>
-
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-4">
-        <div>
-          <h1 className="font-outfit text-2xl font-bold text-slate-900">
-            Detalle de la Atención Médica
-          </h1>
-          <p className="capitalize text-sm text-slate-500">
-            {fecha} · {hora}
-          </p>
-        </div>
-
-        <Badge variant={badge.variant}>{badge.texto}</Badge>
-      </div>
-
-      <div className="grid gap-6 sm:grid-cols-2">
-        <div className="flex items-start gap-4 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
-          {cita.mascota.fotoUrl ? (
-  <img
-    src={cita.mascota.fotoUrl}
-    alt={cita.mascota.nombre}
-    className="h-16 w-16 shrink-0 rounded-2xl border border-slate-200 object-cover"
-  />
-) : (
-  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-tertiary text-primary">
-    <PawPrint className="h-8 w-8" />
-  </div>
-)}
-          <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-              Paciente
-            </span>
-            <h3 className="text-lg font-bold text-slate-800">
-              {cita.mascota.nombre}
-            </h3>
-            <p className="text-sm text-slate-500">
-              {cita.mascota.especie} · {cita.mascota.raza}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-start gap-4 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
-          {cita.propietario.fotoUrl ? (
-  <img
-    src={cita.propietario.fotoUrl}
-    alt={cita.propietario.nombre}
-    className="h-16 w-16 shrink-0 rounded-full border border-slate-200 object-cover"
-  />
-) : (
-  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-secondary/10 text-secondary-hover">
-    <User className="h-8 w-8" />
-  </div>
-)}
-          <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-              Propietario
-            </span>
-            <h3 className="text-lg font-bold text-slate-800">
-              {cita.propietario.nombre}
-            </h3>
-            <p className="text-sm text-slate-500">
-              Teléfono: {cita.propietario.telefono}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-4 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
-        <h4 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-slate-400">
-          <FileText className="h-4 w-4" />
-          Información de la cita
-        </h4>
-
-        <div className="grid gap-4 border-t border-slate-100 pt-4 sm:grid-cols-2">
-          <div className="flex items-start gap-3">
-            <Calendar className="mt-0.5 h-5 w-5 shrink-0 text-slate-400" />
-            <div>
-              <p className="text-xs font-medium text-slate-400">Fecha y horario</p>
-              <p className="text-sm font-semibold text-slate-700">
-                {fecha} · {hora}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3">
-            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-slate-400" />
-            <div>
-              <p className="text-xs font-medium text-slate-400">
-                Motivo de consulta
-              </p>
-              <p className="text-sm font-semibold text-slate-700">
-                {cita.motivo}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-slate-200 bg-white p-8 text-center">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
-          <Stethoscope className="h-6 w-6" />
-        </div>
-        <h3 className="text-base font-bold text-slate-800">
-          Registro de Diagnóstico y Tratamiento
-        </h3>
-        <p className="max-w-md text-xs text-slate-500">
-          Aquí se implementará el formulario de la US-22 y las acciones de la
-          US-23 y US-24.
+      <div>
+        <h1 className="font-outfit text-2xl font-bold text-slate-900">
+          Atenciones Médicas
+        </h1>
+        <p className="text-sm text-slate-500">
+          Registra y consulta el diagnóstico y tratamiento de las citas
+          iniciadas.
         </p>
       </div>
+
+      {citasEnCurso.length === 0 ? (
+        <div className="flex flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed border-slate-200 bg-white p-10 text-center">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-tertiary text-primary">
+            <Stethoscope className="h-7 w-7" />
+          </div>
+
+          <div>
+            <h2 className="text-lg font-bold text-slate-800">
+              No hay atenciones iniciadas
+            </h2>
+            <p className="mt-2 max-w-md text-sm text-slate-500">
+              Las citas aparecerán aquí cuando pulses “Iniciar atención” desde
+              la Agenda Diaria.
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-4">
+          {citasEnCurso.map((cita) => {
+            const detalleVisible = citaExpandidaId === cita.id;
+            const registro = registros[cita.id];
+            const hora = new Date(cita.fecha_hora).toLocaleTimeString(
+              'es-PE',
+              {
+                hour: '2-digit',
+                minute: '2-digit'
+              }
+            );
+
+            return (
+              <article
+                key={cita.id}
+                className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm"
+              >
+                <button
+                  onClick={() => alternarDetalle(cita.id)}
+                  className="flex w-full items-center gap-4 p-5 text-left transition-colors hover:bg-slate-50"
+                  aria-expanded={detalleVisible}
+                >
+                  {cita.mascota.fotoUrl ? (
+                    <img
+                      src={cita.mascota.fotoUrl}
+                      alt={cita.mascota.nombre}
+                      className="h-14 w-14 rounded-xl border border-slate-200 object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-tertiary text-primary">
+                      <Stethoscope className="h-6 w-6" />
+                    </div>
+                  )}
+
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-slate-800">
+                      {cita.mascota.nombre}
+                    </p>
+                    <p className="truncate text-sm text-slate-500">
+                      {cita.propietario.nombre} · {cita.motivo}
+                    </p>
+                    <p className="mt-1 text-xs font-medium text-primary">
+                      Cita iniciada · {hora}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {registro && (
+                      <span className="hidden rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 sm:inline">
+                        Registrada
+                      </span>
+                    )}
+
+                    <ChevronDown
+                      className={`h-5 w-5 text-slate-400 transition-transform ${
+                        detalleVisible ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </div>
+                </button>
+
+                {detalleVisible && (
+                  <div className="flex flex-col gap-5 border-t border-slate-100 bg-slate-50/70 p-5">
+                    <VetConsultationSummary cita={cita} />
+
+                    {mensajesExito[cita.id] && (
+                      <p className="rounded-xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
+                        {mensajesExito[cita.id]}
+                      </p>
+                    )}
+
+                    <VetConsultationForm
+                      initialValues={{
+                        diagnostico: registro?.diagnostico ?? '',
+                        tratamiento: registro?.tratamiento ?? '',
+                        notas: registro?.notas ?? ''
+                      }}
+                      guardando={citaGuardandoId === cita.id}
+                      onSubmit={(values) => guardarRegistro(cita, values)}
+                    />
+                  </div>
+                )}
+              </article>
+            );
+          })}
+        </div>
+      )}
+
+      {citasEnCurso.length > 0 && (
+        <div className="flex items-center gap-3 rounded-2xl border border-dashed border-primary/30 bg-tertiary/40 p-4 text-primary">
+          <ClipboardPlus className="h-5 w-5 shrink-0" />
+          <p className="text-sm font-medium">
+            Las atenciones iniciadas se mantienen disponibles hasta que la
+            cita sea marcada como atendida o no atendida.
+          </p>
+        </div>
+      )}
     </div>
   );
 };
