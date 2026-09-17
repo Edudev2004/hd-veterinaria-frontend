@@ -1,6 +1,6 @@
-import { getCurrentUser } from './authService';
-export type Especie = 'perro' | 'gato' | 'otro';
-export type Sexo = 'macho' | 'hembra';
+import { getCurrentUser } from "./authService";
+export type Especie = "perro" | "gato" | "otro";
+export type Sexo = "macho" | "hembra";
 
 export interface Mascota {
   id: string;
@@ -10,7 +10,7 @@ export interface Mascota {
   raza?: string;
   sexo: Sexo;
   fechaNacimiento?: string;
-  fotoUrl   ?: string;
+  fotoUrl?: string;
   createdAt: string;
 }
 
@@ -23,7 +23,7 @@ export interface RegisterPetPayload {
   fotoUrl?: string;
 }
 
-const STORAGE_MASCOTAS_KEY = 'vethd_db_mascotas';
+const STORAGE_MASCOTAS_KEY = "vethd_db_mascotas";
 
 const getStoredMascotas = (): Mascota[] => {
   const data = localStorage.getItem(STORAGE_MASCOTAS_KEY);
@@ -34,14 +34,18 @@ const getStoredMascotas = (): Mascota[] => {
     return [];
   }
 };
-export const registerPet = async (payload: RegisterPetPayload): Promise<Mascota> => {
+export const registerPet = async (
+  payload: RegisterPetPayload,
+): Promise<Mascota> => {
   const currentUser = getCurrentUser();
   if (!currentUser || !currentUser.propietarioId) {
-    throw new Error('Debes iniciar sesión como propietario para registrar una mascota.');
+    throw new Error(
+      "Debes iniciar sesión como propietario para registrar una mascota.",
+    );
   }
 
   if (!payload.nombre.trim()) {
-    throw new Error('El nombre de la mascota es obligatorio.');
+    throw new Error("El nombre de la mascota es obligatorio.");
   }
 
   const mascotas = getStoredMascotas();
@@ -55,7 +59,7 @@ export const registerPet = async (payload: RegisterPetPayload): Promise<Mascota>
     sexo: payload.sexo,
     fechaNacimiento: payload.fechaNacimiento || undefined,
     fotoUrl: payload.fotoUrl || undefined,
-    createdAt: new Date().toISOString()
+    createdAt: new Date().toISOString(),
   };
 
   mascotas.push(newMascota);
@@ -70,4 +74,45 @@ export const getMyPets = (): Mascota[] => {
 
   const mascotas = getStoredMascotas();
   return mascotas.filter((m) => m.propietarioId === currentUser.propietarioId);
+};
+export const updatePet = async (
+  id: string,
+  payload: RegisterPetPayload,
+): Promise<Mascota> => {
+  const currentUser = getCurrentUser();
+  if (!currentUser || !currentUser.propietarioId) {
+    throw new Error(
+      "Debes iniciar sesión como propietario para editar una mascota.",
+    );
+  }
+
+  if (!payload.nombre.trim()) {
+    throw new Error("El nombre de la mascota es obligatorio.");
+  }
+
+  const mascotas = getStoredMascotas();
+  const index = mascotas.findIndex((m) => m.id === id);
+
+  if (index === -1) {
+    throw new Error("No se encontró la mascota a editar.");
+  }
+
+  if (mascotas[index].propietarioId !== currentUser.propietarioId) {
+    throw new Error("No tienes permiso para editar esta mascota.");
+  }
+
+  const updatedMascota: Mascota = {
+    ...mascotas[index],
+    nombre: payload.nombre.trim(),
+    especie: payload.especie,
+    raza: payload.raza?.trim() || undefined,
+    sexo: payload.sexo,
+    fechaNacimiento: payload.fechaNacimiento || undefined,
+    fotoUrl: payload.fotoUrl || undefined,
+  };
+
+  mascotas[index] = updatedMascota;
+  localStorage.setItem(STORAGE_MASCOTAS_KEY, JSON.stringify(mascotas));
+
+  return updatedMascota;
 };

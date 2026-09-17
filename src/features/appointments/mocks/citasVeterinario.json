@@ -1,0 +1,98 @@
+[
+  {
+    "id": "cita-001",
+    "mascota_id": "masc-001",
+    "veterinario_id": "usr-seed-vet-01",
+    "fecha_hora": "2026-09-16T08:00:00-05:00",
+    "estado": "atendida",
+    "motivo": "Vacunación Anual",
+    "created_at": "2026-09-10T10:00:00-05:00",
+    "mascota": {
+      "id": "masc-001",
+      "nombre": "Bella",
+      "especie": "Perro",
+      "raza": "Golden Retriever",
+      "edad": "4 años",
+      "descripcion": "Paciente activa y sociable. Su propietario no reporta alergias conocidas.",
+      "fotoUrl": "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=160&h=160&q=80"
+    },
+    "propietario": {
+      "id": "prop-001",
+      "nombre": "Juan Pérez",
+      "telefono": "555-0101",
+      "fotoUrl": "https://randomuser.me/api/portraits/men/32.jpg"
+    }
+  },
+  {
+    "id": "cita-002",
+    "mascota_id": "masc-002",
+    "veterinario_id": "usr-seed-vet-01",
+    "fecha_hora": "2026-09-16T09:30:00-05:00",
+    "estado": "pendiente",
+    "motivo": "Control post-operatorio (Esterilización realizada hace 7 días)",
+    "created_at": "2026-09-09T15:00:00-05:00",
+    "mascota": {
+      "id": "masc-002",
+      "nombre": "Milo",
+      "especie": "Gato",
+      "raza": "Siamés",
+      "edad": "2 años",
+"descripcion": "Gato tranquilo. Acude para control posterior a su esterilización.",
+      "fotoUrl": "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?auto=format&fit=crop&w=160&h=160&q=80"
+    },
+    "propietario": {
+      "id": "prop-002",
+      "nombre": "Ana Gómez",
+      "telefono": "555-0192",
+      "fotoUrl": "https://randomuser.me/api/portraits/women/44.jpg"
+    }
+  },
+  {
+    "id": "cita-003",
+    "mascota_id": "masc-003",
+    "veterinario_id": "usr-seed-vet-01",
+    "fecha_hora": "2026-09-16T10:15:00-05:00",
+    "estado": "no_atendida",
+    "motivo": "Chequeo general y desparasitación",
+    "created_at": "2026-09-08T12:00:00-05:00",
+    "mascota": {
+      "id": "masc-003",
+      "nombre": "Toby",
+      "especie": "Perro",
+      "raza": "Beagle",
+      "edad": "6 años",
+"descripcion": "Paciente dócil y acostumbrado a los controles preventivos.",
+      "fotoUrl": "https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?auto=format&fit=crop&w=160&h=160&q=80"
+    },
+    "propietario": {
+      "id": "prop-003",
+      "nombre": "Lucía Fernández",
+      "telefono": "555-0233",
+      "fotoUrl": "https://randomuser.me/api/portraits/women/68.jpg"
+    }
+  },
+  {
+    "id": "cita-004",
+    "mascota_id": "masc-004",
+    "veterinario_id": "usr-seed-vet-01",
+    "fecha_hora": "2026-09-16T11:00:00-05:00",
+    "estado": "pendiente",
+    "motivo": "Dermatología",
+    "created_at": "2026-09-11T09:00:00-05:00",
+    "mascota": {
+      "id": "masc-004",
+      "nombre": "Rocky",
+      "especie": "Perro",
+      "raza": "Bulldog",
+      "edad": "3 años",
+"descripcion": "Perro activo con sensibilidad cutánea reportada por su propietario.",
+      "fotoUrl": "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=160&h=160&q=80"
+    },
+    "propietario": {
+      "id": "prop-004",
+      "nombre": "Carlos Ruiz",
+      "telefono": "555-0143",
+      "fotoUrl": "https://randomuser.me/api/portraits/men/46.jpg"
+    }
+  }
+]
