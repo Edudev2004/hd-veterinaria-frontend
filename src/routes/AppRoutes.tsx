@@ -73,6 +73,7 @@ export const AppRoutes: React.FC = () => {
           <Route element={<ProtectedRoute allowedRoles={['veterinario']} />}>
             <Route path="veterinario/agenda" element={<VetSchedulePage />} />
             <Route path="veterinario/atenciones" element={<VetConsultationsPage />} />
+            <Route path="veterinario/atenciones/:citaId" element={<VetConsultationsPage />} />
             <Route path="veterinario/historial" element={<VetMedicalHistoryPage />} />
             <Route path="veterinario/valoraciones" element={<VetReviewsPage />} />
           </Route>
