@@ -15,6 +15,7 @@ import {
   User,
   Power,
   AlertTriangle,
+  Edit2,
 } from 'lucide-react';
 
 export interface Veterinario {
@@ -119,12 +120,20 @@ export const AdminVetsPage: React.FC = () => {
 
   const [busqueda, setBusqueda] = useState('');
   const [paginaActual, setPaginaActual] = useState(1);
-  const [modalAbierto, setModalAbierto] = useState(false);
+  const [modalRegistroAbierto, setModalRegistroAbierto] = useState(false);
   const [mensajeExito, setMensajeExito] = useState<string | null>(null);
 
-  // Estado para el modal de confirmación de activación / desactivación
+  // Estados de control para la US-28
   const [vetAConfirmar, setVetAConfirmar] = useState<Veterinario | null>(null);
+  const [vetAEditar, setVetAEditar] = useState<Veterinario | null>(null);
+  const [editFormData, setEditFormData] = useState({
+    nombre: '',
+    correo: '',
+    especialidad: ESPECIALIDADES[0],
+    telefono: '',
+  });
 
+  // Estado del formulario de registro nuevo
   const [formData, setFormData] = useState({
     nombre: '',
     correo: '',
@@ -133,7 +142,6 @@ export const AdminVetsPage: React.FC = () => {
     telefono: '',
   });
 
-  // Guardar en localStorage ante cualquier cambio de la lista
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(veterinarios));
@@ -164,6 +172,11 @@ export const AdminVetsPage: React.FC = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleEditInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setEditFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
   const handleRegistrar = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -190,12 +203,11 @@ export const AdminVetsPage: React.FC = () => {
       especialidad: ESPECIALIDADES[0],
       telefono: '',
     });
-    setModalAbierto(false);
+    setModalRegistroAbierto(false);
     setMensajeExito(`Veterinario ${nuevoVet.nombre} registrado exitosamente.`);
     setTimeout(() => setMensajeExito(null), 3500);
   };
 
-  // Función para alternar el estado
   const handleToggleEstado = () => {
     if (!vetAConfirmar) return;
 
@@ -213,6 +225,41 @@ export const AdminVetsPage: React.FC = () => {
     setTimeout(() => setMensajeExito(null), 3500);
   };
 
+  // Abrir modal y precargar los datos del veterinario
+  const iniciarEdicion = (vet: Veterinario) => {
+    setVetAEditar(vet);
+    setEditFormData({
+      nombre: vet.nombre,
+      correo: vet.correo,
+      especialidad: vet.especialidad,
+      telefono: vet.telefono,
+    });
+  };
+
+  // Guardar cambios de la edición
+  const handleGuardarEdicion = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!vetAEditar) return;
+
+    setVeterinarios((prev) =>
+      prev.map((v) =>
+        v.id === vetAEditar.id
+          ? {
+              ...v,
+              nombre: editFormData.nombre.trim(),
+              correo: editFormData.correo.trim(),
+              especialidad: editFormData.especialidad,
+              telefono: editFormData.telefono.trim(),
+            }
+          : v
+      )
+    );
+
+    setMensajeExito(`Veterinario ${editFormData.nombre} actualizado exitosamente.`);
+    setVetAEditar(null);
+    setTimeout(() => setMensajeExito(null), 3500);
+  };
+
   return (
     <div className="flex flex-col gap-6 p-1 md:p-2">
       {/* Encabezado con Botón de Acción */}
@@ -226,7 +273,7 @@ export const AdminVetsPage: React.FC = () => {
           </p>
         </div>
         <button
-          onClick={() => setModalAbierto(true)}
+          onClick={() => setModalRegistroAbierto(true)}
           className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl shadow-sm transition-all hover:shadow-md cursor-pointer"
         >
           <UserPlus className="w-4 h-4" />
@@ -324,18 +371,28 @@ export const AdminVetsPage: React.FC = () => {
                       </div>
                     </td>
                     <td className="py-4 px-6 text-center">
-                      <button
-                        onClick={() => setVetAConfirmar(vet)}
-                        title={vet.estado === 'activo' ? 'Desactivar veterinario' : 'Activar veterinario'}
-                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                          vet.estado === 'activo'
-                            ? 'bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200'
-                            : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200'
-                        }`}
-                      >
-                        <Power className="w-3.5 h-3.5" />
-                        {vet.estado === 'activo' ? 'Desactivar' : 'Activar'}
-                      </button>
+                      <div className="flex items-center justify-center gap-2">
+                        <button
+                          onClick={() => iniciarEdicion(vet)}
+                          title="Editar información"
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition-all cursor-pointer"
+                        >
+                          <Edit2 className="w-3.5 h-3.5 text-slate-500" />
+                          Editar
+                        </button>
+                        <button
+                          onClick={() => setVetAConfirmar(vet)}
+                          title={vet.estado === 'activo' ? 'Desactivar veterinario' : 'Activar veterinario'}
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                            vet.estado === 'activo'
+                              ? 'bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200'
+                              : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200'
+                          }`}
+                        >
+                          <Power className="w-3.5 h-3.5" />
+                          {vet.estado === 'activo' ? 'Desactivar' : 'Activar'}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -380,7 +437,7 @@ export const AdminVetsPage: React.FC = () => {
       </div>
 
       {/* Modal de Registro */}
-      {modalAbierto && (
+      {modalRegistroAbierto && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4 animate-fadeIn">
           <div className="bg-white w-full max-w-lg rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
@@ -393,7 +450,7 @@ export const AdminVetsPage: React.FC = () => {
                 </h2>
               </div>
               <button
-                onClick={() => setModalAbierto(false)}
+                onClick={() => setModalRegistroAbierto(false)}
                 className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition-colors"
               >
                 <X className="w-5 h-5" />
@@ -496,7 +553,7 @@ export const AdminVetsPage: React.FC = () => {
               <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
                 <button
                   type="button"
-                  onClick={() => setModalAbierto(false)}
+                  onClick={() => setModalRegistroAbierto(false)}
                   className="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
                 >
                   Cancelar
@@ -506,6 +563,119 @@ export const AdminVetsPage: React.FC = () => {
                   className="px-4 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-sm transition-all cursor-pointer"
                 >
                   Guardar Veterinario
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Edición con Datos Precargados */}
+      {vetAEditar && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4 animate-fadeIn">
+          <div className="bg-white w-full max-w-lg rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="p-2 bg-slate-100 text-slate-700 rounded-lg">
+                  <Edit2 className="w-5 h-5" />
+                </div>
+                <h2 className="text-lg font-bold text-slate-900 font-outfit">
+                  Editar Datos del Veterinario
+                </h2>
+              </div>
+              <button
+                onClick={() => setVetAEditar(null)}
+                className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleGuardarEdicion} className="p-6 overflow-y-auto flex flex-col gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Nombre Completo *
+                </label>
+                <div className="relative">
+                  <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    name="nombre"
+                    required
+                    value={editFormData.nombre}
+                    onChange={handleEditInputChange}
+                    className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Correo Electrónico *
+                </label>
+                <div className="relative">
+                  <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="email"
+                    name="correo"
+                    required
+                    value={editFormData.correo}
+                    onChange={handleEditInputChange}
+                    className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    Especialidad *
+                  </label>
+                  <select
+                    name="especialidad"
+                    value={editFormData.especialidad}
+                    onChange={handleEditInputChange}
+                    className="w-full px-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
+                  >
+                    {ESPECIALIDADES.map((esp) => (
+                      <option key={esp} value={esp}>
+                        {esp}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    Teléfono *
+                  </label>
+                  <div className="relative">
+                    <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="tel"
+                      name="telefono"
+                      required
+                      value={editFormData.telefono}
+                      onChange={handleEditInputChange}
+                      className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setVetAEditar(null)}
+                  className="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-xl shadow-sm transition-all cursor-pointer"
+                >
+                  Guardar Cambios
                 </button>
               </div>
             </form>
