@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, Clock, Stethoscope, Edit3, ChevronRight, CalendarX } from 'lucide-react';
+import { Calendar, Clock, Stethoscope, Edit3, ChevronRight, CalendarX, Eye } from 'lucide-react';
 import { CitaDetallada } from '../../../types/cita.types';
 import { CitaEstadoBadge } from './CitaEstadoBadge';
 
@@ -7,10 +7,13 @@ interface CitaCardProps {
   cita: CitaDetallada;
   onModificar: (cita: CitaDetallada) => void;
   onCancelar?: (cita: CitaDetallada) => void;
+  onVerDetalle?: (cita: CitaDetallada) => void;
 }
 
-export const CitaCard: React.FC<CitaCardProps> = ({ cita, onModificar, onCancelar }) => {
-  const esModificable = cita.estado === 'pendiente';
+export const CitaCard: React.FC<CitaCardProps> = ({ cita, onModificar, onCancelar, onVerDetalle }) => {
+  const estadoNormalizado = (cita.estado ? String(cita.estado).toLowerCase() : 'pendiente');
+  const esModificable = estadoNormalizado === 'pendiente';
+  const esCancelable = estadoNormalizado === 'pendiente' || estadoNormalizado === 'confirmada';
 
   // Formatear fecha y hora
   const { fechaTexto, horaTexto } = (() => {
@@ -91,11 +94,11 @@ export const CitaCard: React.FC<CitaCardProps> = ({ cita, onModificar, onCancela
       {cita.motivo && (
         <div className="text-xs text-slate-600">
           <span className="font-semibold text-slate-700 block mb-1">
-            {cita.estado === 'cancelada' ? 'Motivo de cancelación / registro:' : 'Motivo:'}
+            {estadoNormalizado === 'cancelada' ? 'Motivo de cancelación / registro:' : 'Motivo:'}
           </span>
           <p
             className={`p-2.5 rounded-xl border line-clamp-2 italic ${
-              cita.estado === 'cancelada'
+              estadoNormalizado === 'cancelada'
                 ? 'bg-rose-50/60 border-rose-100 text-rose-900'
                 : 'bg-slate-50/70 border-slate-100 text-slate-600'
             }`}
@@ -107,8 +110,21 @@ export const CitaCard: React.FC<CitaCardProps> = ({ cita, onModificar, onCancela
 
       {/* Pie de Tarjeta y Botones de Acción */}
       <div className="pt-2 border-t border-slate-100/80 flex flex-wrap items-center justify-between gap-2.5">
-        <div className="text-[11px] text-slate-400 font-mono">
-          ID: {cita.id.slice(0, 8)}
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] text-slate-400 font-mono">
+            ID: {cita.id.slice(0, 8)}
+          </span>
+          {onVerDetalle && (
+            <button
+              type="button"
+              onClick={() => onVerDetalle(cita)}
+              className="flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-slate-700 hover:text-teal-800 bg-slate-100 hover:bg-teal-50 border border-slate-200 hover:border-teal-300 rounded-xl transition-all shadow-xs active:scale-95"
+              title="Consultar detalle completo de la cita médica"
+            >
+              <Eye className="w-3.5 h-3.5 text-[#0d9488]" />
+              <span>Detalle</span>
+            </button>
+          )}
         </div>
 
         {esModificable ? (
@@ -136,11 +152,23 @@ export const CitaCard: React.FC<CitaCardProps> = ({ cita, onModificar, onCancela
               <ChevronRight className="w-3 h-3" />
             </button>
           </div>
+        ) : esCancelable && onCancelar ? (
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => onCancelar(cita)}
+              className="flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-rose-600 hover:text-white bg-rose-50 hover:bg-rose-600 border border-rose-200 hover:border-rose-600 rounded-xl transition-all shadow-sm active:scale-95"
+              title="Cancelar esta cita médica confirmada"
+            >
+              <CalendarX className="w-3.5 h-3.5" />
+              <span>Cancelar</span>
+            </button>
+          </div>
         ) : (
           <span
             className="text-[11px] text-slate-400 italic px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-100"
             title={
-              cita.estado === 'cancelada'
+              estadoNormalizado === 'cancelada'
                 ? 'Esta cita ya fue cancelada y no permite acciones'
                 : `Las citas en estado '${cita.estado}' no permiten modificaciones ni cancelación`
             }
