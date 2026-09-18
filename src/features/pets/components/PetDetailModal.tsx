@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { X, PawPrint } from "lucide-react";
+import { X, PawPrint, ClipboardList } from "lucide-react";
 import { Mascota } from "@/services/petService";
 
 interface PetDetailModalProps {
   mascota: Mascota;
   onClose: () => void;
   onEdit?: () => void;
+  onVerHistorial?: (mascota: Mascota) => void;
 }
 
 const especieLabel: Record<string, string> = {
@@ -19,6 +20,7 @@ export const PetDetailModal: React.FC<PetDetailModalProps> = ({
   mascota,
   onClose,
   onEdit,
+  onVerHistorial,
 }) => {
   const [imgError, setImgError] = useState(false);
 
@@ -81,13 +83,31 @@ export const PetDetailModal: React.FC<PetDetailModalProps> = ({
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={onEdit}
-          className="mt-6 w-full py-3 rounded-xl bg-[#0D7C84] text-white font-bold text-sm hover:bg-[#0b686f] transition-colors"
-        >
-          Editar Mascota
-        </button>
+        <div className="mt-6 flex flex-col gap-2">
+          {onVerHistorial && (
+            <button
+              type="button"
+              onClick={() => {
+                onClose();
+                onVerHistorial(mascota);
+              }}
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-bold text-white bg-[#0d9488] hover:bg-[#0f766e] transition-all shadow-md shadow-[#0d9488]/20 active:scale-95 cursor-pointer"
+            >
+              <ClipboardList className="w-4 h-4" />
+              <span>Consultar Historial Clínico</span>
+            </button>
+          )}
+
+          {onEdit && (
+            <button
+              type="button"
+              onClick={onEdit}
+              className="w-full py-3 rounded-xl bg-slate-100 text-slate-700 font-bold text-sm hover:bg-slate-200 transition-colors cursor-pointer"
+            >
+              Editar Mascota
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

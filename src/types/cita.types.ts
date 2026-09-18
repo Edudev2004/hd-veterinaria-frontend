@@ -3,9 +3,14 @@
  * Basado estrictamente en el esquema relacional de bd-veterinaria-hd.sql
  */
 
-// Estados permitidos según check constraint en bd-veterinaria-hd.sql:
-// check (estado in ('pendiente', 'atendida', 'no_atendida', 'cancelada'))
-export type EstadoCita = 'pendiente' | 'atendida' | 'no_atendida' | 'cancelada';
+// Estados permitidos en bd-veterinaria-hd.sql y el flujo del frontend:
+// check (estado in ('pendiente', 'atendida', 'no_atendida', 'cancelada')) + 'confirmada'
+export type EstadoCita = 'pendiente' | 'confirmada' | 'atendida' | 'no_atendida' | 'cancelada';
+
+/**
+ * Opciones de filtro por estado según requerimientos de la historia US-17
+ */
+export type FiltroEstadoCita = 'TODAS' | 'PENDIENTE' | 'CONFIRMADA' | 'CANCELADA';
 
 /**
  * Representa un registro de la tabla 'citas' en la base de datos
@@ -18,6 +23,8 @@ export interface Cita {
   estado: EstadoCita; // varchar(20) not null default 'pendiente'
   motivo: string | null; // text
   created_at: string; // timestamptz not null default now()
+  motivo_original?: string | null; // Motivo original inicial de la solicitud médica (US-18)
+  motivo_cancelacion?: string | null; // Justificación o razón registrada de cancelación si aplica (US-18)
 }
 
 /**
@@ -104,12 +111,24 @@ export interface ModificarCitaValidationErrors {
 }
 
 /**
- * Filtros para el listado de citas
+ * Filtros para el listado de citas (US-17)
  */
 export interface CitasFilterParams {
-  estado?: EstadoCita | 'todos';
+  estado?: EstadoCita | FiltroEstadoCita | 'todos' | 'todas';
   terminoBusqueda?: string;
   fecha?: string;
+  pagina?: number;
+  elementosPorPagina?: number;
+}
+
+/**
+ * Estado y control de paginación para el listado de citas (US-17)
+ */
+export interface CitasPaginationState {
+  paginaActual: number;
+  elementosPorPagina: number;
+  totalElementos: number;
+  totalPaginas: number;
 }
 
 /**
@@ -155,5 +174,16 @@ export interface CancelarCitaResult {
   cita: CitaDetallada;
   mensaje: string;
   fecha_cancelacion: string;
+}
+
+/**
+ * Propiedades del componente ModalDetalleCita (US-18)
+ */
+export interface ModalDetalleCitaProps {
+  citaId: string | null;
+  isOpen: boolean;
+  onClose: () => void;
+  onModificar?: (cita: CitaDetallada) => void;
+  onCancelar?: (cita: CitaDetallada) => void;
 }
 

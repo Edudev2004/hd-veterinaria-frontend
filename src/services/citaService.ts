@@ -59,17 +59,94 @@ export const MOTIVOS_CANCELACION_PRESET: MotivoCancelacionOpcion[] = [
 ];
 
 /**
- * Transforma un registro Appointment de la clave 'appointments' a CitaDetallada para la UI
+ * Normaliza los estados provenientes de 'appointments' (mayúsculas o minúsculas)
+ * al tipo EstadoCita respetando bd-veterinaria-hd.sql y los requerimientos de US-17
  */
-const appointmentToCitaDetallada = (a: Appointment): CitaDetallada => {
-  // Normalización de estados: CANCELADA -> cancelada; PENDIENTE / CONFIRMADA -> pendiente
-  const estado: EstadoCita = a.status === 'CANCELADA' ? 'cancelada' : 'pendiente';
+export const normalizarEstado = (status?: string): EstadoCita => {
+  if (!status) return 'pendiente';
+  const normalizado = status.toLowerCase().trim();
+  if (normalizado === 'cancelada') return 'cancelada';
+  if (normalizado === 'confirmada') return 'confirmada';
+  if (normalizado === 'atendida') return 'atendida';
+  if (normalizado === 'no_atendida') return 'no_atendida';
+  return 'pendiente';
+};
+
+/**
+ * Extrae y desglosa con precisión el motivo original y la justificación de cancelación (US-18)
+ * Admite lectura de campos directos (motivoOriginal, motivoCancelacion)
+ * y parseo robusto de cadenas compuestas tipo '[Cancelada: ...] | Motivo inicial/original: ...'
+ */
+export const extraerMotivosCita = (
+  motivoRaw?: string | null,
+  estado?: EstadoCita,
+  motivoOriginalDirect?: string,
+  motivoCancelacionDirect?: string
+): { motivoOriginal: string | null; motivoCancelacion: string | null } => {
+  const estadoNormalizado = normalizarEstado(estado);
+  const raw = motivoRaw ? motivoRaw.trim() : '';
+
+  // Si no está cancelada, el motivo original es el texto directo o motivo general
+  if (estadoNormalizado !== 'cancelada') {
+    return {
+      motivoOriginal: motivoOriginalDirect || (raw.length > 0 ? raw : null),
+      motivoCancelacion: null,
+    };
+  }
+
+  // Caso: Cita Cancelada
+  // 1. Si ya tiene campos explícitos guardados
+  if (motivoCancelacionDirect || motivoOriginalDirect) {
+    return {
+      motivoOriginal: motivoOriginalDirect || null,
+      motivoCancelacion: motivoCancelacionDirect || (raw.length > 0 ? raw : null),
+    };
+  }
+
+  // 2. Parseo de string compuesto [Cancelada: Justificación] | Motivo original/inicial: Motivo
+  const matchCompuesto = raw.match(/^\[Cancelada:\s*(.*?)(?:\]\s*\|\s*Motivo\s*(?:inicial|original):\s*(.*)|\]\s*$)/i);
+  if (matchCompuesto) {
+    const cancelacion = matchCompuesto[1] ? matchCompuesto[1].trim() : null;
+    const original = matchCompuesto[2] ? matchCompuesto[2].trim() : null;
+    return {
+      motivoOriginal: original && original.length > 0 ? original : null,
+      motivoCancelacion: cancelacion && cancelacion.length > 0 ? cancelacion : raw,
+    };
+  }
+
+  // 3. Si no cumple el patrón exacto pero empieza por [Cancelada:
+  if (raw.startsWith('[Cancelada:')) {
+    const sinPrefijo = raw.replace(/^\[Cancelada:\s*/i, '').replace(/\]$/, '').trim();
+    return {
+      motivoOriginal: null,
+      motivoCancelacion: sinPrefijo,
+    };
+  }
+
+  // 4. Si es cancelada pero solo tiene un string de texto
+  return {
+    motivoOriginal: null,
+    motivoCancelacion: raw.length > 0 ? raw : 'Cancelación registrada sin justificación adicional',
+  };
+};
+
+/**
+ * Transforma un registro de la clave 'appointments' a CitaDetallada para la UI
+ * garantizando compatibilidad con bd-veterinaria-hd.sql y el formato Appointment
+ */
+const appointmentToCitaDetallada = (a: Appointment | any): CitaDetallada => {
+  // Normalización fiel de estados: PENDIENTE -> pendiente, CONFIRMADA -> confirmada, CANCELADA -> cancelada
+  const estado: EstadoCita = normalizarEstado(a.status || a.estado);
 
   // Combinación y formateo de fecha y hora a formato ISO 8601
   const fechaHoraIso = (() => {
+    if (a.fecha_hora) return a.fecha_hora;
     try {
-      const d = new Date(`${a.date}T${a.startTime}:00`);
-      return isNaN(d.getTime()) ? (a.createdAt || new Date().toISOString()) : d.toISOString();
+      if (a.date && a.startTime) {
+        const d = new Date(`${a.date}T${a.startTime}:00`);
+        return isNaN(d.getTime()) ? (a.createdAt || new Date().toISOString()) : d.toISOString();
+      }
+      return a.createdAt || new Date().toISOString();
     } catch {
       return a.createdAt || new Date().toISOString();
     }
@@ -82,8 +159,8 @@ const appointmentToCitaDetallada = (a: Appointment): CitaDetallada => {
   );
 
   const mascota: MascotaCita = {
-    id: String(a.petId),
-    propietario_id: 'prop-seed-01',
+    id: String(a.mascota_id || a.petId || (petFound ? petFound.id : '1')),
+    propietario_id: a.propietario_id || 'prop-seed-01',
     nombre: a.petName || petFound?.nombre || 'Mascota',
     especie: petFound?.especie || 'canino',
     raza: petFound?.raza,
@@ -91,30 +168,40 @@ const appointmentToCitaDetallada = (a: Appointment): CitaDetallada => {
   };
 
   // Búsqueda de veterinario en mock
+  const vetIdNum = a.vetId ? Number(a.vetId) : (a.veterinario_id ? Number(a.veterinario_id) : 1);
   const vetFound = (vetsMock as any[]).find(
-    (v) => v.id === a.vetId || (a.vetName && v.name.toLowerCase() === a.vetName.toLowerCase())
+    (v) => v.id === vetIdNum || (a.vetName && v.name.toLowerCase() === String(a.vetName).toLowerCase())
   );
 
   const veterinario: VeterinarioDetallado = {
-    id: String(a.vetId),
-    usuario_id: `usr-vet-${a.vetId}`,
-    especialidad_id: `esp-${a.vetId}`,
+    id: String(a.veterinario_id || a.vetId || (vetFound ? vetFound.id : '1')),
+    usuario_id: `usr-vet-${vetIdNum}`,
+    especialidad_id: `esp-${vetIdNum}`,
     activo: true,
     nombre: a.vetName || vetFound?.name || 'Veterinario Asignado',
-    email: `veterinario${a.vetId}@vethd.com`,
+    email: `veterinario${vetIdNum}@vethd.com`,
     especialidad_nombre: a.specialty || vetFound?.specialty || 'Medicina General'
   };
 
+  const { motivoOriginal, motivoCancelacion } = extraerMotivosCita(
+    a.motivo,
+    estado,
+    a.motivoOriginal,
+    a.motivoCancelacion
+  );
+
   return {
     id: a.id,
-    mascota_id: String(a.petId),
-    veterinario_id: String(a.vetId),
+    mascota_id: mascota.id,
+    veterinario_id: veterinario.id,
     fecha_hora: fechaHoraIso,
     estado,
     motivo: a.motivo || null,
-    created_at: a.createdAt || new Date().toISOString(),
+    created_at: a.createdAt || a.created_at || new Date().toISOString(),
     mascota,
-    veterinario
+    veterinario,
+    motivo_original: motivoOriginal,
+    motivo_cancelacion: motivoCancelacion,
   };
 };
 
@@ -316,5 +403,6 @@ export const citaService = {
   isHorarioDisponible,
   modificarCita,
   cancelarCita,
+  extraerMotivosCita,
   MOTIVOS_CANCELACION_PRESET
 };
