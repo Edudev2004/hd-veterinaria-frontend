@@ -78,6 +78,8 @@ export const CalendarDatePicker = ({
     }
   };
 
+  const todayStr = formatDate(today.getFullYear(), today.getMonth(), today.getDate());
+
   const days = [];
   for (let i = 0; i < firstDay; i++) {
     days.push(<div key={`empty-${i}`} />);
@@ -87,12 +89,13 @@ export const CalendarDatePicker = ({
     const isAvailable = availableDates.includes(dateStr);
     const isSelected = selectedDate === dateStr;
     const isTodayFlag = isToday(currentYear, currentMonth, day);
+    const isPastDate = dateStr < todayStr;
 
     days.push(
       <button
         key={day}
-        onClick={() => isAvailable && onDateSelect(dateStr)}
-        disabled={!isAvailable}
+        onClick={() => isAvailable && !isPastDate && onDateSelect(dateStr)}
+        disabled={!isAvailable || isPastDate}
         className={`
           relative h-10 w-full rounded-xl text-sm font-medium transition-all
           ${
@@ -100,14 +103,14 @@ export const CalendarDatePicker = ({
               ? "bg-[#0d9488] text-white shadow-md ring-2 ring-teal-200"
               : isTodayFlag
                 ? "bg-amber-50 text-amber-700 font-bold ring-1 ring-amber-200"
-                : isAvailable
+                : isAvailable && !isPastDate
                   ? "text-slate-700 hover:bg-teal-50 hover:text-[#0d9488] cursor-pointer"
                   : "text-slate-300 cursor-not-allowed"
           }
         `}
       >
         {day}
-        {isAvailable && !isSelected && (
+        {isAvailable && !isPastDate && !isSelected && (
           <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#0d9488]/60" />
         )}
       </button>,
