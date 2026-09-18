@@ -16,7 +16,7 @@ import {
   Appointment,
   APPOINTMENTS_STORAGE_KEY
 } from '../features/appointments/services/appointmentService';
-import petsMock from '../features/appointments/mocks/pets.json';
+import { getMyPets } from './petService';
 import vetsMock from '../features/appointments/mocks/veterinarians.json';
 
 // Clave unificada de almacenamiento compartida con US-14
@@ -75,18 +75,19 @@ const appointmentToCitaDetallada = (a: Appointment): CitaDetallada => {
     }
   })();
 
-  // Búsqueda de mascota en mock para enriquecer especie, raza y foto
-  const petFound = (petsMock as any[]).find(
-    (p) => p.id === a.petId || (a.petName && p.name.toLowerCase() === a.petName.toLowerCase())
+  // Búsqueda de mascota del usuario para enriquecer especie, raza y foto
+  const mascotasUsuario = getMyPets();
+  const petFound = mascotasUsuario.find(
+    (p) => p.id === a.petId || p.id === String(a.petId) || (a.petName && p.nombre.toLowerCase() === a.petName.toLowerCase())
   );
 
   const mascota: MascotaCita = {
     id: String(a.petId),
     propietario_id: 'prop-seed-01',
-    nombre: a.petName || petFound?.name || 'Mascota',
-    especie: petFound?.species?.toLowerCase() || 'canino',
-    raza: petFound?.breed,
-    foto_url: petFound?.image
+    nombre: a.petName || petFound?.nombre || 'Mascota',
+    especie: petFound?.especie || 'canino',
+    raza: petFound?.raza,
+    foto_url: petFound?.fotoUrl
   };
 
   // Búsqueda de veterinario en mock
