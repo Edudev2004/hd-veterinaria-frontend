@@ -1,6 +1,6 @@
 export interface Appointment {
   id: string;
-  petId: number;
+  petId: string | number;
   petName: string;
   vetId: number;
   vetName: string;
