@@ -14,7 +14,7 @@ export interface Veterinarian {
 }
 
 export interface Pet {
-  id: number;
+  id: string | number;
   name: string;
   species: string;
   breed: string;

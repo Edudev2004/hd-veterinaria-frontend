@@ -25,13 +25,79 @@ export interface RegisterPetPayload {
 
 const STORAGE_MASCOTAS_KEY = "vethd_db_mascotas";
 
+export const DEFAULT_SEED_MASCOTAS: Mascota[] = [
+  {
+    id: '1',
+    propietarioId: 'prop-seed-01',
+    nombre: 'Luna',
+    especie: 'perro',
+    raza: 'Golden Retriever',
+    sexo: 'hembra',
+    fechaNacimiento: '2023-04-10',
+    fotoUrl: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=600&q=80',
+    createdAt: '2025-01-10T10:00:00.000Z'
+  },
+  {
+    id: '2',
+    propietarioId: 'prop-seed-01',
+    nombre: 'Max',
+    especie: 'gato',
+    raza: 'Bombay',
+    sexo: 'macho',
+    fechaNacimiento: '2025-01-15',
+    fotoUrl: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=600&q=80',
+    createdAt: '2025-02-15T12:00:00.000Z'
+  },
+  {
+    id: '3',
+    propietarioId: 'prop-seed-01',
+    nombre: 'Rocco',
+    especie: 'perro',
+    raza: 'Bulldog Francés',
+    sexo: 'macho',
+    fechaNacimiento: '2024-06-20',
+    fotoUrl: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=600&q=80',
+    createdAt: '2025-03-01T09:00:00.000Z'
+  },
+  {
+    id: '4',
+    propietarioId: 'prop-seed-01',
+    nombre: 'Milo',
+    especie: 'gato',
+    raza: 'Siamés',
+    sexo: 'macho',
+    fechaNacimiento: '2022-09-05',
+    fotoUrl: 'https://images.unsplash.com/photo-1574158622682-e40e69881006?auto=format&fit=crop&w=600&q=80',
+    createdAt: '2025-01-20T14:30:00.000Z'
+  },
+  {
+    id: '5',
+    propietarioId: 'prop-seed-01',
+    nombre: 'Canela',
+    especie: 'perro',
+    raza: 'Labrador Retriever',
+    sexo: 'hembra',
+    fechaNacimiento: '2021-03-12',
+    fotoUrl: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=600&q=80',
+    createdAt: '2025-01-05T08:15:00.000Z'
+  }
+];
+
 const getStoredMascotas = (): Mascota[] => {
   const data = localStorage.getItem(STORAGE_MASCOTAS_KEY);
-  if (!data) return [];
+  if (!data) {
+    localStorage.setItem(STORAGE_MASCOTAS_KEY, JSON.stringify(DEFAULT_SEED_MASCOTAS));
+    return DEFAULT_SEED_MASCOTAS;
+  }
   try {
-    return JSON.parse(data);
+    const parsed: Mascota[] = JSON.parse(data);
+    if (!Array.isArray(parsed) || parsed.length === 0) {
+      localStorage.setItem(STORAGE_MASCOTAS_KEY, JSON.stringify(DEFAULT_SEED_MASCOTAS));
+      return DEFAULT_SEED_MASCOTAS;
+    }
+    return parsed;
   } catch {
-    return [];
+    return DEFAULT_SEED_MASCOTAS;
   }
 };
 export const registerPet = async (
@@ -74,6 +140,10 @@ export const getMyPets = (): Mascota[] => {
 
   const mascotas = getStoredMascotas();
   return mascotas.filter((m) => m.propietarioId === currentUser.propietarioId);
+};
+
+export const getAllPets = (): Mascota[] => {
+  return getStoredMascotas();
 };
 export const updatePet = async (
   id: string,

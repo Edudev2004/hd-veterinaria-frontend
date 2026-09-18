@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/Button";
 import { PetForm } from "../components/PetForm";
 import { PetCard } from "../components/PetCard";
 import { PetDetailModal } from "../components/PetDetailModal";
+import { HistorialClinicoModal } from "../components/HistorialClinicoModal";
 import { getMyPets, Mascota } from "@/services/petService";
 
 export const PetsPage: React.FC = () => {
@@ -11,6 +12,7 @@ export const PetsPage: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingMascota, setEditingMascota] = useState<Mascota | null>(null);
   const [selectedMascota, setSelectedMascota] = useState<Mascota | null>(null);
+  const [mascotaParaHistorial, setMascotaParaHistorial] = useState<Mascota | null>(null);
 
   useEffect(() => {
     setMascotas(getMyPets());
@@ -78,6 +80,7 @@ export const PetsPage: React.FC = () => {
               key={mascota.id}
               mascota={mascota}
               onClick={() => setSelectedMascota(mascota)}
+              onVerHistorial={(m) => setMascotaParaHistorial(m)}
             />
           ))}
         </div>
@@ -88,6 +91,16 @@ export const PetsPage: React.FC = () => {
           mascota={selectedMascota}
           onClose={() => setSelectedMascota(null)}
           onEdit={handleEditClick}
+          onVerHistorial={(m) => setMascotaParaHistorial(m)}
+        />
+      )}
+
+      {mascotaParaHistorial && (
+        <HistorialClinicoModal
+          isOpen={Boolean(mascotaParaHistorial)}
+          onClose={() => setMascotaParaHistorial(null)}
+          mascotaId={mascotaParaHistorial.id}
+          mascotaNombre={mascotaParaHistorial.nombre}
         />
       )}
     </div>
