@@ -1,301 +1,7205 @@
 [
-  { "id": 1, "vetId": 1, "date": "2026-09-14", "startTime": "08:00", "status": "available" },
-  { "id": 2, "vetId": 1, "date": "2026-09-14", "startTime": "09:00", "status": "available" },
-  { "id": 3, "vetId": 1, "date": "2026-09-14", "startTime": "10:00", "status": "occupied", "appointmentId": "APT-001" },
-  { "id": 4, "vetId": 1, "date": "2026-09-14", "startTime": "11:00", "status": "available" },
-  { "id": 5, "vetId": 1, "date": "2026-09-14", "startTime": "12:00", "status": "available" },
-  { "id": 6, "vetId": 1, "date": "2026-09-14", "startTime": "13:00", "status": "occupied", "appointmentId": "APT-002" },
-  { "id": 7, "vetId": 1, "date": "2026-09-14", "startTime": "14:00", "status": "available" },
-  { "id": 8, "vetId": 1, "date": "2026-09-14", "startTime": "15:00", "status": "available" },
-  { "id": 9, "vetId": 1, "date": "2026-09-14", "startTime": "16:00", "status": "available" },
-
-  { "id": 10, "vetId": 1, "date": "2026-09-15", "startTime": "08:00", "status": "available" },
-  { "id": 11, "vetId": 1, "date": "2026-09-15", "startTime": "09:00", "status": "occupied", "appointmentId": "APT-003" },
-  { "id": 12, "vetId": 1, "date": "2026-09-15", "startTime": "10:00", "status": "occupied", "appointmentId": "APT-004" },
-  { "id": 13, "vetId": 1, "date": "2026-09-15", "startTime": "11:00", "status": "available" },
-  { "id": 14, "vetId": 1, "date": "2026-09-15", "startTime": "12:00", "status": "available" },
-  { "id": 15, "vetId": 1, "date": "2026-09-15", "startTime": "13:00", "status": "available" },
-  { "id": 16, "vetId": 1, "date": "2026-09-15", "startTime": "14:00", "status": "occupied", "appointmentId": "APT-005" },
-  { "id": 17, "vetId": 1, "date": "2026-09-15", "startTime": "15:00", "status": "available" },
-  { "id": 18, "vetId": 1, "date": "2026-09-15", "startTime": "16:00", "status": "available" },
-
-  { "id": 19, "vetId": 1, "date": "2026-09-16", "startTime": "08:00", "status": "occupied", "appointmentId": "APT-006" },
-  { "id": 20, "vetId": 1, "date": "2026-09-16", "startTime": "09:00", "status": "available" },
-  { "id": 21, "vetId": 1, "date": "2026-09-16", "startTime": "10:00", "status": "available" },
-  { "id": 22, "vetId": 1, "date": "2026-09-16", "startTime": "11:00", "status": "available" },
-  { "id": 23, "vetId": 1, "date": "2026-09-16", "startTime": "12:00", "status": "occupied", "appointmentId": "APT-007" },
-  { "id": 24, "vetId": 1, "date": "2026-09-16", "startTime": "13:00", "status": "available" },
-  { "id": 25, "vetId": 1, "date": "2026-09-16", "startTime": "14:00", "status": "available" },
-  { "id": 26, "vetId": 1, "date": "2026-09-16", "startTime": "15:00", "status": "occupied", "appointmentId": "APT-008" },
-  { "id": 27, "vetId": 1, "date": "2026-09-16", "startTime": "16:00", "status": "available" },
-
-  { "id": 28, "vetId": 1, "date": "2026-09-17", "startTime": "08:00", "status": "available" },
-  { "id": 29, "vetId": 1, "date": "2026-09-17", "startTime": "09:00", "status": "available" },
-  { "id": 30, "vetId": 1, "date": "2026-09-17", "startTime": "10:00", "status": "occupied", "appointmentId": "APT-009" },
-  { "id": 31, "vetId": 1, "date": "2026-09-17", "startTime": "11:00", "status": "available" },
-  { "id": 32, "vetId": 1, "date": "2026-09-17", "startTime": "12:00", "status": "available" },
-  { "id": 33, "vetId": 1, "date": "2026-09-17", "startTime": "13:00", "status": "occupied", "appointmentId": "APT-010" },
-  { "id": 34, "vetId": 1, "date": "2026-09-17", "startTime": "14:00", "status": "available" },
-  { "id": 35, "vetId": 1, "date": "2026-09-17", "startTime": "15:00", "status": "available" },
-  { "id": 36, "vetId": 1, "date": "2026-09-17", "startTime": "16:00", "status": "occupied", "appointmentId": "APT-011" },
-
-  { "id": 37, "vetId": 1, "date": "2026-09-18", "startTime": "08:00", "status": "available" },
-  { "id": 38, "vetId": 1, "date": "2026-09-18", "startTime": "09:00", "status": "occupied", "appointmentId": "APT-012" },
-  { "id": 39, "vetId": 1, "date": "2026-09-18", "startTime": "10:00", "status": "available" },
-  { "id": 40, "vetId": 1, "date": "2026-09-18", "startTime": "11:00", "status": "available" },
-  { "id": 41, "vetId": 1, "date": "2026-09-18", "startTime": "12:00", "status": "available" },
-  { "id": 42, "vetId": 1, "date": "2026-09-18", "startTime": "13:00", "status": "available" },
-  { "id": 43, "vetId": 1, "date": "2026-09-18", "startTime": "14:00", "status": "occupied", "appointmentId": "APT-013" },
-  { "id": 44, "vetId": 1, "date": "2026-09-18", "startTime": "15:00", "status": "available" },
-  { "id": 45, "vetId": 1, "date": "2026-09-18", "startTime": "16:00", "status": "available" },
-
-  { "id": 46, "vetId": 1, "date": "2026-09-21", "startTime": "08:00", "status": "available" },
-  { "id": 47, "vetId": 1, "date": "2026-09-21", "startTime": "09:00", "status": "available" },
-  { "id": 48, "vetId": 1, "date": "2026-09-21", "startTime": "10:00", "status": "occupied", "appointmentId": "APT-014" },
-  { "id": 49, "vetId": 1, "date": "2026-09-21", "startTime": "11:00", "status": "available" },
-  { "id": 50, "vetId": 1, "date": "2026-09-21", "startTime": "12:00", "status": "available" },
-  { "id": 51, "vetId": 1, "date": "2026-09-21", "startTime": "13:00", "status": "available" },
-  { "id": 52, "vetId": 1, "date": "2026-09-21", "startTime": "14:00", "status": "available" },
-  { "id": 53, "vetId": 1, "date": "2026-09-21", "startTime": "15:00", "status": "occupied", "appointmentId": "APT-015" },
-  { "id": 54, "vetId": 1, "date": "2026-09-21", "startTime": "16:00", "status": "available" },
-
-  { "id": 55, "vetId": 1, "date": "2026-09-22", "startTime": "08:00", "status": "occupied", "appointmentId": "APT-016" },
-  { "id": 56, "vetId": 1, "date": "2026-09-22", "startTime": "09:00", "status": "available" },
-  { "id": 57, "vetId": 1, "date": "2026-09-22", "startTime": "10:00", "status": "available" },
-  { "id": 58, "vetId": 1, "date": "2026-09-22", "startTime": "11:00", "status": "occupied", "appointmentId": "APT-017" },
-  { "id": 59, "vetId": 1, "date": "2026-09-22", "startTime": "12:00", "status": "available" },
-  { "id": 60, "vetId": 1, "date": "2026-09-22", "startTime": "13:00", "status": "available" },
-  { "id": 61, "vetId": 1, "date": "2026-09-22", "startTime": "14:00", "status": "available" },
-  { "id": 62, "vetId": 1, "date": "2026-09-22", "startTime": "15:00", "status": "available" },
-  { "id": 63, "vetId": 1, "date": "2026-09-22", "startTime": "16:00", "status": "occupied", "appointmentId": "APT-018" },
-
-  { "id": 64, "vetId": 1, "date": "2026-09-23", "startTime": "08:00", "status": "available" },
-  { "id": 65, "vetId": 1, "date": "2026-09-23", "startTime": "09:00", "status": "available" },
-  { "id": 66, "vetId": 1, "date": "2026-09-23", "startTime": "10:00", "status": "available" },
-  { "id": 67, "vetId": 1, "date": "2026-09-23", "startTime": "11:00", "status": "occupied", "appointmentId": "APT-019" },
-  { "id": 68, "vetId": 1, "date": "2026-09-23", "startTime": "12:00", "status": "occupied", "appointmentId": "APT-020" },
-  { "id": 69, "vetId": 1, "date": "2026-09-23", "startTime": "13:00", "status": "available" },
-  { "id": 70, "vetId": 1, "date": "2026-09-23", "startTime": "14:00", "status": "available" },
-  { "id": 71, "vetId": 1, "date": "2026-09-23", "startTime": "15:00", "status": "available" },
-  { "id": 72, "vetId": 1, "date": "2026-09-23", "startTime": "16:00", "status": "available" },
-
-  { "id": 73, "vetId": 1, "date": "2026-09-24", "startTime": "08:00", "status": "available" },
-  { "id": 74, "vetId": 1, "date": "2026-09-24", "startTime": "09:00", "status": "occupied", "appointmentId": "APT-021" },
-  { "id": 75, "vetId": 1, "date": "2026-09-24", "startTime": "10:00", "status": "available" },
-  { "id": 76, "vetId": 1, "date": "2026-09-24", "startTime": "11:00", "status": "available" },
-  { "id": 77, "vetId": 1, "date": "2026-09-24", "startTime": "12:00", "status": "occupied", "appointmentId": "APT-022" },
-  { "id": 78, "vetId": 1, "date": "2026-09-24", "startTime": "13:00", "status": "available" },
-  { "id": 79, "vetId": 1, "date": "2026-09-24", "startTime": "14:00", "status": "available" },
-  { "id": 80, "vetId": 1, "date": "2026-09-24", "startTime": "15:00", "status": "occupied", "appointmentId": "APT-023" },
-  { "id": 81, "vetId": 1, "date": "2026-09-24", "startTime": "16:00", "status": "available" },
-
-  { "id": 82, "vetId": 1, "date": "2026-09-25", "startTime": "08:00", "status": "available" },
-  { "id": 83, "vetId": 1, "date": "2026-09-25", "startTime": "09:00", "status": "available" },
-  { "id": 84, "vetId": 1, "date": "2026-09-25", "startTime": "10:00", "status": "occupied", "appointmentId": "APT-024" },
-  { "id": 85, "vetId": 1, "date": "2026-09-25", "startTime": "11:00", "status": "available" },
-  { "id": 86, "vetId": 1, "date": "2026-09-25", "startTime": "12:00", "status": "available" },
-  { "id": 87, "vetId": 1, "date": "2026-09-25", "startTime": "13:00", "status": "occupied", "appointmentId": "APT-025" },
-  { "id": 88, "vetId": 1, "date": "2026-09-25", "startTime": "14:00", "status": "available" },
-  { "id": 89, "vetId": 1, "date": "2026-09-25", "startTime": "15:00", "status": "available" },
-  { "id": 90, "vetId": 1, "date": "2026-09-25", "startTime": "16:00", "status": "occupied", "appointmentId": "APT-026" },
-
-  { "id": 91, "vetId": 1, "date": "2026-09-28", "startTime": "08:00", "status": "available" },
-  { "id": 92, "vetId": 1, "date": "2026-09-28", "startTime": "09:00", "status": "available" },
-  { "id": 93, "vetId": 1, "date": "2026-09-28", "startTime": "10:00", "status": "available" },
-  { "id": 94, "vetId": 1, "date": "2026-09-28", "startTime": "11:00", "status": "occupied", "appointmentId": "APT-027" },
-  { "id": 95, "vetId": 1, "date": "2026-09-28", "startTime": "12:00", "status": "available" },
-  { "id": 96, "vetId": 1, "date": "2026-09-28", "startTime": "13:00", "status": "available" },
-  { "id": 97, "vetId": 1, "date": "2026-09-28", "startTime": "14:00", "status": "occupied", "appointmentId": "APT-028" },
-  { "id": 98, "vetId": 1, "date": "2026-09-28", "startTime": "15:00", "status": "available" },
-  { "id": 99, "vetId": 1, "date": "2026-09-28", "startTime": "16:00", "status": "available" },
-
-  { "id": 100, "vetId": 1, "date": "2026-09-29", "startTime": "08:00", "status": "occupied", "appointmentId": "APT-029" },
-  { "id": 101, "vetId": 1, "date": "2026-09-29", "startTime": "09:00", "status": "available" },
-  { "id": 102, "vetId": 1, "date": "2026-09-29", "startTime": "10:00", "status": "available" },
-  { "id": 103, "vetId": 1, "date": "2026-09-29", "startTime": "11:00", "status": "available" },
-  { "id": 104, "vetId": 1, "date": "2026-09-29", "startTime": "12:00", "status": "occupied", "appointmentId": "APT-030" },
-  { "id": 105, "vetId": 1, "date": "2026-09-29", "startTime": "13:00", "status": "available" },
-  { "id": 106, "vetId": 1, "date": "2026-09-29", "startTime": "14:00", "status": "available" },
-  { "id": 107, "vetId": 1, "date": "2026-09-29", "startTime": "15:00", "status": "occupied", "appointmentId": "APT-031" },
-  { "id": 108, "vetId": 1, "date": "2026-09-29", "startTime": "16:00", "status": "available" },
-
-  { "id": 109, "vetId": 1, "date": "2026-09-30", "startTime": "08:00", "status": "available" },
-  { "id": 110, "vetId": 1, "date": "2026-09-30", "startTime": "09:00", "status": "occupied", "appointmentId": "APT-032" },
-  { "id": 111, "vetId": 1, "date": "2026-09-30", "startTime": "10:00", "status": "available" },
-  { "id": 112, "vetId": 1, "date": "2026-09-30", "startTime": "11:00", "status": "available" },
-  { "id": 113, "vetId": 1, "date": "2026-09-30", "startTime": "12:00", "status": "available" },
-  { "id": 114, "vetId": 1, "date": "2026-09-30", "startTime": "13:00", "status": "occupied", "appointmentId": "APT-033" },
-  { "id": 115, "vetId": 1, "date": "2026-09-30", "startTime": "14:00", "status": "available" },
-  { "id": 116, "vetId": 1, "date": "2026-09-30", "startTime": "15:00", "status": "available" },
-  { "id": 117, "vetId": 1, "date": "2026-09-30", "startTime": "16:00", "status": "available" },
-
-  { "id": 118, "vetId": 1, "date": "2026-10-01", "startTime": "08:00", "status": "available" },
-  { "id": 119, "vetId": 1, "date": "2026-10-01", "startTime": "09:00", "status": "available" },
-  { "id": 120, "vetId": 1, "date": "2026-10-01", "startTime": "10:00", "status": "occupied", "appointmentId": "APT-034" },
-  { "id": 121, "vetId": 1, "date": "2026-10-01", "startTime": "11:00", "status": "available" },
-  { "id": 122, "vetId": 1, "date": "2026-10-01", "startTime": "12:00", "status": "available" },
-  { "id": 123, "vetId": 1, "date": "2026-10-01", "startTime": "13:00", "status": "available" },
-  { "id": 124, "vetId": 1, "date": "2026-10-01", "startTime": "14:00", "status": "occupied", "appointmentId": "APT-035" },
-  { "id": 125, "vetId": 1, "date": "2026-10-01", "startTime": "15:00", "status": "available" },
-  { "id": 126, "vetId": 1, "date": "2026-10-01", "startTime": "16:00", "status": "occupied", "appointmentId": "APT-036" },
-
-  { "id": 127, "vetId": 1, "date": "2026-10-02", "startTime": "08:00", "status": "available" },
-  { "id": 128, "vetId": 1, "date": "2026-10-02", "startTime": "09:00", "status": "available" },
-  { "id": 129, "vetId": 1, "date": "2026-10-02", "startTime": "10:00", "status": "available" },
-  { "id": 130, "vetId": 1, "date": "2026-10-02", "startTime": "11:00", "status": "occupied", "appointmentId": "APT-037" },
-  { "id": 131, "vetId": 1, "date": "2026-10-02", "startTime": "12:00", "status": "available" },
-  { "id": 132, "vetId": 1, "date": "2026-10-02", "startTime": "13:00", "status": "available" },
-  { "id": 133, "vetId": 1, "date": "2026-10-02", "startTime": "14:00", "status": "available" },
-  { "id": 134, "vetId": 1, "date": "2026-10-02", "startTime": "15:00", "status": "occupied", "appointmentId": "APT-038" },
-  { "id": 135, "vetId": 1, "date": "2026-10-02", "startTime": "16:00", "status": "available" },
-
-  { "id": 136, "vetId": 2, "date": "2026-09-14", "startTime": "08:00", "status": "available" },
-  { "id": 137, "vetId": 2, "date": "2026-09-14", "startTime": "09:00", "status": "occupied", "appointmentId": "APT-039" },
-  { "id": 138, "vetId": 2, "date": "2026-09-14", "startTime": "10:00", "status": "available" },
-  { "id": 139, "vetId": 2, "date": "2026-09-14", "startTime": "11:00", "status": "available" },
-  { "id": 140, "vetId": 2, "date": "2026-09-14", "startTime": "12:00", "status": "occupied", "appointmentId": "APT-040" },
-  { "id": 141, "vetId": 2, "date": "2026-09-14", "startTime": "13:00", "status": "available" },
-  { "id": 142, "vetId": 2, "date": "2026-09-14", "startTime": "14:00", "status": "available" },
-  { "id": 143, "vetId": 2, "date": "2026-09-14", "startTime": "15:00", "status": "occupied", "appointmentId": "APT-041" },
-  { "id": 144, "vetId": 2, "date": "2026-09-14", "startTime": "16:00", "status": "available" },
-
-  { "id": 145, "vetId": 2, "date": "2026-09-15", "startTime": "08:00", "status": "available" },
-  { "id": 146, "vetId": 2, "date": "2026-09-15", "startTime": "09:00", "status": "available" },
-  { "id": 147, "vetId": 2, "date": "2026-09-15", "startTime": "10:00", "status": "occupied", "appointmentId": "APT-042" },
-  { "id": 148, "vetId": 2, "date": "2026-09-15", "startTime": "11:00", "status": "available" },
-  { "id": 149, "vetId": 2, "date": "2026-09-15", "startTime": "12:00", "status": "available" },
-  { "id": 150, "vetId": 2, "date": "2026-09-15", "startTime": "13:00", "status": "occupied", "appointmentId": "APT-043" },
-  { "id": 151, "vetId": 2, "date": "2026-09-15", "startTime": "14:00", "status": "available" },
-  { "id": 152, "vetId": 2, "date": "2026-09-15", "startTime": "15:00", "status": "available" },
-  { "id": 153, "vetId": 2, "date": "2026-09-15", "startTime": "16:00", "status": "occupied", "appointmentId": "APT-044" },
-
-  { "id": 154, "vetId": 2, "date": "2026-09-16", "startTime": "08:00", "status": "occupied", "appointmentId": "APT-045" },
-  { "id": 155, "vetId": 2, "date": "2026-09-16", "startTime": "09:00", "status": "available" },
-  { "id": 156, "vetId": 2, "date": "2026-09-16", "startTime": "10:00", "status": "available" },
-  { "id": 157, "vetId": 2, "date": "2026-09-16", "startTime": "11:00", "status": "occupied", "appointmentId": "APT-046" },
-  { "id": 158, "vetId": 2, "date": "2026-09-16", "startTime": "12:00", "status": "available" },
-  { "id": 159, "vetId": 2, "date": "2026-09-16", "startTime": "13:00", "status": "available" },
-  { "id": 160, "vetId": 2, "date": "2026-09-16", "startTime": "14:00", "status": "occupied", "appointmentId": "APT-047" },
-  { "id": 161, "vetId": 2, "date": "2026-09-16", "startTime": "15:00", "status": "available" },
-  { "id": 162, "vetId": 2, "date": "2026-09-16", "startTime": "16:00", "status": "available" },
-
-  { "id": 163, "vetId": 3, "date": "2026-09-14", "startTime": "08:00", "status": "available" },
-  { "id": 164, "vetId": 3, "date": "2026-09-14", "startTime": "09:00", "status": "available" },
-  { "id": 165, "vetId": 3, "date": "2026-09-14", "startTime": "10:00", "status": "occupied", "appointmentId": "APT-048" },
-  { "id": 166, "vetId": 3, "date": "2026-09-14", "startTime": "11:00", "status": "available" },
-  { "id": 167, "vetId": 3, "date": "2026-09-14", "startTime": "12:00", "status": "available" },
-  { "id": 168, "vetId": 3, "date": "2026-09-14", "startTime": "13:00", "status": "occupied", "appointmentId": "APT-049" },
-  { "id": 169, "vetId": 3, "date": "2026-09-14", "startTime": "14:00", "status": "available" },
-  { "id": 170, "vetId": 3, "date": "2026-09-14", "startTime": "15:00", "status": "available" },
-  { "id": 171, "vetId": 3, "date": "2026-09-14", "startTime": "16:00", "status": "occupied", "appointmentId": "APT-050" },
-
-  { "id": 172, "vetId": 3, "date": "2026-09-15", "startTime": "08:00", "status": "occupied", "appointmentId": "APT-051" },
-  { "id": 173, "vetId": 3, "date": "2026-09-15", "startTime": "09:00", "status": "available" },
-  { "id": 174, "vetId": 3, "date": "2026-09-15", "startTime": "10:00", "status": "available" },
-  { "id": 175, "vetId": 3, "date": "2026-09-15", "startTime": "11:00", "status": "available" },
-  { "id": 176, "vetId": 3, "date": "2026-09-15", "startTime": "12:00", "status": "occupied", "appointmentId": "APT-052" },
-  { "id": 177, "vetId": 3, "date": "2026-09-15", "startTime": "13:00", "status": "available" },
-  { "id": 178, "vetId": 3, "date": "2026-09-15", "startTime": "14:00", "status": "available" },
-  { "id": 179, "vetId": 3, "date": "2026-09-15", "startTime": "15:00", "status": "occupied", "appointmentId": "APT-053" },
-  { "id": 180, "vetId": 3, "date": "2026-09-15", "startTime": "16:00", "status": "available" },
-
-  { "id": 181, "vetId": 4, "date": "2026-09-14", "startTime": "08:00", "status": "available" },
-  { "id": 182, "vetId": 4, "date": "2026-09-14", "startTime": "09:00", "status": "occupied", "appointmentId": "APT-054" },
-  { "id": 183, "vetId": 4, "date": "2026-09-14", "startTime": "10:00", "status": "available" },
-  { "id": 184, "vetId": 4, "date": "2026-09-14", "startTime": "11:00", "status": "occupied", "appointmentId": "APT-055" },
-  { "id": 185, "vetId": 4, "date": "2026-09-14", "startTime": "12:00", "status": "available" },
-  { "id": 186, "vetId": 4, "date": "2026-09-14", "startTime": "13:00", "status": "available" },
-  { "id": 187, "vetId": 4, "date": "2026-09-14", "startTime": "14:00", "status": "occupied", "appointmentId": "APT-056" },
-  { "id": 188, "vetId": 4, "date": "2026-09-14", "startTime": "15:00", "status": "available" },
-  { "id": 189, "vetId": 4, "date": "2026-09-14", "startTime": "16:00", "status": "available" },
-
-  { "id": 190, "vetId": 5, "date": "2026-09-14", "startTime": "08:00", "status": "available" },
-  { "id": 191, "vetId": 5, "date": "2026-09-14", "startTime": "09:00", "status": "available" },
-  { "id": 192, "vetId": 5, "date": "2026-09-14", "startTime": "10:00", "status": "available" },
-  { "id": 193, "vetId": 5, "date": "2026-09-14", "startTime": "11:00", "status": "occupied", "appointmentId": "APT-057" },
-  { "id": 194, "vetId": 5, "date": "2026-09-14", "startTime": "12:00", "status": "available" },
-  { "id": 195, "vetId": 5, "date": "2026-09-14", "startTime": "13:00", "status": "occupied", "appointmentId": "APT-058" },
-  { "id": 196, "vetId": 5, "date": "2026-09-14", "startTime": "14:00", "status": "available" },
-  { "id": 197, "vetId": 5, "date": "2026-09-14", "startTime": "15:00", "status": "available" },
-  { "id": 198, "vetId": 5, "date": "2026-09-14", "startTime": "16:00", "status": "available" },
-
-  { "id": 199, "vetId": 6, "date": "2026-09-14", "startTime": "08:00", "status": "occupied", "appointmentId": "APT-059" },
-  { "id": 200, "vetId": 6, "date": "2026-09-14", "startTime": "09:00", "status": "available" },
-  { "id": 201, "vetId": 6, "date": "2026-09-14", "startTime": "10:00", "status": "available" },
-  { "id": 202, "vetId": 6, "date": "2026-09-14", "startTime": "11:00", "status": "available" },
-  { "id": 203, "vetId": 6, "date": "2026-09-14", "startTime": "12:00", "status": "occupied", "appointmentId": "APT-060" },
-  { "id": 204, "vetId": 6, "date": "2026-09-14", "startTime": "13:00", "status": "available" },
-  { "id": 205, "vetId": 6, "date": "2026-09-14", "startTime": "14:00", "status": "available" },
-  { "id": 206, "vetId": 6, "date": "2026-09-14", "startTime": "15:00", "status": "occupied", "appointmentId": "APT-061" },
-  { "id": 207, "vetId": 6, "date": "2026-09-14", "startTime": "16:00", "status": "available" },
-
-  { "id": 208, "vetId": 7, "date": "2026-09-14", "startTime": "08:00", "status": "available" },
-  { "id": 209, "vetId": 7, "date": "2026-09-14", "startTime": "09:00", "status": "available" },
-  { "id": 210, "vetId": 7, "date": "2026-09-14", "startTime": "10:00", "status": "occupied", "appointmentId": "APT-062" },
-  { "id": 211, "vetId": 7, "date": "2026-09-14", "startTime": "11:00", "status": "available" },
-  { "id": 212, "vetId": 7, "date": "2026-09-14", "startTime": "12:00", "status": "available" },
-  { "id": 213, "vetId": 7, "date": "2026-09-14", "startTime": "13:00", "status": "occupied", "appointmentId": "APT-063" },
-  { "id": 214, "vetId": 7, "date": "2026-09-14", "startTime": "14:00", "status": "available" },
-  { "id": 215, "vetId": 7, "date": "2026-09-14", "startTime": "15:00", "status": "available" },
-  { "id": 216, "vetId": 7, "date": "2026-09-14", "startTime": "16:00", "status": "occupied", "appointmentId": "APT-064" },
-
-  { "id": 217, "vetId": 8, "date": "2026-09-14", "startTime": "08:00", "status": "available" },
-  { "id": 218, "vetId": 8, "date": "2026-09-14", "startTime": "09:00", "status": "occupied", "appointmentId": "APT-065" },
-  { "id": 219, "vetId": 8, "date": "2026-09-14", "startTime": "10:00", "status": "available" },
-  { "id": 220, "vetId": 8, "date": "2026-09-14", "startTime": "11:00", "status": "available" },
-  { "id": 221, "vetId": 8, "date": "2026-09-14", "startTime": "12:00", "status": "occupied", "appointmentId": "APT-066" },
-  { "id": 222, "vetId": 8, "date": "2026-09-14", "startTime": "13:00", "status": "available" },
-  { "id": 223, "vetId": 8, "date": "2026-09-14", "startTime": "14:00", "status": "available" },
-  { "id": 224, "vetId": 8, "date": "2026-09-14", "startTime": "15:00", "status": "available" },
-  { "id": 225, "vetId": 8, "date": "2026-09-14", "startTime": "16:00", "status": "occupied", "appointmentId": "APT-067" },
-
-  { "id": 226, "vetId": 9, "date": "2026-09-14", "startTime": "08:00", "status": "occupied", "appointmentId": "APT-068" },
-  { "id": 227, "vetId": 9, "date": "2026-09-14", "startTime": "09:00", "status": "available" },
-  { "id": 228, "vetId": 9, "date": "2026-09-14", "startTime": "10:00", "status": "available" },
-  { "id": 229, "vetId": 9, "date": "2026-09-14", "startTime": "11:00", "status": "occupied", "appointmentId": "APT-069" },
-  { "id": 230, "vetId": 9, "date": "2026-09-14", "startTime": "12:00", "status": "available" },
-  { "id": 231, "vetId": 9, "date": "2026-09-14", "startTime": "13:00", "status": "available" },
-  { "id": 232, "vetId": 9, "date": "2026-09-14", "startTime": "14:00", "status": "occupied", "appointmentId": "APT-070" },
-  { "id": 233, "vetId": 9, "date": "2026-09-14", "startTime": "15:00", "status": "available" },
-  { "id": 234, "vetId": 9, "date": "2026-09-14", "startTime": "16:00", "status": "available" },
-
-  { "id": 235, "vetId": 10, "date": "2026-09-14", "startTime": "08:00", "status": "available" },
-  { "id": 236, "vetId": 10, "date": "2026-09-14", "startTime": "09:00", "status": "available" },
-  { "id": 237, "vetId": 10, "date": "2026-09-14", "startTime": "10:00", "status": "occupied", "appointmentId": "APT-071" },
-  { "id": 238, "vetId": 10, "date": "2026-09-14", "startTime": "11:00", "status": "available" },
-  { "id": 239, "vetId": 10, "date": "2026-09-14", "startTime": "12:00", "status": "occupied", "appointmentId": "APT-072" },
-  { "id": 240, "vetId": 10, "date": "2026-09-14", "startTime": "13:00", "status": "available" },
-  { "id": 241, "vetId": 10, "date": "2026-09-14", "startTime": "14:00", "status": "available" },
-  { "id": 242, "vetId": 10, "date": "2026-09-14", "startTime": "15:00", "status": "occupied", "appointmentId": "APT-073" },
-  { "id": 243, "vetId": 10, "date": "2026-09-14", "startTime": "16:00", "status": "available" },
-
-  { "id": 244, "vetId": 2, "date": "2026-09-17", "startTime": "08:00", "status": "available" },
-  { "id": 245, "vetId": 2, "date": "2026-09-17", "startTime": "09:00", "status": "occupied", "appointmentId": "APT-074" },
-  { "id": 246, "vetId": 2, "date": "2026-09-17", "startTime": "10:00", "status": "available" },
-  { "id": 247, "vetId": 2, "date": "2026-09-17", "startTime": "11:00", "status": "available" },
-  { "id": 248, "vetId": 2, "date": "2026-09-17", "startTime": "12:00", "status": "available" },
-  { "id": 249, "vetId": 2, "date": "2026-09-17", "startTime": "13:00", "status": "occupied", "appointmentId": "APT-075" },
-  { "id": 250, "vetId": 2, "date": "2026-09-17", "startTime": "14:00", "status": "available" },
-  { "id": 251, "vetId": 2, "date": "2026-09-17", "startTime": "15:00", "status": "available" },
-  { "id": 252, "vetId": 2, "date": "2026-09-17", "startTime": "16:00", "status": "occupied", "appointmentId": "APT-076" },
-
-  { "id": 253, "vetId": 5, "date": "2026-09-15", "startTime": "08:00", "status": "occupied", "appointmentId": "APT-077" },
-  { "id": 254, "vetId": 5, "date": "2026-09-15", "startTime": "09:00", "status": "available" },
-  { "id": 255, "vetId": 5, "date": "2026-09-15", "startTime": "10:00", "status": "available" },
-  { "id": 256, "vetId": 5, "date": "2026-09-15", "startTime": "11:00", "status": "occupied", "appointmentId": "APT-078" },
-  { "id": 257, "vetId": 5, "date": "2026-09-15", "startTime": "12:00", "status": "available" },
-  { "id": 258, "vetId": 5, "date": "2026-09-15", "startTime": "13:00", "status": "available" },
-  { "id": 259, "vetId": 5, "date": "2026-09-15", "startTime": "14:00", "status": "occupied", "appointmentId": "APT-079" },
-  { "id": 260, "vetId": 5, "date": "2026-09-15", "startTime": "15:00", "status": "available" },
-  { "id": 261, "vetId": 5, "date": "2026-09-15", "startTime": "16:00", "status": "available" },
-
-  { "id": 262, "vetId": 10, "date": "2026-09-15", "startTime": "08:00", "status": "available" },
-  { "id": 263, "vetId": 10, "date": "2026-09-15", "startTime": "09:00", "status": "available" },
-  { "id": 264, "vetId": 10, "date": "2026-09-15", "startTime": "10:00", "status": "occupied", "appointmentId": "APT-080" },
-  { "id": 265, "vetId": 10, "date": "2026-09-15", "startTime": "11:00", "status": "available" },
-  { "id": 266, "vetId": 10, "date": "2026-09-15", "startTime": "12:00", "status": "available" },
-  { "id": 267, "vetId": 10, "date": "2026-09-15", "startTime": "13:00", "status": "occupied", "appointmentId": "APT-081" },
-  { "id": 268, "vetId": 10, "date": "2026-09-15", "startTime": "14:00", "status": "available" },
-  { "id": 269, "vetId": 10, "date": "2026-09-15", "startTime": "15:00", "status": "available" },
-  { "id": 270, "vetId": 10, "date": "2026-09-15", "startTime": "16:00", "status": "occupied", "appointmentId": "APT-082" }
+  {
+    "id": 1,
+    "vetId": 1,
+    "date": "2026-09-14",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 2,
+    "vetId": 1,
+    "date": "2026-09-14",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 3,
+    "vetId": 1,
+    "date": "2026-09-14",
+    "startTime": "10:00",
+    "status": "occupied",
+    "appointmentId": "APT-001"
+  },
+  {
+    "id": 4,
+    "vetId": 1,
+    "date": "2026-09-14",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 5,
+    "vetId": 1,
+    "date": "2026-09-14",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 6,
+    "vetId": 1,
+    "date": "2026-09-14",
+    "startTime": "13:00",
+    "status": "occupied",
+    "appointmentId": "APT-002"
+  },
+  {
+    "id": 7,
+    "vetId": 1,
+    "date": "2026-09-14",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 8,
+    "vetId": 1,
+    "date": "2026-09-14",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 9,
+    "vetId": 1,
+    "date": "2026-09-14",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 10,
+    "vetId": 1,
+    "date": "2026-09-15",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 11,
+    "vetId": 1,
+    "date": "2026-09-15",
+    "startTime": "09:00",
+    "status": "occupied",
+    "appointmentId": "APT-003"
+  },
+  {
+    "id": 12,
+    "vetId": 1,
+    "date": "2026-09-15",
+    "startTime": "10:00",
+    "status": "occupied",
+    "appointmentId": "APT-004"
+  },
+  {
+    "id": 13,
+    "vetId": 1,
+    "date": "2026-09-15",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 14,
+    "vetId": 1,
+    "date": "2026-09-15",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 15,
+    "vetId": 1,
+    "date": "2026-09-15",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 16,
+    "vetId": 1,
+    "date": "2026-09-15",
+    "startTime": "14:00",
+    "status": "occupied",
+    "appointmentId": "APT-005"
+  },
+  {
+    "id": 17,
+    "vetId": 1,
+    "date": "2026-09-15",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 18,
+    "vetId": 1,
+    "date": "2026-09-15",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 19,
+    "vetId": 1,
+    "date": "2026-09-16",
+    "startTime": "08:00",
+    "status": "occupied",
+    "appointmentId": "APT-006"
+  },
+  {
+    "id": 20,
+    "vetId": 1,
+    "date": "2026-09-16",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 21,
+    "vetId": 1,
+    "date": "2026-09-16",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 22,
+    "vetId": 1,
+    "date": "2026-09-16",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 23,
+    "vetId": 1,
+    "date": "2026-09-16",
+    "startTime": "12:00",
+    "status": "occupied",
+    "appointmentId": "APT-007"
+  },
+  {
+    "id": 24,
+    "vetId": 1,
+    "date": "2026-09-16",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 25,
+    "vetId": 1,
+    "date": "2026-09-16",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 26,
+    "vetId": 1,
+    "date": "2026-09-16",
+    "startTime": "15:00",
+    "status": "occupied",
+    "appointmentId": "APT-008"
+  },
+  {
+    "id": 27,
+    "vetId": 1,
+    "date": "2026-09-16",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 28,
+    "vetId": 1,
+    "date": "2026-09-17",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 29,
+    "vetId": 1,
+    "date": "2026-09-17",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 30,
+    "vetId": 1,
+    "date": "2026-09-17",
+    "startTime": "10:00",
+    "status": "occupied",
+    "appointmentId": "APT-009"
+  },
+  {
+    "id": 31,
+    "vetId": 1,
+    "date": "2026-09-17",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 32,
+    "vetId": 1,
+    "date": "2026-09-17",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 33,
+    "vetId": 1,
+    "date": "2026-09-17",
+    "startTime": "13:00",
+    "status": "occupied",
+    "appointmentId": "APT-010"
+  },
+  {
+    "id": 34,
+    "vetId": 1,
+    "date": "2026-09-17",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 35,
+    "vetId": 1,
+    "date": "2026-09-17",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 36,
+    "vetId": 1,
+    "date": "2026-09-17",
+    "startTime": "16:00",
+    "status": "occupied",
+    "appointmentId": "APT-011"
+  },
+  {
+    "id": 37,
+    "vetId": 1,
+    "date": "2026-09-18",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 38,
+    "vetId": 1,
+    "date": "2026-09-18",
+    "startTime": "09:00",
+    "status": "occupied",
+    "appointmentId": "APT-012"
+  },
+  {
+    "id": 39,
+    "vetId": 1,
+    "date": "2026-09-18",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 40,
+    "vetId": 1,
+    "date": "2026-09-18",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 41,
+    "vetId": 1,
+    "date": "2026-09-18",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 42,
+    "vetId": 1,
+    "date": "2026-09-18",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 43,
+    "vetId": 1,
+    "date": "2026-09-18",
+    "startTime": "14:00",
+    "status": "occupied",
+    "appointmentId": "APT-013"
+  },
+  {
+    "id": 44,
+    "vetId": 1,
+    "date": "2026-09-18",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 45,
+    "vetId": 1,
+    "date": "2026-09-18",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 46,
+    "vetId": 1,
+    "date": "2026-09-21",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 47,
+    "vetId": 1,
+    "date": "2026-09-21",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 48,
+    "vetId": 1,
+    "date": "2026-09-21",
+    "startTime": "10:00",
+    "status": "occupied",
+    "appointmentId": "APT-014"
+  },
+  {
+    "id": 49,
+    "vetId": 1,
+    "date": "2026-09-21",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 50,
+    "vetId": 1,
+    "date": "2026-09-21",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 51,
+    "vetId": 1,
+    "date": "2026-09-21",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 52,
+    "vetId": 1,
+    "date": "2026-09-21",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 53,
+    "vetId": 1,
+    "date": "2026-09-21",
+    "startTime": "15:00",
+    "status": "occupied",
+    "appointmentId": "APT-015"
+  },
+  {
+    "id": 54,
+    "vetId": 1,
+    "date": "2026-09-21",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 55,
+    "vetId": 1,
+    "date": "2026-09-22",
+    "startTime": "08:00",
+    "status": "occupied",
+    "appointmentId": "APT-016"
+  },
+  {
+    "id": 56,
+    "vetId": 1,
+    "date": "2026-09-22",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 57,
+    "vetId": 1,
+    "date": "2026-09-22",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 58,
+    "vetId": 1,
+    "date": "2026-09-22",
+    "startTime": "11:00",
+    "status": "occupied",
+    "appointmentId": "APT-017"
+  },
+  {
+    "id": 59,
+    "vetId": 1,
+    "date": "2026-09-22",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 60,
+    "vetId": 1,
+    "date": "2026-09-22",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 61,
+    "vetId": 1,
+    "date": "2026-09-22",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 62,
+    "vetId": 1,
+    "date": "2026-09-22",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 63,
+    "vetId": 1,
+    "date": "2026-09-22",
+    "startTime": "16:00",
+    "status": "occupied",
+    "appointmentId": "APT-018"
+  },
+  {
+    "id": 64,
+    "vetId": 1,
+    "date": "2026-09-23",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 65,
+    "vetId": 1,
+    "date": "2026-09-23",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 66,
+    "vetId": 1,
+    "date": "2026-09-23",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 67,
+    "vetId": 1,
+    "date": "2026-09-23",
+    "startTime": "11:00",
+    "status": "occupied",
+    "appointmentId": "APT-019"
+  },
+  {
+    "id": 68,
+    "vetId": 1,
+    "date": "2026-09-23",
+    "startTime": "12:00",
+    "status": "occupied",
+    "appointmentId": "APT-020"
+  },
+  {
+    "id": 69,
+    "vetId": 1,
+    "date": "2026-09-23",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 70,
+    "vetId": 1,
+    "date": "2026-09-23",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 71,
+    "vetId": 1,
+    "date": "2026-09-23",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 72,
+    "vetId": 1,
+    "date": "2026-09-23",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 73,
+    "vetId": 1,
+    "date": "2026-09-24",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 74,
+    "vetId": 1,
+    "date": "2026-09-24",
+    "startTime": "09:00",
+    "status": "occupied",
+    "appointmentId": "APT-021"
+  },
+  {
+    "id": 75,
+    "vetId": 1,
+    "date": "2026-09-24",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 76,
+    "vetId": 1,
+    "date": "2026-09-24",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 77,
+    "vetId": 1,
+    "date": "2026-09-24",
+    "startTime": "12:00",
+    "status": "occupied",
+    "appointmentId": "APT-022"
+  },
+  {
+    "id": 78,
+    "vetId": 1,
+    "date": "2026-09-24",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 79,
+    "vetId": 1,
+    "date": "2026-09-24",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 80,
+    "vetId": 1,
+    "date": "2026-09-24",
+    "startTime": "15:00",
+    "status": "occupied",
+    "appointmentId": "APT-023"
+  },
+  {
+    "id": 81,
+    "vetId": 1,
+    "date": "2026-09-24",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 82,
+    "vetId": 1,
+    "date": "2026-09-25",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 83,
+    "vetId": 1,
+    "date": "2026-09-25",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 84,
+    "vetId": 1,
+    "date": "2026-09-25",
+    "startTime": "10:00",
+    "status": "occupied",
+    "appointmentId": "APT-024"
+  },
+  {
+    "id": 85,
+    "vetId": 1,
+    "date": "2026-09-25",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 86,
+    "vetId": 1,
+    "date": "2026-09-25",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 87,
+    "vetId": 1,
+    "date": "2026-09-25",
+    "startTime": "13:00",
+    "status": "occupied",
+    "appointmentId": "APT-025"
+  },
+  {
+    "id": 88,
+    "vetId": 1,
+    "date": "2026-09-25",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 89,
+    "vetId": 1,
+    "date": "2026-09-25",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 90,
+    "vetId": 1,
+    "date": "2026-09-25",
+    "startTime": "16:00",
+    "status": "occupied",
+    "appointmentId": "APT-026"
+  },
+  {
+    "id": 91,
+    "vetId": 1,
+    "date": "2026-09-28",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 92,
+    "vetId": 1,
+    "date": "2026-09-28",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 93,
+    "vetId": 1,
+    "date": "2026-09-28",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 94,
+    "vetId": 1,
+    "date": "2026-09-28",
+    "startTime": "11:00",
+    "status": "occupied",
+    "appointmentId": "APT-027"
+  },
+  {
+    "id": 95,
+    "vetId": 1,
+    "date": "2026-09-28",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 96,
+    "vetId": 1,
+    "date": "2026-09-28",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 97,
+    "vetId": 1,
+    "date": "2026-09-28",
+    "startTime": "14:00",
+    "status": "occupied",
+    "appointmentId": "APT-028"
+  },
+  {
+    "id": 98,
+    "vetId": 1,
+    "date": "2026-09-28",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 99,
+    "vetId": 1,
+    "date": "2026-09-28",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 100,
+    "vetId": 1,
+    "date": "2026-09-29",
+    "startTime": "08:00",
+    "status": "occupied",
+    "appointmentId": "APT-029"
+  },
+  {
+    "id": 101,
+    "vetId": 1,
+    "date": "2026-09-29",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 102,
+    "vetId": 1,
+    "date": "2026-09-29",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 103,
+    "vetId": 1,
+    "date": "2026-09-29",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 104,
+    "vetId": 1,
+    "date": "2026-09-29",
+    "startTime": "12:00",
+    "status": "occupied",
+    "appointmentId": "APT-030"
+  },
+  {
+    "id": 105,
+    "vetId": 1,
+    "date": "2026-09-29",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 106,
+    "vetId": 1,
+    "date": "2026-09-29",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 107,
+    "vetId": 1,
+    "date": "2026-09-29",
+    "startTime": "15:00",
+    "status": "occupied",
+    "appointmentId": "APT-031"
+  },
+  {
+    "id": 108,
+    "vetId": 1,
+    "date": "2026-09-29",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 109,
+    "vetId": 1,
+    "date": "2026-09-30",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 110,
+    "vetId": 1,
+    "date": "2026-09-30",
+    "startTime": "09:00",
+    "status": "occupied",
+    "appointmentId": "APT-032"
+  },
+  {
+    "id": 111,
+    "vetId": 1,
+    "date": "2026-09-30",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 112,
+    "vetId": 1,
+    "date": "2026-09-30",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 113,
+    "vetId": 1,
+    "date": "2026-09-30",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 114,
+    "vetId": 1,
+    "date": "2026-09-30",
+    "startTime": "13:00",
+    "status": "occupied",
+    "appointmentId": "APT-033"
+  },
+  {
+    "id": 115,
+    "vetId": 1,
+    "date": "2026-09-30",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 116,
+    "vetId": 1,
+    "date": "2026-09-30",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 117,
+    "vetId": 1,
+    "date": "2026-09-30",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 118,
+    "vetId": 1,
+    "date": "2026-10-01",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 119,
+    "vetId": 1,
+    "date": "2026-10-01",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 120,
+    "vetId": 1,
+    "date": "2026-10-01",
+    "startTime": "10:00",
+    "status": "occupied",
+    "appointmentId": "APT-034"
+  },
+  {
+    "id": 121,
+    "vetId": 1,
+    "date": "2026-10-01",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 122,
+    "vetId": 1,
+    "date": "2026-10-01",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 123,
+    "vetId": 1,
+    "date": "2026-10-01",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 124,
+    "vetId": 1,
+    "date": "2026-10-01",
+    "startTime": "14:00",
+    "status": "occupied",
+    "appointmentId": "APT-035"
+  },
+  {
+    "id": 125,
+    "vetId": 1,
+    "date": "2026-10-01",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 126,
+    "vetId": 1,
+    "date": "2026-10-01",
+    "startTime": "16:00",
+    "status": "occupied",
+    "appointmentId": "APT-036"
+  },
+  {
+    "id": 127,
+    "vetId": 1,
+    "date": "2026-10-02",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 128,
+    "vetId": 1,
+    "date": "2026-10-02",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 129,
+    "vetId": 1,
+    "date": "2026-10-02",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 130,
+    "vetId": 1,
+    "date": "2026-10-02",
+    "startTime": "11:00",
+    "status": "occupied",
+    "appointmentId": "APT-037"
+  },
+  {
+    "id": 131,
+    "vetId": 1,
+    "date": "2026-10-02",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 132,
+    "vetId": 1,
+    "date": "2026-10-02",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 133,
+    "vetId": 1,
+    "date": "2026-10-02",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 134,
+    "vetId": 1,
+    "date": "2026-10-02",
+    "startTime": "15:00",
+    "status": "occupied",
+    "appointmentId": "APT-038"
+  },
+  {
+    "id": 135,
+    "vetId": 1,
+    "date": "2026-10-02",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 136,
+    "vetId": 2,
+    "date": "2026-09-14",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 137,
+    "vetId": 2,
+    "date": "2026-09-14",
+    "startTime": "09:00",
+    "status": "occupied",
+    "appointmentId": "APT-039"
+  },
+  {
+    "id": 138,
+    "vetId": 2,
+    "date": "2026-09-14",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 139,
+    "vetId": 2,
+    "date": "2026-09-14",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 140,
+    "vetId": 2,
+    "date": "2026-09-14",
+    "startTime": "12:00",
+    "status": "occupied",
+    "appointmentId": "APT-040"
+  },
+  {
+    "id": 141,
+    "vetId": 2,
+    "date": "2026-09-14",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 142,
+    "vetId": 2,
+    "date": "2026-09-14",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 143,
+    "vetId": 2,
+    "date": "2026-09-14",
+    "startTime": "15:00",
+    "status": "occupied",
+    "appointmentId": "APT-041"
+  },
+  {
+    "id": 144,
+    "vetId": 2,
+    "date": "2026-09-14",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 145,
+    "vetId": 2,
+    "date": "2026-09-15",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 146,
+    "vetId": 2,
+    "date": "2026-09-15",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 147,
+    "vetId": 2,
+    "date": "2026-09-15",
+    "startTime": "10:00",
+    "status": "occupied",
+    "appointmentId": "APT-042"
+  },
+  {
+    "id": 148,
+    "vetId": 2,
+    "date": "2026-09-15",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 149,
+    "vetId": 2,
+    "date": "2026-09-15",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 150,
+    "vetId": 2,
+    "date": "2026-09-15",
+    "startTime": "13:00",
+    "status": "occupied",
+    "appointmentId": "APT-043"
+  },
+  {
+    "id": 151,
+    "vetId": 2,
+    "date": "2026-09-15",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 152,
+    "vetId": 2,
+    "date": "2026-09-15",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 153,
+    "vetId": 2,
+    "date": "2026-09-15",
+    "startTime": "16:00",
+    "status": "occupied",
+    "appointmentId": "APT-044"
+  },
+  {
+    "id": 154,
+    "vetId": 2,
+    "date": "2026-09-16",
+    "startTime": "08:00",
+    "status": "occupied",
+    "appointmentId": "APT-045"
+  },
+  {
+    "id": 155,
+    "vetId": 2,
+    "date": "2026-09-16",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 156,
+    "vetId": 2,
+    "date": "2026-09-16",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 157,
+    "vetId": 2,
+    "date": "2026-09-16",
+    "startTime": "11:00",
+    "status": "occupied",
+    "appointmentId": "APT-046"
+  },
+  {
+    "id": 158,
+    "vetId": 2,
+    "date": "2026-09-16",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 159,
+    "vetId": 2,
+    "date": "2026-09-16",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 160,
+    "vetId": 2,
+    "date": "2026-09-16",
+    "startTime": "14:00",
+    "status": "occupied",
+    "appointmentId": "APT-047"
+  },
+  {
+    "id": 161,
+    "vetId": 2,
+    "date": "2026-09-16",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 162,
+    "vetId": 2,
+    "date": "2026-09-16",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 163,
+    "vetId": 3,
+    "date": "2026-09-14",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 164,
+    "vetId": 3,
+    "date": "2026-09-14",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 165,
+    "vetId": 3,
+    "date": "2026-09-14",
+    "startTime": "10:00",
+    "status": "occupied",
+    "appointmentId": "APT-048"
+  },
+  {
+    "id": 166,
+    "vetId": 3,
+    "date": "2026-09-14",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 167,
+    "vetId": 3,
+    "date": "2026-09-14",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 168,
+    "vetId": 3,
+    "date": "2026-09-14",
+    "startTime": "13:00",
+    "status": "occupied",
+    "appointmentId": "APT-049"
+  },
+  {
+    "id": 169,
+    "vetId": 3,
+    "date": "2026-09-14",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 170,
+    "vetId": 3,
+    "date": "2026-09-14",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 171,
+    "vetId": 3,
+    "date": "2026-09-14",
+    "startTime": "16:00",
+    "status": "occupied",
+    "appointmentId": "APT-050"
+  },
+  {
+    "id": 172,
+    "vetId": 3,
+    "date": "2026-09-15",
+    "startTime": "08:00",
+    "status": "occupied",
+    "appointmentId": "APT-051"
+  },
+  {
+    "id": 173,
+    "vetId": 3,
+    "date": "2026-09-15",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 174,
+    "vetId": 3,
+    "date": "2026-09-15",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 175,
+    "vetId": 3,
+    "date": "2026-09-15",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 176,
+    "vetId": 3,
+    "date": "2026-09-15",
+    "startTime": "12:00",
+    "status": "occupied",
+    "appointmentId": "APT-052"
+  },
+  {
+    "id": 177,
+    "vetId": 3,
+    "date": "2026-09-15",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 178,
+    "vetId": 3,
+    "date": "2026-09-15",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 179,
+    "vetId": 3,
+    "date": "2026-09-15",
+    "startTime": "15:00",
+    "status": "occupied",
+    "appointmentId": "APT-053"
+  },
+  {
+    "id": 180,
+    "vetId": 3,
+    "date": "2026-09-15",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 181,
+    "vetId": 4,
+    "date": "2026-09-14",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 182,
+    "vetId": 4,
+    "date": "2026-09-14",
+    "startTime": "09:00",
+    "status": "occupied",
+    "appointmentId": "APT-054"
+  },
+  {
+    "id": 183,
+    "vetId": 4,
+    "date": "2026-09-14",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 184,
+    "vetId": 4,
+    "date": "2026-09-14",
+    "startTime": "11:00",
+    "status": "occupied",
+    "appointmentId": "APT-055"
+  },
+  {
+    "id": 185,
+    "vetId": 4,
+    "date": "2026-09-14",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 186,
+    "vetId": 4,
+    "date": "2026-09-14",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 187,
+    "vetId": 4,
+    "date": "2026-09-14",
+    "startTime": "14:00",
+    "status": "occupied",
+    "appointmentId": "APT-056"
+  },
+  {
+    "id": 188,
+    "vetId": 4,
+    "date": "2026-09-14",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 189,
+    "vetId": 4,
+    "date": "2026-09-14",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 190,
+    "vetId": 5,
+    "date": "2026-09-14",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 191,
+    "vetId": 5,
+    "date": "2026-09-14",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 192,
+    "vetId": 5,
+    "date": "2026-09-14",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 193,
+    "vetId": 5,
+    "date": "2026-09-14",
+    "startTime": "11:00",
+    "status": "occupied",
+    "appointmentId": "APT-057"
+  },
+  {
+    "id": 194,
+    "vetId": 5,
+    "date": "2026-09-14",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 195,
+    "vetId": 5,
+    "date": "2026-09-14",
+    "startTime": "13:00",
+    "status": "occupied",
+    "appointmentId": "APT-058"
+  },
+  {
+    "id": 196,
+    "vetId": 5,
+    "date": "2026-09-14",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 197,
+    "vetId": 5,
+    "date": "2026-09-14",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 198,
+    "vetId": 5,
+    "date": "2026-09-14",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 199,
+    "vetId": 6,
+    "date": "2026-09-14",
+    "startTime": "08:00",
+    "status": "occupied",
+    "appointmentId": "APT-059"
+  },
+  {
+    "id": 200,
+    "vetId": 6,
+    "date": "2026-09-14",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 201,
+    "vetId": 6,
+    "date": "2026-09-14",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 202,
+    "vetId": 6,
+    "date": "2026-09-14",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 203,
+    "vetId": 6,
+    "date": "2026-09-14",
+    "startTime": "12:00",
+    "status": "occupied",
+    "appointmentId": "APT-060"
+  },
+  {
+    "id": 204,
+    "vetId": 6,
+    "date": "2026-09-14",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 205,
+    "vetId": 6,
+    "date": "2026-09-14",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 206,
+    "vetId": 6,
+    "date": "2026-09-14",
+    "startTime": "15:00",
+    "status": "occupied",
+    "appointmentId": "APT-061"
+  },
+  {
+    "id": 207,
+    "vetId": 6,
+    "date": "2026-09-14",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 208,
+    "vetId": 7,
+    "date": "2026-09-14",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 209,
+    "vetId": 7,
+    "date": "2026-09-14",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 210,
+    "vetId": 7,
+    "date": "2026-09-14",
+    "startTime": "10:00",
+    "status": "occupied",
+    "appointmentId": "APT-062"
+  },
+  {
+    "id": 211,
+    "vetId": 7,
+    "date": "2026-09-14",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 212,
+    "vetId": 7,
+    "date": "2026-09-14",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 213,
+    "vetId": 7,
+    "date": "2026-09-14",
+    "startTime": "13:00",
+    "status": "occupied",
+    "appointmentId": "APT-063"
+  },
+  {
+    "id": 214,
+    "vetId": 7,
+    "date": "2026-09-14",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 215,
+    "vetId": 7,
+    "date": "2026-09-14",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 216,
+    "vetId": 7,
+    "date": "2026-09-14",
+    "startTime": "16:00",
+    "status": "occupied",
+    "appointmentId": "APT-064"
+  },
+  {
+    "id": 217,
+    "vetId": 8,
+    "date": "2026-09-14",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 218,
+    "vetId": 8,
+    "date": "2026-09-14",
+    "startTime": "09:00",
+    "status": "occupied",
+    "appointmentId": "APT-065"
+  },
+  {
+    "id": 219,
+    "vetId": 8,
+    "date": "2026-09-14",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 220,
+    "vetId": 8,
+    "date": "2026-09-14",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 221,
+    "vetId": 8,
+    "date": "2026-09-14",
+    "startTime": "12:00",
+    "status": "occupied",
+    "appointmentId": "APT-066"
+  },
+  {
+    "id": 222,
+    "vetId": 8,
+    "date": "2026-09-14",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 223,
+    "vetId": 8,
+    "date": "2026-09-14",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 224,
+    "vetId": 8,
+    "date": "2026-09-14",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 225,
+    "vetId": 8,
+    "date": "2026-09-14",
+    "startTime": "16:00",
+    "status": "occupied",
+    "appointmentId": "APT-067"
+  },
+  {
+    "id": 226,
+    "vetId": 9,
+    "date": "2026-09-14",
+    "startTime": "08:00",
+    "status": "occupied",
+    "appointmentId": "APT-068"
+  },
+  {
+    "id": 227,
+    "vetId": 9,
+    "date": "2026-09-14",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 228,
+    "vetId": 9,
+    "date": "2026-09-14",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 229,
+    "vetId": 9,
+    "date": "2026-09-14",
+    "startTime": "11:00",
+    "status": "occupied",
+    "appointmentId": "APT-069"
+  },
+  {
+    "id": 230,
+    "vetId": 9,
+    "date": "2026-09-14",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 231,
+    "vetId": 9,
+    "date": "2026-09-14",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 232,
+    "vetId": 9,
+    "date": "2026-09-14",
+    "startTime": "14:00",
+    "status": "occupied",
+    "appointmentId": "APT-070"
+  },
+  {
+    "id": 233,
+    "vetId": 9,
+    "date": "2026-09-14",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 234,
+    "vetId": 9,
+    "date": "2026-09-14",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 235,
+    "vetId": 10,
+    "date": "2026-09-14",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 236,
+    "vetId": 10,
+    "date": "2026-09-14",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 237,
+    "vetId": 10,
+    "date": "2026-09-14",
+    "startTime": "10:00",
+    "status": "occupied",
+    "appointmentId": "APT-071"
+  },
+  {
+    "id": 238,
+    "vetId": 10,
+    "date": "2026-09-14",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 239,
+    "vetId": 10,
+    "date": "2026-09-14",
+    "startTime": "12:00",
+    "status": "occupied",
+    "appointmentId": "APT-072"
+  },
+  {
+    "id": 240,
+    "vetId": 10,
+    "date": "2026-09-14",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 241,
+    "vetId": 10,
+    "date": "2026-09-14",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 242,
+    "vetId": 10,
+    "date": "2026-09-14",
+    "startTime": "15:00",
+    "status": "occupied",
+    "appointmentId": "APT-073"
+  },
+  {
+    "id": 243,
+    "vetId": 10,
+    "date": "2026-09-14",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 244,
+    "vetId": 2,
+    "date": "2026-09-17",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 245,
+    "vetId": 2,
+    "date": "2026-09-17",
+    "startTime": "09:00",
+    "status": "occupied",
+    "appointmentId": "APT-074"
+  },
+  {
+    "id": 246,
+    "vetId": 2,
+    "date": "2026-09-17",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 247,
+    "vetId": 2,
+    "date": "2026-09-17",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 248,
+    "vetId": 2,
+    "date": "2026-09-17",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 249,
+    "vetId": 2,
+    "date": "2026-09-17",
+    "startTime": "13:00",
+    "status": "occupied",
+    "appointmentId": "APT-075"
+  },
+  {
+    "id": 250,
+    "vetId": 2,
+    "date": "2026-09-17",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 251,
+    "vetId": 2,
+    "date": "2026-09-17",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 252,
+    "vetId": 2,
+    "date": "2026-09-17",
+    "startTime": "16:00",
+    "status": "occupied",
+    "appointmentId": "APT-076"
+  },
+  {
+    "id": 253,
+    "vetId": 5,
+    "date": "2026-09-15",
+    "startTime": "08:00",
+    "status": "occupied",
+    "appointmentId": "APT-077"
+  },
+  {
+    "id": 254,
+    "vetId": 5,
+    "date": "2026-09-15",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 255,
+    "vetId": 5,
+    "date": "2026-09-15",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 256,
+    "vetId": 5,
+    "date": "2026-09-15",
+    "startTime": "11:00",
+    "status": "occupied",
+    "appointmentId": "APT-078"
+  },
+  {
+    "id": 257,
+    "vetId": 5,
+    "date": "2026-09-15",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 258,
+    "vetId": 5,
+    "date": "2026-09-15",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 259,
+    "vetId": 5,
+    "date": "2026-09-15",
+    "startTime": "14:00",
+    "status": "occupied",
+    "appointmentId": "APT-079"
+  },
+  {
+    "id": 260,
+    "vetId": 5,
+    "date": "2026-09-15",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 261,
+    "vetId": 5,
+    "date": "2026-09-15",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 262,
+    "vetId": 10,
+    "date": "2026-09-15",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 263,
+    "vetId": 10,
+    "date": "2026-09-15",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 264,
+    "vetId": 10,
+    "date": "2026-09-15",
+    "startTime": "10:00",
+    "status": "occupied",
+    "appointmentId": "APT-080"
+  },
+  {
+    "id": 265,
+    "vetId": 10,
+    "date": "2026-09-15",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 266,
+    "vetId": 10,
+    "date": "2026-09-15",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 267,
+    "vetId": 10,
+    "date": "2026-09-15",
+    "startTime": "13:00",
+    "status": "occupied",
+    "appointmentId": "APT-081"
+  },
+  {
+    "id": 268,
+    "vetId": 10,
+    "date": "2026-09-15",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 269,
+    "vetId": 10,
+    "date": "2026-09-15",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 270,
+    "vetId": 10,
+    "date": "2026-09-15",
+    "startTime": "16:00",
+    "status": "occupied",
+    "appointmentId": "APT-082"
+  },
+  {
+    "id": 271,
+    "vetId": 2,
+    "date": "2026-09-18",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 272,
+    "vetId": 2,
+    "date": "2026-09-18",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 273,
+    "vetId": 2,
+    "date": "2026-09-18",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 274,
+    "vetId": 2,
+    "date": "2026-09-18",
+    "startTime": "11:00",
+    "status": "occupied",
+    "appointmentId": "APT-275"
+  },
+  {
+    "id": 275,
+    "vetId": 2,
+    "date": "2026-09-18",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 276,
+    "vetId": 2,
+    "date": "2026-09-18",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 277,
+    "vetId": 2,
+    "date": "2026-09-18",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 278,
+    "vetId": 2,
+    "date": "2026-09-18",
+    "startTime": "15:00",
+    "status": "occupied",
+    "appointmentId": "APT-279"
+  },
+  {
+    "id": 279,
+    "vetId": 2,
+    "date": "2026-09-18",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 280,
+    "vetId": 2,
+    "date": "2026-09-21",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 281,
+    "vetId": 2,
+    "date": "2026-09-21",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 282,
+    "vetId": 2,
+    "date": "2026-09-21",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 283,
+    "vetId": 2,
+    "date": "2026-09-21",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 284,
+    "vetId": 2,
+    "date": "2026-09-21",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 285,
+    "vetId": 2,
+    "date": "2026-09-21",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 286,
+    "vetId": 2,
+    "date": "2026-09-21",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 287,
+    "vetId": 2,
+    "date": "2026-09-21",
+    "startTime": "15:00",
+    "status": "occupied",
+    "appointmentId": "APT-288"
+  },
+  {
+    "id": 288,
+    "vetId": 2,
+    "date": "2026-09-21",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 289,
+    "vetId": 2,
+    "date": "2026-09-22",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 290,
+    "vetId": 2,
+    "date": "2026-09-22",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 291,
+    "vetId": 2,
+    "date": "2026-09-22",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 292,
+    "vetId": 2,
+    "date": "2026-09-22",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 293,
+    "vetId": 2,
+    "date": "2026-09-22",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 294,
+    "vetId": 2,
+    "date": "2026-09-22",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 295,
+    "vetId": 2,
+    "date": "2026-09-22",
+    "startTime": "14:00",
+    "status": "occupied",
+    "appointmentId": "APT-296"
+  },
+  {
+    "id": 296,
+    "vetId": 2,
+    "date": "2026-09-22",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 297,
+    "vetId": 2,
+    "date": "2026-09-22",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 298,
+    "vetId": 2,
+    "date": "2026-09-23",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 299,
+    "vetId": 2,
+    "date": "2026-09-23",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 300,
+    "vetId": 2,
+    "date": "2026-09-23",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 301,
+    "vetId": 2,
+    "date": "2026-09-23",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 302,
+    "vetId": 2,
+    "date": "2026-09-23",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 303,
+    "vetId": 2,
+    "date": "2026-09-23",
+    "startTime": "13:00",
+    "status": "occupied",
+    "appointmentId": "APT-304"
+  },
+  {
+    "id": 304,
+    "vetId": 2,
+    "date": "2026-09-23",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 305,
+    "vetId": 2,
+    "date": "2026-09-23",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 306,
+    "vetId": 2,
+    "date": "2026-09-23",
+    "startTime": "16:00",
+    "status": "occupied",
+    "appointmentId": "APT-307"
+  },
+  {
+    "id": 307,
+    "vetId": 2,
+    "date": "2026-09-24",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 308,
+    "vetId": 2,
+    "date": "2026-09-24",
+    "startTime": "09:00",
+    "status": "occupied",
+    "appointmentId": "APT-309"
+  },
+  {
+    "id": 309,
+    "vetId": 2,
+    "date": "2026-09-24",
+    "startTime": "10:00",
+    "status": "occupied",
+    "appointmentId": "APT-310"
+  },
+  {
+    "id": 310,
+    "vetId": 2,
+    "date": "2026-09-24",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 311,
+    "vetId": 2,
+    "date": "2026-09-24",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 312,
+    "vetId": 2,
+    "date": "2026-09-24",
+    "startTime": "13:00",
+    "status": "occupied",
+    "appointmentId": "APT-313"
+  },
+  {
+    "id": 313,
+    "vetId": 2,
+    "date": "2026-09-24",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 314,
+    "vetId": 2,
+    "date": "2026-09-24",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 315,
+    "vetId": 2,
+    "date": "2026-09-24",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 316,
+    "vetId": 2,
+    "date": "2026-09-25",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 317,
+    "vetId": 2,
+    "date": "2026-09-25",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 318,
+    "vetId": 2,
+    "date": "2026-09-25",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 319,
+    "vetId": 2,
+    "date": "2026-09-25",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 320,
+    "vetId": 2,
+    "date": "2026-09-25",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 321,
+    "vetId": 2,
+    "date": "2026-09-25",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 322,
+    "vetId": 2,
+    "date": "2026-09-25",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 323,
+    "vetId": 2,
+    "date": "2026-09-25",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 324,
+    "vetId": 2,
+    "date": "2026-09-25",
+    "startTime": "16:00",
+    "status": "occupied",
+    "appointmentId": "APT-325"
+  },
+  {
+    "id": 325,
+    "vetId": 2,
+    "date": "2026-09-28",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 326,
+    "vetId": 2,
+    "date": "2026-09-28",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 327,
+    "vetId": 2,
+    "date": "2026-09-28",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 328,
+    "vetId": 2,
+    "date": "2026-09-28",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 329,
+    "vetId": 2,
+    "date": "2026-09-28",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 330,
+    "vetId": 2,
+    "date": "2026-09-28",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 331,
+    "vetId": 2,
+    "date": "2026-09-28",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 332,
+    "vetId": 2,
+    "date": "2026-09-28",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 333,
+    "vetId": 2,
+    "date": "2026-09-28",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 334,
+    "vetId": 2,
+    "date": "2026-09-29",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 335,
+    "vetId": 2,
+    "date": "2026-09-29",
+    "startTime": "09:00",
+    "status": "occupied",
+    "appointmentId": "APT-336"
+  },
+  {
+    "id": 336,
+    "vetId": 2,
+    "date": "2026-09-29",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 337,
+    "vetId": 2,
+    "date": "2026-09-29",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 338,
+    "vetId": 2,
+    "date": "2026-09-29",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 339,
+    "vetId": 2,
+    "date": "2026-09-29",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 340,
+    "vetId": 2,
+    "date": "2026-09-29",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 341,
+    "vetId": 2,
+    "date": "2026-09-29",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 342,
+    "vetId": 2,
+    "date": "2026-09-29",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 343,
+    "vetId": 2,
+    "date": "2026-09-30",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 344,
+    "vetId": 2,
+    "date": "2026-09-30",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 345,
+    "vetId": 2,
+    "date": "2026-09-30",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 346,
+    "vetId": 2,
+    "date": "2026-09-30",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 347,
+    "vetId": 2,
+    "date": "2026-09-30",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 348,
+    "vetId": 2,
+    "date": "2026-09-30",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 349,
+    "vetId": 2,
+    "date": "2026-09-30",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 350,
+    "vetId": 2,
+    "date": "2026-09-30",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 351,
+    "vetId": 2,
+    "date": "2026-09-30",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 352,
+    "vetId": 3,
+    "date": "2026-09-18",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 353,
+    "vetId": 3,
+    "date": "2026-09-18",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 354,
+    "vetId": 3,
+    "date": "2026-09-18",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 355,
+    "vetId": 3,
+    "date": "2026-09-18",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 356,
+    "vetId": 3,
+    "date": "2026-09-18",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 357,
+    "vetId": 3,
+    "date": "2026-09-18",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 358,
+    "vetId": 3,
+    "date": "2026-09-18",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 359,
+    "vetId": 3,
+    "date": "2026-09-18",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 360,
+    "vetId": 3,
+    "date": "2026-09-18",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 361,
+    "vetId": 3,
+    "date": "2026-09-21",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 362,
+    "vetId": 3,
+    "date": "2026-09-21",
+    "startTime": "09:00",
+    "status": "occupied",
+    "appointmentId": "APT-363"
+  },
+  {
+    "id": 363,
+    "vetId": 3,
+    "date": "2026-09-21",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 364,
+    "vetId": 3,
+    "date": "2026-09-21",
+    "startTime": "11:00",
+    "status": "occupied",
+    "appointmentId": "APT-365"
+  },
+  {
+    "id": 365,
+    "vetId": 3,
+    "date": "2026-09-21",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 366,
+    "vetId": 3,
+    "date": "2026-09-21",
+    "startTime": "13:00",
+    "status": "occupied",
+    "appointmentId": "APT-367"
+  },
+  {
+    "id": 367,
+    "vetId": 3,
+    "date": "2026-09-21",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 368,
+    "vetId": 3,
+    "date": "2026-09-21",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 369,
+    "vetId": 3,
+    "date": "2026-09-21",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 370,
+    "vetId": 3,
+    "date": "2026-09-22",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 371,
+    "vetId": 3,
+    "date": "2026-09-22",
+    "startTime": "09:00",
+    "status": "occupied",
+    "appointmentId": "APT-372"
+  },
+  {
+    "id": 372,
+    "vetId": 3,
+    "date": "2026-09-22",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 373,
+    "vetId": 3,
+    "date": "2026-09-22",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 374,
+    "vetId": 3,
+    "date": "2026-09-22",
+    "startTime": "12:00",
+    "status": "occupied",
+    "appointmentId": "APT-375"
+  },
+  {
+    "id": 375,
+    "vetId": 3,
+    "date": "2026-09-22",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 376,
+    "vetId": 3,
+    "date": "2026-09-22",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 377,
+    "vetId": 3,
+    "date": "2026-09-22",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 378,
+    "vetId": 3,
+    "date": "2026-09-22",
+    "startTime": "16:00",
+    "status": "occupied",
+    "appointmentId": "APT-379"
+  },
+  {
+    "id": 379,
+    "vetId": 3,
+    "date": "2026-09-23",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 380,
+    "vetId": 3,
+    "date": "2026-09-23",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 381,
+    "vetId": 3,
+    "date": "2026-09-23",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 382,
+    "vetId": 3,
+    "date": "2026-09-23",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 383,
+    "vetId": 3,
+    "date": "2026-09-23",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 384,
+    "vetId": 3,
+    "date": "2026-09-23",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 385,
+    "vetId": 3,
+    "date": "2026-09-23",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 386,
+    "vetId": 3,
+    "date": "2026-09-23",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 387,
+    "vetId": 3,
+    "date": "2026-09-23",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 388,
+    "vetId": 3,
+    "date": "2026-09-24",
+    "startTime": "08:00",
+    "status": "occupied",
+    "appointmentId": "APT-389"
+  },
+  {
+    "id": 389,
+    "vetId": 3,
+    "date": "2026-09-24",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 390,
+    "vetId": 3,
+    "date": "2026-09-24",
+    "startTime": "10:00",
+    "status": "occupied",
+    "appointmentId": "APT-391"
+  },
+  {
+    "id": 391,
+    "vetId": 3,
+    "date": "2026-09-24",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 392,
+    "vetId": 3,
+    "date": "2026-09-24",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 393,
+    "vetId": 3,
+    "date": "2026-09-24",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 394,
+    "vetId": 3,
+    "date": "2026-09-24",
+    "startTime": "14:00",
+    "status": "occupied",
+    "appointmentId": "APT-395"
+  },
+  {
+    "id": 395,
+    "vetId": 3,
+    "date": "2026-09-24",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 396,
+    "vetId": 3,
+    "date": "2026-09-24",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 397,
+    "vetId": 3,
+    "date": "2026-09-25",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 398,
+    "vetId": 3,
+    "date": "2026-09-25",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 399,
+    "vetId": 3,
+    "date": "2026-09-25",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 400,
+    "vetId": 3,
+    "date": "2026-09-25",
+    "startTime": "11:00",
+    "status": "occupied",
+    "appointmentId": "APT-401"
+  },
+  {
+    "id": 401,
+    "vetId": 3,
+    "date": "2026-09-25",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 402,
+    "vetId": 3,
+    "date": "2026-09-25",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 403,
+    "vetId": 3,
+    "date": "2026-09-25",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 404,
+    "vetId": 3,
+    "date": "2026-09-25",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 405,
+    "vetId": 3,
+    "date": "2026-09-25",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 406,
+    "vetId": 3,
+    "date": "2026-09-28",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 407,
+    "vetId": 3,
+    "date": "2026-09-28",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 408,
+    "vetId": 3,
+    "date": "2026-09-28",
+    "startTime": "10:00",
+    "status": "occupied",
+    "appointmentId": "APT-409"
+  },
+  {
+    "id": 409,
+    "vetId": 3,
+    "date": "2026-09-28",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 410,
+    "vetId": 3,
+    "date": "2026-09-28",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 411,
+    "vetId": 3,
+    "date": "2026-09-28",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 412,
+    "vetId": 3,
+    "date": "2026-09-28",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 413,
+    "vetId": 3,
+    "date": "2026-09-28",
+    "startTime": "15:00",
+    "status": "occupied",
+    "appointmentId": "APT-414"
+  },
+  {
+    "id": 414,
+    "vetId": 3,
+    "date": "2026-09-28",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 415,
+    "vetId": 3,
+    "date": "2026-09-29",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 416,
+    "vetId": 3,
+    "date": "2026-09-29",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 417,
+    "vetId": 3,
+    "date": "2026-09-29",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 418,
+    "vetId": 3,
+    "date": "2026-09-29",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 419,
+    "vetId": 3,
+    "date": "2026-09-29",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 420,
+    "vetId": 3,
+    "date": "2026-09-29",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 421,
+    "vetId": 3,
+    "date": "2026-09-29",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 422,
+    "vetId": 3,
+    "date": "2026-09-29",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 423,
+    "vetId": 3,
+    "date": "2026-09-29",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 424,
+    "vetId": 3,
+    "date": "2026-09-30",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 425,
+    "vetId": 3,
+    "date": "2026-09-30",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 426,
+    "vetId": 3,
+    "date": "2026-09-30",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 427,
+    "vetId": 3,
+    "date": "2026-09-30",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 428,
+    "vetId": 3,
+    "date": "2026-09-30",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 429,
+    "vetId": 3,
+    "date": "2026-09-30",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 430,
+    "vetId": 3,
+    "date": "2026-09-30",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 431,
+    "vetId": 3,
+    "date": "2026-09-30",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 432,
+    "vetId": 3,
+    "date": "2026-09-30",
+    "startTime": "16:00",
+    "status": "occupied",
+    "appointmentId": "APT-433"
+  },
+  {
+    "id": 433,
+    "vetId": 4,
+    "date": "2026-09-18",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 434,
+    "vetId": 4,
+    "date": "2026-09-18",
+    "startTime": "09:00",
+    "status": "occupied",
+    "appointmentId": "APT-435"
+  },
+  {
+    "id": 435,
+    "vetId": 4,
+    "date": "2026-09-18",
+    "startTime": "10:00",
+    "status": "occupied",
+    "appointmentId": "APT-436"
+  },
+  {
+    "id": 436,
+    "vetId": 4,
+    "date": "2026-09-18",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 437,
+    "vetId": 4,
+    "date": "2026-09-18",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 438,
+    "vetId": 4,
+    "date": "2026-09-18",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 439,
+    "vetId": 4,
+    "date": "2026-09-18",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 440,
+    "vetId": 4,
+    "date": "2026-09-18",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 441,
+    "vetId": 4,
+    "date": "2026-09-18",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 442,
+    "vetId": 4,
+    "date": "2026-09-21",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 443,
+    "vetId": 4,
+    "date": "2026-09-21",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 444,
+    "vetId": 4,
+    "date": "2026-09-21",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 445,
+    "vetId": 4,
+    "date": "2026-09-21",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 446,
+    "vetId": 4,
+    "date": "2026-09-21",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 447,
+    "vetId": 4,
+    "date": "2026-09-21",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 448,
+    "vetId": 4,
+    "date": "2026-09-21",
+    "startTime": "14:00",
+    "status": "occupied",
+    "appointmentId": "APT-449"
+  },
+  {
+    "id": 449,
+    "vetId": 4,
+    "date": "2026-09-21",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 450,
+    "vetId": 4,
+    "date": "2026-09-21",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 451,
+    "vetId": 4,
+    "date": "2026-09-22",
+    "startTime": "08:00",
+    "status": "occupied",
+    "appointmentId": "APT-452"
+  },
+  {
+    "id": 452,
+    "vetId": 4,
+    "date": "2026-09-22",
+    "startTime": "09:00",
+    "status": "occupied",
+    "appointmentId": "APT-453"
+  },
+  {
+    "id": 453,
+    "vetId": 4,
+    "date": "2026-09-22",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 454,
+    "vetId": 4,
+    "date": "2026-09-22",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 455,
+    "vetId": 4,
+    "date": "2026-09-22",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 456,
+    "vetId": 4,
+    "date": "2026-09-22",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 457,
+    "vetId": 4,
+    "date": "2026-09-22",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 458,
+    "vetId": 4,
+    "date": "2026-09-22",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 459,
+    "vetId": 4,
+    "date": "2026-09-22",
+    "startTime": "16:00",
+    "status": "occupied",
+    "appointmentId": "APT-460"
+  },
+  {
+    "id": 460,
+    "vetId": 4,
+    "date": "2026-09-23",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 461,
+    "vetId": 4,
+    "date": "2026-09-23",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 462,
+    "vetId": 4,
+    "date": "2026-09-23",
+    "startTime": "10:00",
+    "status": "occupied",
+    "appointmentId": "APT-463"
+  },
+  {
+    "id": 463,
+    "vetId": 4,
+    "date": "2026-09-23",
+    "startTime": "11:00",
+    "status": "occupied",
+    "appointmentId": "APT-464"
+  },
+  {
+    "id": 464,
+    "vetId": 4,
+    "date": "2026-09-23",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 465,
+    "vetId": 4,
+    "date": "2026-09-23",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 466,
+    "vetId": 4,
+    "date": "2026-09-23",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 467,
+    "vetId": 4,
+    "date": "2026-09-23",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 468,
+    "vetId": 4,
+    "date": "2026-09-23",
+    "startTime": "16:00",
+    "status": "occupied",
+    "appointmentId": "APT-469"
+  },
+  {
+    "id": 469,
+    "vetId": 4,
+    "date": "2026-09-24",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 470,
+    "vetId": 4,
+    "date": "2026-09-24",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 471,
+    "vetId": 4,
+    "date": "2026-09-24",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 472,
+    "vetId": 4,
+    "date": "2026-09-24",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 473,
+    "vetId": 4,
+    "date": "2026-09-24",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 474,
+    "vetId": 4,
+    "date": "2026-09-24",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 475,
+    "vetId": 4,
+    "date": "2026-09-24",
+    "startTime": "14:00",
+    "status": "occupied",
+    "appointmentId": "APT-476"
+  },
+  {
+    "id": 476,
+    "vetId": 4,
+    "date": "2026-09-24",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 477,
+    "vetId": 4,
+    "date": "2026-09-24",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 478,
+    "vetId": 4,
+    "date": "2026-09-25",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 479,
+    "vetId": 4,
+    "date": "2026-09-25",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 480,
+    "vetId": 4,
+    "date": "2026-09-25",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 481,
+    "vetId": 4,
+    "date": "2026-09-25",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 482,
+    "vetId": 4,
+    "date": "2026-09-25",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 483,
+    "vetId": 4,
+    "date": "2026-09-25",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 484,
+    "vetId": 4,
+    "date": "2026-09-25",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 485,
+    "vetId": 4,
+    "date": "2026-09-25",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 486,
+    "vetId": 4,
+    "date": "2026-09-25",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 487,
+    "vetId": 4,
+    "date": "2026-09-28",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 488,
+    "vetId": 4,
+    "date": "2026-09-28",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 489,
+    "vetId": 4,
+    "date": "2026-09-28",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 490,
+    "vetId": 4,
+    "date": "2026-09-28",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 491,
+    "vetId": 4,
+    "date": "2026-09-28",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 492,
+    "vetId": 4,
+    "date": "2026-09-28",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 493,
+    "vetId": 4,
+    "date": "2026-09-28",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 494,
+    "vetId": 4,
+    "date": "2026-09-28",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 495,
+    "vetId": 4,
+    "date": "2026-09-28",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 496,
+    "vetId": 4,
+    "date": "2026-09-29",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 497,
+    "vetId": 4,
+    "date": "2026-09-29",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 498,
+    "vetId": 4,
+    "date": "2026-09-29",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 499,
+    "vetId": 4,
+    "date": "2026-09-29",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 500,
+    "vetId": 4,
+    "date": "2026-09-29",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 501,
+    "vetId": 4,
+    "date": "2026-09-29",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 502,
+    "vetId": 4,
+    "date": "2026-09-29",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 503,
+    "vetId": 4,
+    "date": "2026-09-29",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 504,
+    "vetId": 4,
+    "date": "2026-09-29",
+    "startTime": "16:00",
+    "status": "occupied",
+    "appointmentId": "APT-505"
+  },
+  {
+    "id": 505,
+    "vetId": 4,
+    "date": "2026-09-30",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 506,
+    "vetId": 4,
+    "date": "2026-09-30",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 507,
+    "vetId": 4,
+    "date": "2026-09-30",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 508,
+    "vetId": 4,
+    "date": "2026-09-30",
+    "startTime": "11:00",
+    "status": "occupied",
+    "appointmentId": "APT-509"
+  },
+  {
+    "id": 509,
+    "vetId": 4,
+    "date": "2026-09-30",
+    "startTime": "12:00",
+    "status": "occupied",
+    "appointmentId": "APT-510"
+  },
+  {
+    "id": 510,
+    "vetId": 4,
+    "date": "2026-09-30",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 511,
+    "vetId": 4,
+    "date": "2026-09-30",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 512,
+    "vetId": 4,
+    "date": "2026-09-30",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 513,
+    "vetId": 4,
+    "date": "2026-09-30",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 514,
+    "vetId": 5,
+    "date": "2026-09-18",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 515,
+    "vetId": 5,
+    "date": "2026-09-18",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 516,
+    "vetId": 5,
+    "date": "2026-09-18",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 517,
+    "vetId": 5,
+    "date": "2026-09-18",
+    "startTime": "11:00",
+    "status": "occupied",
+    "appointmentId": "APT-518"
+  },
+  {
+    "id": 518,
+    "vetId": 5,
+    "date": "2026-09-18",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 519,
+    "vetId": 5,
+    "date": "2026-09-18",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 520,
+    "vetId": 5,
+    "date": "2026-09-18",
+    "startTime": "14:00",
+    "status": "occupied",
+    "appointmentId": "APT-521"
+  },
+  {
+    "id": 521,
+    "vetId": 5,
+    "date": "2026-09-18",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 522,
+    "vetId": 5,
+    "date": "2026-09-18",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 523,
+    "vetId": 5,
+    "date": "2026-09-21",
+    "startTime": "08:00",
+    "status": "occupied",
+    "appointmentId": "APT-524"
+  },
+  {
+    "id": 524,
+    "vetId": 5,
+    "date": "2026-09-21",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 525,
+    "vetId": 5,
+    "date": "2026-09-21",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 526,
+    "vetId": 5,
+    "date": "2026-09-21",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 527,
+    "vetId": 5,
+    "date": "2026-09-21",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 528,
+    "vetId": 5,
+    "date": "2026-09-21",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 529,
+    "vetId": 5,
+    "date": "2026-09-21",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 530,
+    "vetId": 5,
+    "date": "2026-09-21",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 531,
+    "vetId": 5,
+    "date": "2026-09-21",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 532,
+    "vetId": 5,
+    "date": "2026-09-22",
+    "startTime": "08:00",
+    "status": "occupied",
+    "appointmentId": "APT-533"
+  },
+  {
+    "id": 533,
+    "vetId": 5,
+    "date": "2026-09-22",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 534,
+    "vetId": 5,
+    "date": "2026-09-22",
+    "startTime": "10:00",
+    "status": "occupied",
+    "appointmentId": "APT-535"
+  },
+  {
+    "id": 535,
+    "vetId": 5,
+    "date": "2026-09-22",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 536,
+    "vetId": 5,
+    "date": "2026-09-22",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 537,
+    "vetId": 5,
+    "date": "2026-09-22",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 538,
+    "vetId": 5,
+    "date": "2026-09-22",
+    "startTime": "14:00",
+    "status": "occupied",
+    "appointmentId": "APT-539"
+  },
+  {
+    "id": 539,
+    "vetId": 5,
+    "date": "2026-09-22",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 540,
+    "vetId": 5,
+    "date": "2026-09-22",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 541,
+    "vetId": 5,
+    "date": "2026-09-23",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 542,
+    "vetId": 5,
+    "date": "2026-09-23",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 543,
+    "vetId": 5,
+    "date": "2026-09-23",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 544,
+    "vetId": 5,
+    "date": "2026-09-23",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 545,
+    "vetId": 5,
+    "date": "2026-09-23",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 546,
+    "vetId": 5,
+    "date": "2026-09-23",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 547,
+    "vetId": 5,
+    "date": "2026-09-23",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 548,
+    "vetId": 5,
+    "date": "2026-09-23",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 549,
+    "vetId": 5,
+    "date": "2026-09-23",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 550,
+    "vetId": 5,
+    "date": "2026-09-24",
+    "startTime": "08:00",
+    "status": "occupied",
+    "appointmentId": "APT-551"
+  },
+  {
+    "id": 551,
+    "vetId": 5,
+    "date": "2026-09-24",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 552,
+    "vetId": 5,
+    "date": "2026-09-24",
+    "startTime": "10:00",
+    "status": "occupied",
+    "appointmentId": "APT-553"
+  },
+  {
+    "id": 553,
+    "vetId": 5,
+    "date": "2026-09-24",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 554,
+    "vetId": 5,
+    "date": "2026-09-24",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 555,
+    "vetId": 5,
+    "date": "2026-09-24",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 556,
+    "vetId": 5,
+    "date": "2026-09-24",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 557,
+    "vetId": 5,
+    "date": "2026-09-24",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 558,
+    "vetId": 5,
+    "date": "2026-09-24",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 559,
+    "vetId": 5,
+    "date": "2026-09-25",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 560,
+    "vetId": 5,
+    "date": "2026-09-25",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 561,
+    "vetId": 5,
+    "date": "2026-09-25",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 562,
+    "vetId": 5,
+    "date": "2026-09-25",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 563,
+    "vetId": 5,
+    "date": "2026-09-25",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 564,
+    "vetId": 5,
+    "date": "2026-09-25",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 565,
+    "vetId": 5,
+    "date": "2026-09-25",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 566,
+    "vetId": 5,
+    "date": "2026-09-25",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 567,
+    "vetId": 5,
+    "date": "2026-09-25",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 568,
+    "vetId": 5,
+    "date": "2026-09-28",
+    "startTime": "08:00",
+    "status": "occupied",
+    "appointmentId": "APT-569"
+  },
+  {
+    "id": 569,
+    "vetId": 5,
+    "date": "2026-09-28",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 570,
+    "vetId": 5,
+    "date": "2026-09-28",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 571,
+    "vetId": 5,
+    "date": "2026-09-28",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 572,
+    "vetId": 5,
+    "date": "2026-09-28",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 573,
+    "vetId": 5,
+    "date": "2026-09-28",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 574,
+    "vetId": 5,
+    "date": "2026-09-28",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 575,
+    "vetId": 5,
+    "date": "2026-09-28",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 576,
+    "vetId": 5,
+    "date": "2026-09-28",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 577,
+    "vetId": 5,
+    "date": "2026-09-29",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 578,
+    "vetId": 5,
+    "date": "2026-09-29",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 579,
+    "vetId": 5,
+    "date": "2026-09-29",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 580,
+    "vetId": 5,
+    "date": "2026-09-29",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 581,
+    "vetId": 5,
+    "date": "2026-09-29",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 582,
+    "vetId": 5,
+    "date": "2026-09-29",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 583,
+    "vetId": 5,
+    "date": "2026-09-29",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 584,
+    "vetId": 5,
+    "date": "2026-09-29",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 585,
+    "vetId": 5,
+    "date": "2026-09-29",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 586,
+    "vetId": 5,
+    "date": "2026-09-30",
+    "startTime": "08:00",
+    "status": "occupied",
+    "appointmentId": "APT-587"
+  },
+  {
+    "id": 587,
+    "vetId": 5,
+    "date": "2026-09-30",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 588,
+    "vetId": 5,
+    "date": "2026-09-30",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 589,
+    "vetId": 5,
+    "date": "2026-09-30",
+    "startTime": "11:00",
+    "status": "occupied",
+    "appointmentId": "APT-590"
+  },
+  {
+    "id": 590,
+    "vetId": 5,
+    "date": "2026-09-30",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 591,
+    "vetId": 5,
+    "date": "2026-09-30",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 592,
+    "vetId": 5,
+    "date": "2026-09-30",
+    "startTime": "14:00",
+    "status": "occupied",
+    "appointmentId": "APT-593"
+  },
+  {
+    "id": 593,
+    "vetId": 5,
+    "date": "2026-09-30",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 594,
+    "vetId": 5,
+    "date": "2026-09-30",
+    "startTime": "16:00",
+    "status": "occupied",
+    "appointmentId": "APT-595"
+  },
+  {
+    "id": 595,
+    "vetId": 6,
+    "date": "2026-09-18",
+    "startTime": "08:00",
+    "status": "occupied",
+    "appointmentId": "APT-596"
+  },
+  {
+    "id": 596,
+    "vetId": 6,
+    "date": "2026-09-18",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 597,
+    "vetId": 6,
+    "date": "2026-09-18",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 598,
+    "vetId": 6,
+    "date": "2026-09-18",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 599,
+    "vetId": 6,
+    "date": "2026-09-18",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 600,
+    "vetId": 6,
+    "date": "2026-09-18",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 601,
+    "vetId": 6,
+    "date": "2026-09-18",
+    "startTime": "14:00",
+    "status": "occupied",
+    "appointmentId": "APT-602"
+  },
+  {
+    "id": 602,
+    "vetId": 6,
+    "date": "2026-09-18",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 603,
+    "vetId": 6,
+    "date": "2026-09-18",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 604,
+    "vetId": 6,
+    "date": "2026-09-21",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 605,
+    "vetId": 6,
+    "date": "2026-09-21",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 606,
+    "vetId": 6,
+    "date": "2026-09-21",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 607,
+    "vetId": 6,
+    "date": "2026-09-21",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 608,
+    "vetId": 6,
+    "date": "2026-09-21",
+    "startTime": "12:00",
+    "status": "occupied",
+    "appointmentId": "APT-609"
+  },
+  {
+    "id": 609,
+    "vetId": 6,
+    "date": "2026-09-21",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 610,
+    "vetId": 6,
+    "date": "2026-09-21",
+    "startTime": "14:00",
+    "status": "occupied",
+    "appointmentId": "APT-611"
+  },
+  {
+    "id": 611,
+    "vetId": 6,
+    "date": "2026-09-21",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 612,
+    "vetId": 6,
+    "date": "2026-09-21",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 613,
+    "vetId": 6,
+    "date": "2026-09-22",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 614,
+    "vetId": 6,
+    "date": "2026-09-22",
+    "startTime": "09:00",
+    "status": "occupied",
+    "appointmentId": "APT-615"
+  },
+  {
+    "id": 615,
+    "vetId": 6,
+    "date": "2026-09-22",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 616,
+    "vetId": 6,
+    "date": "2026-09-22",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 617,
+    "vetId": 6,
+    "date": "2026-09-22",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 618,
+    "vetId": 6,
+    "date": "2026-09-22",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 619,
+    "vetId": 6,
+    "date": "2026-09-22",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 620,
+    "vetId": 6,
+    "date": "2026-09-22",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 621,
+    "vetId": 6,
+    "date": "2026-09-22",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 622,
+    "vetId": 6,
+    "date": "2026-09-23",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 623,
+    "vetId": 6,
+    "date": "2026-09-23",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 624,
+    "vetId": 6,
+    "date": "2026-09-23",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 625,
+    "vetId": 6,
+    "date": "2026-09-23",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 626,
+    "vetId": 6,
+    "date": "2026-09-23",
+    "startTime": "12:00",
+    "status": "occupied",
+    "appointmentId": "APT-627"
+  },
+  {
+    "id": 627,
+    "vetId": 6,
+    "date": "2026-09-23",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 628,
+    "vetId": 6,
+    "date": "2026-09-23",
+    "startTime": "14:00",
+    "status": "occupied",
+    "appointmentId": "APT-629"
+  },
+  {
+    "id": 629,
+    "vetId": 6,
+    "date": "2026-09-23",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 630,
+    "vetId": 6,
+    "date": "2026-09-23",
+    "startTime": "16:00",
+    "status": "occupied",
+    "appointmentId": "APT-631"
+  },
+  {
+    "id": 631,
+    "vetId": 6,
+    "date": "2026-09-24",
+    "startTime": "08:00",
+    "status": "occupied",
+    "appointmentId": "APT-632"
+  },
+  {
+    "id": 632,
+    "vetId": 6,
+    "date": "2026-09-24",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 633,
+    "vetId": 6,
+    "date": "2026-09-24",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 634,
+    "vetId": 6,
+    "date": "2026-09-24",
+    "startTime": "11:00",
+    "status": "occupied",
+    "appointmentId": "APT-635"
+  },
+  {
+    "id": 635,
+    "vetId": 6,
+    "date": "2026-09-24",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 636,
+    "vetId": 6,
+    "date": "2026-09-24",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 637,
+    "vetId": 6,
+    "date": "2026-09-24",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 638,
+    "vetId": 6,
+    "date": "2026-09-24",
+    "startTime": "15:00",
+    "status": "occupied",
+    "appointmentId": "APT-639"
+  },
+  {
+    "id": 639,
+    "vetId": 6,
+    "date": "2026-09-24",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 640,
+    "vetId": 6,
+    "date": "2026-09-25",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 641,
+    "vetId": 6,
+    "date": "2026-09-25",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 642,
+    "vetId": 6,
+    "date": "2026-09-25",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 643,
+    "vetId": 6,
+    "date": "2026-09-25",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 644,
+    "vetId": 6,
+    "date": "2026-09-25",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 645,
+    "vetId": 6,
+    "date": "2026-09-25",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 646,
+    "vetId": 6,
+    "date": "2026-09-25",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 647,
+    "vetId": 6,
+    "date": "2026-09-25",
+    "startTime": "15:00",
+    "status": "occupied",
+    "appointmentId": "APT-648"
+  },
+  {
+    "id": 648,
+    "vetId": 6,
+    "date": "2026-09-25",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 649,
+    "vetId": 6,
+    "date": "2026-09-28",
+    "startTime": "08:00",
+    "status": "occupied",
+    "appointmentId": "APT-650"
+  },
+  {
+    "id": 650,
+    "vetId": 6,
+    "date": "2026-09-28",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 651,
+    "vetId": 6,
+    "date": "2026-09-28",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 652,
+    "vetId": 6,
+    "date": "2026-09-28",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 653,
+    "vetId": 6,
+    "date": "2026-09-28",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 654,
+    "vetId": 6,
+    "date": "2026-09-28",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 655,
+    "vetId": 6,
+    "date": "2026-09-28",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 656,
+    "vetId": 6,
+    "date": "2026-09-28",
+    "startTime": "15:00",
+    "status": "occupied",
+    "appointmentId": "APT-657"
+  },
+  {
+    "id": 657,
+    "vetId": 6,
+    "date": "2026-09-28",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 658,
+    "vetId": 6,
+    "date": "2026-09-29",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 659,
+    "vetId": 6,
+    "date": "2026-09-29",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 660,
+    "vetId": 6,
+    "date": "2026-09-29",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 661,
+    "vetId": 6,
+    "date": "2026-09-29",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 662,
+    "vetId": 6,
+    "date": "2026-09-29",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 663,
+    "vetId": 6,
+    "date": "2026-09-29",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 664,
+    "vetId": 6,
+    "date": "2026-09-29",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 665,
+    "vetId": 6,
+    "date": "2026-09-29",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 666,
+    "vetId": 6,
+    "date": "2026-09-29",
+    "startTime": "16:00",
+    "status": "occupied",
+    "appointmentId": "APT-667"
+  },
+  {
+    "id": 667,
+    "vetId": 6,
+    "date": "2026-09-30",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 668,
+    "vetId": 6,
+    "date": "2026-09-30",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 669,
+    "vetId": 6,
+    "date": "2026-09-30",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 670,
+    "vetId": 6,
+    "date": "2026-09-30",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 671,
+    "vetId": 6,
+    "date": "2026-09-30",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 672,
+    "vetId": 6,
+    "date": "2026-09-30",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 673,
+    "vetId": 6,
+    "date": "2026-09-30",
+    "startTime": "14:00",
+    "status": "occupied",
+    "appointmentId": "APT-674"
+  },
+  {
+    "id": 674,
+    "vetId": 6,
+    "date": "2026-09-30",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 675,
+    "vetId": 6,
+    "date": "2026-09-30",
+    "startTime": "16:00",
+    "status": "occupied",
+    "appointmentId": "APT-676"
+  },
+  {
+    "id": 676,
+    "vetId": 7,
+    "date": "2026-09-18",
+    "startTime": "08:00",
+    "status": "occupied",
+    "appointmentId": "APT-677"
+  },
+  {
+    "id": 677,
+    "vetId": 7,
+    "date": "2026-09-18",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 678,
+    "vetId": 7,
+    "date": "2026-09-18",
+    "startTime": "10:00",
+    "status": "occupied",
+    "appointmentId": "APT-679"
+  },
+  {
+    "id": 679,
+    "vetId": 7,
+    "date": "2026-09-18",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 680,
+    "vetId": 7,
+    "date": "2026-09-18",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 681,
+    "vetId": 7,
+    "date": "2026-09-18",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 682,
+    "vetId": 7,
+    "date": "2026-09-18",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 683,
+    "vetId": 7,
+    "date": "2026-09-18",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 684,
+    "vetId": 7,
+    "date": "2026-09-18",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 685,
+    "vetId": 7,
+    "date": "2026-09-21",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 686,
+    "vetId": 7,
+    "date": "2026-09-21",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 687,
+    "vetId": 7,
+    "date": "2026-09-21",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 688,
+    "vetId": 7,
+    "date": "2026-09-21",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 689,
+    "vetId": 7,
+    "date": "2026-09-21",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 690,
+    "vetId": 7,
+    "date": "2026-09-21",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 691,
+    "vetId": 7,
+    "date": "2026-09-21",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 692,
+    "vetId": 7,
+    "date": "2026-09-21",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 693,
+    "vetId": 7,
+    "date": "2026-09-21",
+    "startTime": "16:00",
+    "status": "occupied",
+    "appointmentId": "APT-694"
+  },
+  {
+    "id": 694,
+    "vetId": 7,
+    "date": "2026-09-22",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 695,
+    "vetId": 7,
+    "date": "2026-09-22",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 696,
+    "vetId": 7,
+    "date": "2026-09-22",
+    "startTime": "10:00",
+    "status": "occupied",
+    "appointmentId": "APT-697"
+  },
+  {
+    "id": 697,
+    "vetId": 7,
+    "date": "2026-09-22",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 698,
+    "vetId": 7,
+    "date": "2026-09-22",
+    "startTime": "12:00",
+    "status": "occupied",
+    "appointmentId": "APT-699"
+  },
+  {
+    "id": 699,
+    "vetId": 7,
+    "date": "2026-09-22",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 700,
+    "vetId": 7,
+    "date": "2026-09-22",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 701,
+    "vetId": 7,
+    "date": "2026-09-22",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 702,
+    "vetId": 7,
+    "date": "2026-09-22",
+    "startTime": "16:00",
+    "status": "occupied",
+    "appointmentId": "APT-703"
+  },
+  {
+    "id": 703,
+    "vetId": 7,
+    "date": "2026-09-23",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 704,
+    "vetId": 7,
+    "date": "2026-09-23",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 705,
+    "vetId": 7,
+    "date": "2026-09-23",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 706,
+    "vetId": 7,
+    "date": "2026-09-23",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 707,
+    "vetId": 7,
+    "date": "2026-09-23",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 708,
+    "vetId": 7,
+    "date": "2026-09-23",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 709,
+    "vetId": 7,
+    "date": "2026-09-23",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 710,
+    "vetId": 7,
+    "date": "2026-09-23",
+    "startTime": "15:00",
+    "status": "occupied",
+    "appointmentId": "APT-711"
+  },
+  {
+    "id": 711,
+    "vetId": 7,
+    "date": "2026-09-23",
+    "startTime": "16:00",
+    "status": "occupied",
+    "appointmentId": "APT-712"
+  },
+  {
+    "id": 712,
+    "vetId": 7,
+    "date": "2026-09-24",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 713,
+    "vetId": 7,
+    "date": "2026-09-24",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 714,
+    "vetId": 7,
+    "date": "2026-09-24",
+    "startTime": "10:00",
+    "status": "occupied",
+    "appointmentId": "APT-715"
+  },
+  {
+    "id": 715,
+    "vetId": 7,
+    "date": "2026-09-24",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 716,
+    "vetId": 7,
+    "date": "2026-09-24",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 717,
+    "vetId": 7,
+    "date": "2026-09-24",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 718,
+    "vetId": 7,
+    "date": "2026-09-24",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 719,
+    "vetId": 7,
+    "date": "2026-09-24",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 720,
+    "vetId": 7,
+    "date": "2026-09-24",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 721,
+    "vetId": 7,
+    "date": "2026-09-25",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 722,
+    "vetId": 7,
+    "date": "2026-09-25",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 723,
+    "vetId": 7,
+    "date": "2026-09-25",
+    "startTime": "10:00",
+    "status": "occupied",
+    "appointmentId": "APT-724"
+  },
+  {
+    "id": 724,
+    "vetId": 7,
+    "date": "2026-09-25",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 725,
+    "vetId": 7,
+    "date": "2026-09-25",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 726,
+    "vetId": 7,
+    "date": "2026-09-25",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 727,
+    "vetId": 7,
+    "date": "2026-09-25",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 728,
+    "vetId": 7,
+    "date": "2026-09-25",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 729,
+    "vetId": 7,
+    "date": "2026-09-25",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 730,
+    "vetId": 7,
+    "date": "2026-09-28",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 731,
+    "vetId": 7,
+    "date": "2026-09-28",
+    "startTime": "09:00",
+    "status": "occupied",
+    "appointmentId": "APT-732"
+  },
+  {
+    "id": 732,
+    "vetId": 7,
+    "date": "2026-09-28",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 733,
+    "vetId": 7,
+    "date": "2026-09-28",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 734,
+    "vetId": 7,
+    "date": "2026-09-28",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 735,
+    "vetId": 7,
+    "date": "2026-09-28",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 736,
+    "vetId": 7,
+    "date": "2026-09-28",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 737,
+    "vetId": 7,
+    "date": "2026-09-28",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 738,
+    "vetId": 7,
+    "date": "2026-09-28",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 739,
+    "vetId": 7,
+    "date": "2026-09-29",
+    "startTime": "08:00",
+    "status": "occupied",
+    "appointmentId": "APT-740"
+  },
+  {
+    "id": 740,
+    "vetId": 7,
+    "date": "2026-09-29",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 741,
+    "vetId": 7,
+    "date": "2026-09-29",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 742,
+    "vetId": 7,
+    "date": "2026-09-29",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 743,
+    "vetId": 7,
+    "date": "2026-09-29",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 744,
+    "vetId": 7,
+    "date": "2026-09-29",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 745,
+    "vetId": 7,
+    "date": "2026-09-29",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 746,
+    "vetId": 7,
+    "date": "2026-09-29",
+    "startTime": "15:00",
+    "status": "occupied",
+    "appointmentId": "APT-747"
+  },
+  {
+    "id": 747,
+    "vetId": 7,
+    "date": "2026-09-29",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 748,
+    "vetId": 7,
+    "date": "2026-09-30",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 749,
+    "vetId": 7,
+    "date": "2026-09-30",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 750,
+    "vetId": 7,
+    "date": "2026-09-30",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 751,
+    "vetId": 7,
+    "date": "2026-09-30",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 752,
+    "vetId": 7,
+    "date": "2026-09-30",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 753,
+    "vetId": 7,
+    "date": "2026-09-30",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 754,
+    "vetId": 7,
+    "date": "2026-09-30",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 755,
+    "vetId": 7,
+    "date": "2026-09-30",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 756,
+    "vetId": 7,
+    "date": "2026-09-30",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 757,
+    "vetId": 8,
+    "date": "2026-09-18",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 758,
+    "vetId": 8,
+    "date": "2026-09-18",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 759,
+    "vetId": 8,
+    "date": "2026-09-18",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 760,
+    "vetId": 8,
+    "date": "2026-09-18",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 761,
+    "vetId": 8,
+    "date": "2026-09-18",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 762,
+    "vetId": 8,
+    "date": "2026-09-18",
+    "startTime": "13:00",
+    "status": "occupied",
+    "appointmentId": "APT-763"
+  },
+  {
+    "id": 763,
+    "vetId": 8,
+    "date": "2026-09-18",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 764,
+    "vetId": 8,
+    "date": "2026-09-18",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 765,
+    "vetId": 8,
+    "date": "2026-09-18",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 766,
+    "vetId": 8,
+    "date": "2026-09-21",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 767,
+    "vetId": 8,
+    "date": "2026-09-21",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 768,
+    "vetId": 8,
+    "date": "2026-09-21",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 769,
+    "vetId": 8,
+    "date": "2026-09-21",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 770,
+    "vetId": 8,
+    "date": "2026-09-21",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 771,
+    "vetId": 8,
+    "date": "2026-09-21",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 772,
+    "vetId": 8,
+    "date": "2026-09-21",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 773,
+    "vetId": 8,
+    "date": "2026-09-21",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 774,
+    "vetId": 8,
+    "date": "2026-09-21",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 775,
+    "vetId": 8,
+    "date": "2026-09-22",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 776,
+    "vetId": 8,
+    "date": "2026-09-22",
+    "startTime": "09:00",
+    "status": "occupied",
+    "appointmentId": "APT-777"
+  },
+  {
+    "id": 777,
+    "vetId": 8,
+    "date": "2026-09-22",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 778,
+    "vetId": 8,
+    "date": "2026-09-22",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 779,
+    "vetId": 8,
+    "date": "2026-09-22",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 780,
+    "vetId": 8,
+    "date": "2026-09-22",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 781,
+    "vetId": 8,
+    "date": "2026-09-22",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 782,
+    "vetId": 8,
+    "date": "2026-09-22",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 783,
+    "vetId": 8,
+    "date": "2026-09-22",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 784,
+    "vetId": 8,
+    "date": "2026-09-23",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 785,
+    "vetId": 8,
+    "date": "2026-09-23",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 786,
+    "vetId": 8,
+    "date": "2026-09-23",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 787,
+    "vetId": 8,
+    "date": "2026-09-23",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 788,
+    "vetId": 8,
+    "date": "2026-09-23",
+    "startTime": "12:00",
+    "status": "occupied",
+    "appointmentId": "APT-789"
+  },
+  {
+    "id": 789,
+    "vetId": 8,
+    "date": "2026-09-23",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 790,
+    "vetId": 8,
+    "date": "2026-09-23",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 791,
+    "vetId": 8,
+    "date": "2026-09-23",
+    "startTime": "15:00",
+    "status": "occupied",
+    "appointmentId": "APT-792"
+  },
+  {
+    "id": 792,
+    "vetId": 8,
+    "date": "2026-09-23",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 793,
+    "vetId": 8,
+    "date": "2026-09-24",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 794,
+    "vetId": 8,
+    "date": "2026-09-24",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 795,
+    "vetId": 8,
+    "date": "2026-09-24",
+    "startTime": "10:00",
+    "status": "occupied",
+    "appointmentId": "APT-796"
+  },
+  {
+    "id": 796,
+    "vetId": 8,
+    "date": "2026-09-24",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 797,
+    "vetId": 8,
+    "date": "2026-09-24",
+    "startTime": "12:00",
+    "status": "occupied",
+    "appointmentId": "APT-798"
+  },
+  {
+    "id": 798,
+    "vetId": 8,
+    "date": "2026-09-24",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 799,
+    "vetId": 8,
+    "date": "2026-09-24",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 800,
+    "vetId": 8,
+    "date": "2026-09-24",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 801,
+    "vetId": 8,
+    "date": "2026-09-24",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 802,
+    "vetId": 8,
+    "date": "2026-09-25",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 803,
+    "vetId": 8,
+    "date": "2026-09-25",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 804,
+    "vetId": 8,
+    "date": "2026-09-25",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 805,
+    "vetId": 8,
+    "date": "2026-09-25",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 806,
+    "vetId": 8,
+    "date": "2026-09-25",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 807,
+    "vetId": 8,
+    "date": "2026-09-25",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 808,
+    "vetId": 8,
+    "date": "2026-09-25",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 809,
+    "vetId": 8,
+    "date": "2026-09-25",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 810,
+    "vetId": 8,
+    "date": "2026-09-25",
+    "startTime": "16:00",
+    "status": "occupied",
+    "appointmentId": "APT-811"
+  },
+  {
+    "id": 811,
+    "vetId": 8,
+    "date": "2026-09-28",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 812,
+    "vetId": 8,
+    "date": "2026-09-28",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 813,
+    "vetId": 8,
+    "date": "2026-09-28",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 814,
+    "vetId": 8,
+    "date": "2026-09-28",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 815,
+    "vetId": 8,
+    "date": "2026-09-28",
+    "startTime": "12:00",
+    "status": "occupied",
+    "appointmentId": "APT-816"
+  },
+  {
+    "id": 816,
+    "vetId": 8,
+    "date": "2026-09-28",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 817,
+    "vetId": 8,
+    "date": "2026-09-28",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 818,
+    "vetId": 8,
+    "date": "2026-09-28",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 819,
+    "vetId": 8,
+    "date": "2026-09-28",
+    "startTime": "16:00",
+    "status": "occupied",
+    "appointmentId": "APT-820"
+  },
+  {
+    "id": 820,
+    "vetId": 8,
+    "date": "2026-09-29",
+    "startTime": "08:00",
+    "status": "occupied",
+    "appointmentId": "APT-821"
+  },
+  {
+    "id": 821,
+    "vetId": 8,
+    "date": "2026-09-29",
+    "startTime": "09:00",
+    "status": "occupied",
+    "appointmentId": "APT-822"
+  },
+  {
+    "id": 822,
+    "vetId": 8,
+    "date": "2026-09-29",
+    "startTime": "10:00",
+    "status": "occupied",
+    "appointmentId": "APT-823"
+  },
+  {
+    "id": 823,
+    "vetId": 8,
+    "date": "2026-09-29",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 824,
+    "vetId": 8,
+    "date": "2026-09-29",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 825,
+    "vetId": 8,
+    "date": "2026-09-29",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 826,
+    "vetId": 8,
+    "date": "2026-09-29",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 827,
+    "vetId": 8,
+    "date": "2026-09-29",
+    "startTime": "15:00",
+    "status": "occupied",
+    "appointmentId": "APT-828"
+  },
+  {
+    "id": 828,
+    "vetId": 8,
+    "date": "2026-09-29",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 829,
+    "vetId": 8,
+    "date": "2026-09-30",
+    "startTime": "08:00",
+    "status": "occupied",
+    "appointmentId": "APT-830"
+  },
+  {
+    "id": 830,
+    "vetId": 8,
+    "date": "2026-09-30",
+    "startTime": "09:00",
+    "status": "occupied",
+    "appointmentId": "APT-831"
+  },
+  {
+    "id": 831,
+    "vetId": 8,
+    "date": "2026-09-30",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 832,
+    "vetId": 8,
+    "date": "2026-09-30",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 833,
+    "vetId": 8,
+    "date": "2026-09-30",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 834,
+    "vetId": 8,
+    "date": "2026-09-30",
+    "startTime": "13:00",
+    "status": "occupied",
+    "appointmentId": "APT-835"
+  },
+  {
+    "id": 835,
+    "vetId": 8,
+    "date": "2026-09-30",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 836,
+    "vetId": 8,
+    "date": "2026-09-30",
+    "startTime": "15:00",
+    "status": "occupied",
+    "appointmentId": "APT-837"
+  },
+  {
+    "id": 837,
+    "vetId": 8,
+    "date": "2026-09-30",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 838,
+    "vetId": 9,
+    "date": "2026-09-18",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 839,
+    "vetId": 9,
+    "date": "2026-09-18",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 840,
+    "vetId": 9,
+    "date": "2026-09-18",
+    "startTime": "10:00",
+    "status": "occupied",
+    "appointmentId": "APT-841"
+  },
+  {
+    "id": 841,
+    "vetId": 9,
+    "date": "2026-09-18",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 842,
+    "vetId": 9,
+    "date": "2026-09-18",
+    "startTime": "12:00",
+    "status": "occupied",
+    "appointmentId": "APT-843"
+  },
+  {
+    "id": 843,
+    "vetId": 9,
+    "date": "2026-09-18",
+    "startTime": "13:00",
+    "status": "occupied",
+    "appointmentId": "APT-844"
+  },
+  {
+    "id": 844,
+    "vetId": 9,
+    "date": "2026-09-18",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 845,
+    "vetId": 9,
+    "date": "2026-09-18",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 846,
+    "vetId": 9,
+    "date": "2026-09-18",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 847,
+    "vetId": 9,
+    "date": "2026-09-21",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 848,
+    "vetId": 9,
+    "date": "2026-09-21",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 849,
+    "vetId": 9,
+    "date": "2026-09-21",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 850,
+    "vetId": 9,
+    "date": "2026-09-21",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 851,
+    "vetId": 9,
+    "date": "2026-09-21",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 852,
+    "vetId": 9,
+    "date": "2026-09-21",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 853,
+    "vetId": 9,
+    "date": "2026-09-21",
+    "startTime": "14:00",
+    "status": "occupied",
+    "appointmentId": "APT-854"
+  },
+  {
+    "id": 854,
+    "vetId": 9,
+    "date": "2026-09-21",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 855,
+    "vetId": 9,
+    "date": "2026-09-21",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 856,
+    "vetId": 9,
+    "date": "2026-09-22",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 857,
+    "vetId": 9,
+    "date": "2026-09-22",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 858,
+    "vetId": 9,
+    "date": "2026-09-22",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 859,
+    "vetId": 9,
+    "date": "2026-09-22",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 860,
+    "vetId": 9,
+    "date": "2026-09-22",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 861,
+    "vetId": 9,
+    "date": "2026-09-22",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 862,
+    "vetId": 9,
+    "date": "2026-09-22",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 863,
+    "vetId": 9,
+    "date": "2026-09-22",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 864,
+    "vetId": 9,
+    "date": "2026-09-22",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 865,
+    "vetId": 9,
+    "date": "2026-09-23",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 866,
+    "vetId": 9,
+    "date": "2026-09-23",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 867,
+    "vetId": 9,
+    "date": "2026-09-23",
+    "startTime": "10:00",
+    "status": "occupied",
+    "appointmentId": "APT-868"
+  },
+  {
+    "id": 868,
+    "vetId": 9,
+    "date": "2026-09-23",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 869,
+    "vetId": 9,
+    "date": "2026-09-23",
+    "startTime": "12:00",
+    "status": "occupied",
+    "appointmentId": "APT-870"
+  },
+  {
+    "id": 870,
+    "vetId": 9,
+    "date": "2026-09-23",
+    "startTime": "13:00",
+    "status": "occupied",
+    "appointmentId": "APT-871"
+  },
+  {
+    "id": 871,
+    "vetId": 9,
+    "date": "2026-09-23",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 872,
+    "vetId": 9,
+    "date": "2026-09-23",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 873,
+    "vetId": 9,
+    "date": "2026-09-23",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 874,
+    "vetId": 9,
+    "date": "2026-09-24",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 875,
+    "vetId": 9,
+    "date": "2026-09-24",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 876,
+    "vetId": 9,
+    "date": "2026-09-24",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 877,
+    "vetId": 9,
+    "date": "2026-09-24",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 878,
+    "vetId": 9,
+    "date": "2026-09-24",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 879,
+    "vetId": 9,
+    "date": "2026-09-24",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 880,
+    "vetId": 9,
+    "date": "2026-09-24",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 881,
+    "vetId": 9,
+    "date": "2026-09-24",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 882,
+    "vetId": 9,
+    "date": "2026-09-24",
+    "startTime": "16:00",
+    "status": "occupied",
+    "appointmentId": "APT-883"
+  },
+  {
+    "id": 883,
+    "vetId": 9,
+    "date": "2026-09-25",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 884,
+    "vetId": 9,
+    "date": "2026-09-25",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 885,
+    "vetId": 9,
+    "date": "2026-09-25",
+    "startTime": "10:00",
+    "status": "occupied",
+    "appointmentId": "APT-886"
+  },
+  {
+    "id": 886,
+    "vetId": 9,
+    "date": "2026-09-25",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 887,
+    "vetId": 9,
+    "date": "2026-09-25",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 888,
+    "vetId": 9,
+    "date": "2026-09-25",
+    "startTime": "13:00",
+    "status": "occupied",
+    "appointmentId": "APT-889"
+  },
+  {
+    "id": 889,
+    "vetId": 9,
+    "date": "2026-09-25",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 890,
+    "vetId": 9,
+    "date": "2026-09-25",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 891,
+    "vetId": 9,
+    "date": "2026-09-25",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 892,
+    "vetId": 9,
+    "date": "2026-09-28",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 893,
+    "vetId": 9,
+    "date": "2026-09-28",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 894,
+    "vetId": 9,
+    "date": "2026-09-28",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 895,
+    "vetId": 9,
+    "date": "2026-09-28",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 896,
+    "vetId": 9,
+    "date": "2026-09-28",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 897,
+    "vetId": 9,
+    "date": "2026-09-28",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 898,
+    "vetId": 9,
+    "date": "2026-09-28",
+    "startTime": "14:00",
+    "status": "occupied",
+    "appointmentId": "APT-899"
+  },
+  {
+    "id": 899,
+    "vetId": 9,
+    "date": "2026-09-28",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 900,
+    "vetId": 9,
+    "date": "2026-09-28",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 901,
+    "vetId": 9,
+    "date": "2026-09-29",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 902,
+    "vetId": 9,
+    "date": "2026-09-29",
+    "startTime": "09:00",
+    "status": "occupied",
+    "appointmentId": "APT-903"
+  },
+  {
+    "id": 903,
+    "vetId": 9,
+    "date": "2026-09-29",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 904,
+    "vetId": 9,
+    "date": "2026-09-29",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 905,
+    "vetId": 9,
+    "date": "2026-09-29",
+    "startTime": "12:00",
+    "status": "occupied",
+    "appointmentId": "APT-906"
+  },
+  {
+    "id": 906,
+    "vetId": 9,
+    "date": "2026-09-29",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 907,
+    "vetId": 9,
+    "date": "2026-09-29",
+    "startTime": "14:00",
+    "status": "occupied",
+    "appointmentId": "APT-908"
+  },
+  {
+    "id": 908,
+    "vetId": 9,
+    "date": "2026-09-29",
+    "startTime": "15:00",
+    "status": "occupied",
+    "appointmentId": "APT-909"
+  },
+  {
+    "id": 909,
+    "vetId": 9,
+    "date": "2026-09-29",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 910,
+    "vetId": 9,
+    "date": "2026-09-30",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 911,
+    "vetId": 9,
+    "date": "2026-09-30",
+    "startTime": "09:00",
+    "status": "occupied",
+    "appointmentId": "APT-912"
+  },
+  {
+    "id": 912,
+    "vetId": 9,
+    "date": "2026-09-30",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 913,
+    "vetId": 9,
+    "date": "2026-09-30",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 914,
+    "vetId": 9,
+    "date": "2026-09-30",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 915,
+    "vetId": 9,
+    "date": "2026-09-30",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 916,
+    "vetId": 9,
+    "date": "2026-09-30",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 917,
+    "vetId": 9,
+    "date": "2026-09-30",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 918,
+    "vetId": 9,
+    "date": "2026-09-30",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 919,
+    "vetId": 10,
+    "date": "2026-09-18",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 920,
+    "vetId": 10,
+    "date": "2026-09-18",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 921,
+    "vetId": 10,
+    "date": "2026-09-18",
+    "startTime": "10:00",
+    "status": "occupied",
+    "appointmentId": "APT-922"
+  },
+  {
+    "id": 922,
+    "vetId": 10,
+    "date": "2026-09-18",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 923,
+    "vetId": 10,
+    "date": "2026-09-18",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 924,
+    "vetId": 10,
+    "date": "2026-09-18",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 925,
+    "vetId": 10,
+    "date": "2026-09-18",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 926,
+    "vetId": 10,
+    "date": "2026-09-18",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 927,
+    "vetId": 10,
+    "date": "2026-09-18",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 928,
+    "vetId": 10,
+    "date": "2026-09-21",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 929,
+    "vetId": 10,
+    "date": "2026-09-21",
+    "startTime": "09:00",
+    "status": "occupied",
+    "appointmentId": "APT-930"
+  },
+  {
+    "id": 930,
+    "vetId": 10,
+    "date": "2026-09-21",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 931,
+    "vetId": 10,
+    "date": "2026-09-21",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 932,
+    "vetId": 10,
+    "date": "2026-09-21",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 933,
+    "vetId": 10,
+    "date": "2026-09-21",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 934,
+    "vetId": 10,
+    "date": "2026-09-21",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 935,
+    "vetId": 10,
+    "date": "2026-09-21",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 936,
+    "vetId": 10,
+    "date": "2026-09-21",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 937,
+    "vetId": 10,
+    "date": "2026-09-22",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 938,
+    "vetId": 10,
+    "date": "2026-09-22",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 939,
+    "vetId": 10,
+    "date": "2026-09-22",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 940,
+    "vetId": 10,
+    "date": "2026-09-22",
+    "startTime": "11:00",
+    "status": "occupied",
+    "appointmentId": "APT-941"
+  },
+  {
+    "id": 941,
+    "vetId": 10,
+    "date": "2026-09-22",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 942,
+    "vetId": 10,
+    "date": "2026-09-22",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 943,
+    "vetId": 10,
+    "date": "2026-09-22",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 944,
+    "vetId": 10,
+    "date": "2026-09-22",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 945,
+    "vetId": 10,
+    "date": "2026-09-22",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 946,
+    "vetId": 10,
+    "date": "2026-09-23",
+    "startTime": "08:00",
+    "status": "occupied",
+    "appointmentId": "APT-947"
+  },
+  {
+    "id": 947,
+    "vetId": 10,
+    "date": "2026-09-23",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 948,
+    "vetId": 10,
+    "date": "2026-09-23",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 949,
+    "vetId": 10,
+    "date": "2026-09-23",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 950,
+    "vetId": 10,
+    "date": "2026-09-23",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 951,
+    "vetId": 10,
+    "date": "2026-09-23",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 952,
+    "vetId": 10,
+    "date": "2026-09-23",
+    "startTime": "14:00",
+    "status": "occupied",
+    "appointmentId": "APT-953"
+  },
+  {
+    "id": 953,
+    "vetId": 10,
+    "date": "2026-09-23",
+    "startTime": "15:00",
+    "status": "occupied",
+    "appointmentId": "APT-954"
+  },
+  {
+    "id": 954,
+    "vetId": 10,
+    "date": "2026-09-23",
+    "startTime": "16:00",
+    "status": "occupied",
+    "appointmentId": "APT-955"
+  },
+  {
+    "id": 955,
+    "vetId": 10,
+    "date": "2026-09-24",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 956,
+    "vetId": 10,
+    "date": "2026-09-24",
+    "startTime": "09:00",
+    "status": "occupied",
+    "appointmentId": "APT-957"
+  },
+  {
+    "id": 957,
+    "vetId": 10,
+    "date": "2026-09-24",
+    "startTime": "10:00",
+    "status": "occupied",
+    "appointmentId": "APT-958"
+  },
+  {
+    "id": 958,
+    "vetId": 10,
+    "date": "2026-09-24",
+    "startTime": "11:00",
+    "status": "occupied",
+    "appointmentId": "APT-959"
+  },
+  {
+    "id": 959,
+    "vetId": 10,
+    "date": "2026-09-24",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 960,
+    "vetId": 10,
+    "date": "2026-09-24",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 961,
+    "vetId": 10,
+    "date": "2026-09-24",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 962,
+    "vetId": 10,
+    "date": "2026-09-24",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 963,
+    "vetId": 10,
+    "date": "2026-09-24",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 964,
+    "vetId": 10,
+    "date": "2026-09-25",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 965,
+    "vetId": 10,
+    "date": "2026-09-25",
+    "startTime": "09:00",
+    "status": "occupied",
+    "appointmentId": "APT-966"
+  },
+  {
+    "id": 966,
+    "vetId": 10,
+    "date": "2026-09-25",
+    "startTime": "10:00",
+    "status": "occupied",
+    "appointmentId": "APT-967"
+  },
+  {
+    "id": 967,
+    "vetId": 10,
+    "date": "2026-09-25",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 968,
+    "vetId": 10,
+    "date": "2026-09-25",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 969,
+    "vetId": 10,
+    "date": "2026-09-25",
+    "startTime": "13:00",
+    "status": "occupied",
+    "appointmentId": "APT-970"
+  },
+  {
+    "id": 970,
+    "vetId": 10,
+    "date": "2026-09-25",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 971,
+    "vetId": 10,
+    "date": "2026-09-25",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 972,
+    "vetId": 10,
+    "date": "2026-09-25",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 973,
+    "vetId": 10,
+    "date": "2026-09-28",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 974,
+    "vetId": 10,
+    "date": "2026-09-28",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 975,
+    "vetId": 10,
+    "date": "2026-09-28",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 976,
+    "vetId": 10,
+    "date": "2026-09-28",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 977,
+    "vetId": 10,
+    "date": "2026-09-28",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 978,
+    "vetId": 10,
+    "date": "2026-09-28",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 979,
+    "vetId": 10,
+    "date": "2026-09-28",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 980,
+    "vetId": 10,
+    "date": "2026-09-28",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 981,
+    "vetId": 10,
+    "date": "2026-09-28",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 982,
+    "vetId": 10,
+    "date": "2026-09-29",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 983,
+    "vetId": 10,
+    "date": "2026-09-29",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 984,
+    "vetId": 10,
+    "date": "2026-09-29",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 985,
+    "vetId": 10,
+    "date": "2026-09-29",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 986,
+    "vetId": 10,
+    "date": "2026-09-29",
+    "startTime": "12:00",
+    "status": "occupied",
+    "appointmentId": "APT-987"
+  },
+  {
+    "id": 987,
+    "vetId": 10,
+    "date": "2026-09-29",
+    "startTime": "13:00",
+    "status": "occupied",
+    "appointmentId": "APT-988"
+  },
+  {
+    "id": 988,
+    "vetId": 10,
+    "date": "2026-09-29",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 989,
+    "vetId": 10,
+    "date": "2026-09-29",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 990,
+    "vetId": 10,
+    "date": "2026-09-29",
+    "startTime": "16:00",
+    "status": "available"
+  },
+  {
+    "id": 991,
+    "vetId": 10,
+    "date": "2026-09-30",
+    "startTime": "08:00",
+    "status": "available"
+  },
+  {
+    "id": 992,
+    "vetId": 10,
+    "date": "2026-09-30",
+    "startTime": "09:00",
+    "status": "available"
+  },
+  {
+    "id": 993,
+    "vetId": 10,
+    "date": "2026-09-30",
+    "startTime": "10:00",
+    "status": "available"
+  },
+  {
+    "id": 994,
+    "vetId": 10,
+    "date": "2026-09-30",
+    "startTime": "11:00",
+    "status": "available"
+  },
+  {
+    "id": 995,
+    "vetId": 10,
+    "date": "2026-09-30",
+    "startTime": "12:00",
+    "status": "available"
+  },
+  {
+    "id": 996,
+    "vetId": 10,
+    "date": "2026-09-30",
+    "startTime": "13:00",
+    "status": "available"
+  },
+  {
+    "id": 997,
+    "vetId": 10,
+    "date": "2026-09-30",
+    "startTime": "14:00",
+    "status": "available"
+  },
+  {
+    "id": 998,
+    "vetId": 10,
+    "date": "2026-09-30",
+    "startTime": "15:00",
+    "status": "available"
+  },
+  {
+    "id": 999,
+    "vetId": 10,
+    "date": "2026-09-30",
+    "startTime": "16:00",
+    "status": "available"
+  }
 ]

@@ -211,23 +211,25 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewAppointmentClick }) => {
 
       {/* Bottom Section */}
       <div className="flex flex-col gap-3">
-        {/* Action Button: + Nueva Cita */}
-        <button
-          onClick={onNewAppointmentClick || (() => navigate('/citas?action=new'))}
-          className={`flex items-center justify-center gap-2 bg-[#0d9488] hover:bg-[#0f766e] text-white font-medium py-3 rounded-full shadow-md shadow-teal-700/20 transition-all duration-200 overflow-hidden ${
-            isHovered ? 'px-4 w-full' : 'px-0 w-12 h-12 self-center'
-          }`}
-          title={!isHovered ? 'Nueva Cita' : undefined}
-        >
-          <Plus className="w-5 h-5 flex-shrink-0" />
-          <span
-            className={`transition-opacity duration-200 whitespace-nowrap ${
-              isHovered ? 'opacity-100' : 'opacity-0 w-0 hidden'
+        {/* Action Button: + Nueva Cita (solo propietario) */}
+        {activePortal === 'propietario' && (
+          <button
+            onClick={onNewAppointmentClick || (() => navigate('/citas?action=new'))}
+            className={`flex items-center justify-center gap-2 bg-[#0d9488] hover:bg-[#0f766e] text-white font-medium py-3 rounded-full shadow-md shadow-teal-700/20 transition-all duration-200 overflow-hidden ${
+              isHovered ? 'px-4 w-full' : 'px-0 w-12 h-12 self-center'
             }`}
+            title={!isHovered ? 'Nueva Cita' : undefined}
           >
-            Nueva Cita
-          </span>
-        </button>
+            <Plus className="w-5 h-5 flex-shrink-0" />
+            <span
+              className={`transition-opacity duration-200 whitespace-nowrap ${
+                isHovered ? 'opacity-100' : 'opacity-0 w-0 hidden'
+              }`}
+            >
+              Nueva Cita
+            </span>
+          </button>
+        )}
 
         {/* Logout */}
         <button
