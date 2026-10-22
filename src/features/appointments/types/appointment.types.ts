@@ -1,13 +1,13 @@
 import { ReactNode } from "react";
 
 export interface Specialty {
-  id: number;
+  id: string;
   name: string;
   description: string;
 }
 
 export interface Veterinarian {
-  id: number;
+  id: string;
   name: string;
   specialty: string;
   averageRating: number;
@@ -25,8 +25,8 @@ export interface Pet {
 export type SlotStatus = "available" | "occupied";
 
 export interface AvailabilitySlot {
-  id: number;
-  vetId: number;
+  id: string;
+  vetId: string;
   date: string;
   startTime: string;
   status: SlotStatus;
@@ -47,6 +47,7 @@ export type Action =
   | { type: "SET_VET"; payload: Veterinarian }
   | { type: "SET_PET"; payload: Pet }
   | { type: "SET_SLOT"; payload: AvailabilitySlot }
+  | { type: "CLEAR_SLOT" }
   | { type: "SET_MOTIVO"; payload: string }
   | { type: "GO_TO_STEP"; payload: number }
   | { type: "RESET" };
@@ -56,6 +57,7 @@ export interface StepperContextType extends StepperState {
   setVet: (vet: Veterinarian) => void;
   setPet: (pet: Pet) => void;
   setSlot: (slot: AvailabilitySlot) => void;
+  clearSlot: () => void;
   setMotivo: (motivo: string) => void;
   goToStep: (step: number) => void;
   resetStepper: () => void;
