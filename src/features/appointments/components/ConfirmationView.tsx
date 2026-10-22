@@ -1,4 +1,4 @@
-import type { Appointment } from "../services/appointmentService";
+import type { CitaDetallada } from "../../../types/cita.types";
 import {
   Stethoscope,
   User,
@@ -10,9 +10,29 @@ import {
 } from "lucide-react";
 
 interface ConfirmationViewProps {
-  appointment: Appointment;
+  appointment: CitaDetallada;
   onBackToList: () => void;
 }
+
+const formatFecha = (fechaHora: string): string => {
+  const fecha = new Date(fechaHora);
+  if (Number.isNaN(fecha.getTime())) return fechaHora;
+  return fecha.toLocaleDateString("es-ES", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+};
+
+const formatHora = (fechaHora: string): string => {
+  const fecha = new Date(fechaHora);
+  if (Number.isNaN(fecha.getTime())) return "";
+  return fecha.toLocaleTimeString("es-ES", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
 
 export const ConfirmationView = ({
   appointment,
@@ -38,35 +58,35 @@ export const ConfirmationView = ({
           <Stethoscope className="w-4 h-4 text-[#0d9488]" />
           <span className="text-slate-500">Especialidad:</span>
           <span className="font-medium text-slate-900">
-            {appointment.specialty}
+            {appointment.veterinario.especialidad_nombre || "Medicina General"}
           </span>
         </div>
         <div className="flex items-center gap-3 text-sm">
           <User className="w-4 h-4 text-[#0d9488]" />
           <span className="text-slate-500">Veterinario:</span>
           <span className="font-medium text-slate-900">
-            {appointment.vetName}
+            {appointment.veterinario.nombre}
           </span>
         </div>
         <div className="flex items-center gap-3 text-sm">
           <PawPrint className="w-4 h-4 text-[#0d9488]" />
           <span className="text-slate-500">Mascota:</span>
           <span className="font-medium text-slate-900">
-            {appointment.petName}
+            {appointment.mascota.nombre}
           </span>
         </div>
         <div className="flex items-center gap-3 text-sm">
           <Calendar className="w-4 h-4 text-[#0d9488]" />
           <span className="text-slate-500">Fecha:</span>
-          <span className="font-medium text-slate-900">
-            {appointment.date}
+          <span className="font-medium text-slate-900 capitalize">
+            {formatFecha(appointment.fecha_hora)}
           </span>
         </div>
         <div className="flex items-center gap-3 text-sm">
           <Clock className="w-4 h-4 text-[#0d9488]" />
           <span className="text-slate-500">Hora:</span>
           <span className="font-medium text-slate-900">
-            {appointment.startTime}
+            {formatHora(appointment.fecha_hora)}
           </span>
         </div>
         <div className="flex items-center gap-3 text-sm">

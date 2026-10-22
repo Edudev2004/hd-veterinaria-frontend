@@ -1,13 +1,17 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useStepperContext } from "../context/AppointmentStepperContext";
-import { getMyPets } from "@/services/petService";
+import { getMyPets } from "../../../services/petApi";
+import type { Mascota } from "../../../services/petService";
 import type { Pet } from "../types/appointment.types";
-import { PawPrint } from "lucide-react";
+import { AlertCircle, Loader2, PawPrint, Plus } from "lucide-react";
 
 const DEFAULT_PET_IMAGE = "https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=600&q=80";
 
 const calcularEdad = (fechaNacimiento?: string): number => {
   if (!fechaNacimiento) return 0;
   const nacimiento = new Date(fechaNacimiento);
+  if (Number.isNaN(nacimiento.getTime())) return 0;
   const hoy = new Date();
   let edad = hoy.getFullYear() - nacimiento.getFullYear();
   const mesActual = hoy.getMonth();
@@ -18,7 +22,7 @@ const calcularEdad = (fechaNacimiento?: string): number => {
   return Math.max(0, edad);
 };
 
-const mapMascotaToPet = (mascota: ReturnType<typeof getMyPets>[number]): Pet => ({
+const mapMascotaToPet = (mascota: Mascota): Pet => ({
   id: mascota.id,
   name: mascota.nombre,
   species: mascota.especie.charAt(0).toUpperCase() + mascota.especie.slice(1),
@@ -29,8 +33,65 @@ const mapMascotaToPet = (mascota: ReturnType<typeof getMyPets>[number]): Pet => 
 
 export const StepPetSelection = () => {
   const { selectedPet, setPet } = useStepperContext();
-  const mascotas = getMyPets();
-  const pets: Pet[] = mascotas.map(mapMascotaToPet);
+  const navigate = useNavigate();
+  const [pets, setPets] = useState<Pet[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+
+    const cargarMascotas = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const mascotas = await getMyPets();
+        if (active) {
+          setPets(mascotas.map(mapMascotaToPet));
+        }
+      } catch (err) {
+        if (active) {
+          setError(
+            err instanceof Error
+              ? err.message
+              : "No se pudieron cargar tus mascotas.",
+          );
+        }
+      } finally {
+        if (active) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void cargarMascotas();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-slate-500">
+        <Loader2 className="w-8 h-8 animate-spin text-[#0d9488] mb-3" />
+        <p className="text-sm font-medium">Cargando tus mascotas...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-start gap-3 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
+        <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+        <div>
+          <p className="font-semibold">No se pudieron cargar tus mascotas</p>
+          <p className="text-xs mt-1">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -52,6 +113,13 @@ export const StepPetSelection = () => {
           <p className="text-xs text-slate-400 mt-1">
             Primero agrega una mascota desde "Mis Mascotas"
           </p>
+          <button
+            onClick={() => navigate("/mascotas")}
+            className="mt-4 flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-white bg-[#0d9488] hover:bg-[#0f766e] transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            Agregar mascota
+          </button>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">

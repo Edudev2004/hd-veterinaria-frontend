@@ -11,8 +11,70 @@ import {
   MascotaExpediente,
   VeterinarioTratante
 } from '../types/historial.types';
-import { getAllPets } from './petService';
+import type { Mascota } from './petService';
 import vetsMock from '../features/appointments/mocks/veterinarians.json';
+
+/**
+ * Mascotas de demostración para el expediente clínico (US-19).
+ * Sin persistencia en localStorage: los datos viven en memoria.
+ */
+const MASCOTAS_MOCK: Mascota[] = [
+  {
+    id: '1',
+    propietarioId: 'prop-seed-01',
+    nombre: 'Luna',
+    especie: 'perro',
+    raza: 'Golden Retriever',
+    sexo: 'hembra',
+    fechaNacimiento: '2023-04-10',
+    fotoUrl: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=600&q=80',
+    createdAt: '2025-01-10T10:00:00.000Z'
+  },
+  {
+    id: '2',
+    propietarioId: 'prop-seed-01',
+    nombre: 'Max',
+    especie: 'gato',
+    raza: 'Bombay',
+    sexo: 'macho',
+    fechaNacimiento: '2025-01-15',
+    fotoUrl: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=600&q=80',
+    createdAt: '2025-02-15T12:00:00.000Z'
+  },
+  {
+    id: '3',
+    propietarioId: 'prop-seed-01',
+    nombre: 'Rocco',
+    especie: 'perro',
+    raza: 'Bulldog Frances',
+    sexo: 'macho',
+    fechaNacimiento: '2024-06-20',
+    fotoUrl: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=600&q=80',
+    createdAt: '2025-03-01T09:00:00.000Z'
+  },
+  {
+    id: '4',
+    propietarioId: 'prop-seed-01',
+    nombre: 'Milo',
+    especie: 'gato',
+    raza: 'Siames',
+    sexo: 'macho',
+    fechaNacimiento: '2022-09-05',
+    fotoUrl: 'https://images.unsplash.com/photo-1574158622682-e40e69881006?auto=format&fit=crop&w=600&q=80',
+    createdAt: '2025-01-20T14:30:00.000Z'
+  },
+  {
+    id: '5',
+    propietarioId: 'prop-seed-01',
+    nombre: 'Canela',
+    especie: 'perro',
+    raza: 'Labrador Retriever',
+    sexo: 'hembra',
+    fechaNacimiento: '2021-03-12',
+    fotoUrl: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=600&q=80',
+    createdAt: '2025-01-05T08:15:00.000Z'
+  }
+];
 
 export const STORAGE_DIAGNOSTICOS_KEY = 'vethd_db_diagnosticos';
 
@@ -196,7 +258,7 @@ export const getStoredDiagnosticos = (): (DiagnosticoDB & {
 export const findMascotaInfo = (mascotaIdOrName: string | number): MascotaExpediente => {
   const searchStr = String(mascotaIdOrName).trim().toLowerCase();
   
-  const allPets = getAllPets();
+  const allPets = MASCOTAS_MOCK;
   const found = allPets.find(
     (p) => String(p.id).toLowerCase() === searchStr || (p.nombre && p.nombre.toLowerCase() === searchStr)
   );
@@ -313,7 +375,7 @@ export const getTodasLasMascotasConHistorial = (): {
   // Recorrer todas las mascotas del sistema (mocks y almacenadas)
   const mascotasMap = new Map<string, MascotaExpediente>();
 
-  const allPets = getAllPets();
+  const allPets = MASCOTAS_MOCK;
   allPets.forEach((p) => {
     mascotasMap.set(String(p.id), {
       id: String(p.id),

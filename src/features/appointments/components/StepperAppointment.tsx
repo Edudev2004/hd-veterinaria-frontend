@@ -9,11 +9,8 @@ import { StepPetSelection } from "./StepPetSelection";
 import { StepMotivo } from "./StepMotivo";
 import { StepSummary } from "./StepSummary";
 import { ConfirmationView } from "./ConfirmationView";
-import {
-  saveAppointment,
-  isSlotAvailable,
-  type Appointment,
-} from "../services/appointmentService";
+import { createCita } from "../../../services/citaService";
+import type { CitaDetallada } from "../../../types/cita.types";
 
 const steps = [
   { number: 1, label: "Especialidad" },
@@ -40,8 +37,9 @@ function StepperAppointment({ onBack }: StepperAppointmentProps) {
     resetStepper,
   } = useStepperContext();
 
-  const [savedAppointment, setSavedAppointment] = useState<Appointment | null>(null);
+  const [savedAppointment, setSavedAppointment] = useState<CitaDetallada | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const canNext = () => {
     if (currentStep === 1) return selectedSpecialty !== null;
@@ -52,35 +50,33 @@ function StepperAppointment({ onBack }: StepperAppointmentProps) {
     return false;
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!selectedSpecialty || !selectedVet || !selectedPet || !selectedSlot)
       return;
 
-    if (
-      !isSlotAvailable(
-        selectedVet.id,
-        selectedSlot.date,
-        selectedSlot.startTime,
-      )
-    ) {
+    setError(null);
+    setIsSubmitting(true);
+
+    try {
+      const cita = await createCita({
+        petId: String(selectedPet.id),
+        veterinarianId: selectedVet.id,
+        specialtyId: selectedSpecialty.id,
+        date: selectedSlot.date,
+        hour: selectedSlot.startTime,
+        reason: motivo,
+      });
+
+      setSavedAppointment(cita);
+    } catch (err) {
       setError(
-        "Este horario ya fue tomado por otro propietario. Volvé al paso 3 para elegir otro.",
+        err instanceof Error
+          ? err.message
+          : "No se pudo agendar la cita. Intenta nuevamente.",
       );
-      return;
+    } finally {
+      setIsSubmitting(false);
     }
-
-    const appointment = saveAppointment({
-      petId: selectedPet.id,
-      petName: selectedPet.name,
-      vetId: selectedVet.id,
-      vetName: selectedVet.name,
-      specialty: selectedSpecialty.name,
-      date: selectedSlot.date,
-      startTime: selectedSlot.startTime,
-      motivo,
-    });
-
-    setSavedAppointment(appointment);
   };
 
   const renderStep = () => {
@@ -176,9 +172,10 @@ function StepperAppointment({ onBack }: StepperAppointmentProps) {
         ) : (
           <button
             onClick={handleConfirm}
-            className="flex items-center gap-2 px-6 py-2.5 text-sm font-medium text-white bg-[#f59e0b] hover:bg-[#d97706] rounded-xl transition-colors"
+            disabled={isSubmitting}
+            className="flex items-center gap-2 px-6 py-2.5 text-sm font-medium text-white bg-[#f59e0b] hover:bg-[#d97706] rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Agendar Cita
+            {isSubmitting ? "Agendando..." : "Agendar Cita"}
           </button>
         )}
       </div>
