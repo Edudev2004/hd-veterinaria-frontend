@@ -2,7 +2,8 @@ import { apiRequest } from './apiClient';
 
 export interface Perfil {
   id: string;
-  nombre: string;
+  nombres: string;
+  apellidos: string;
   email: string;
   telefono?: string;
   direccion?: string;
@@ -10,7 +11,8 @@ export interface Perfil {
 }
 
 export interface UpdatePerfilPayload {
-  nombre: string;
+  nombres: string;
+  apellidos: string;
   telefono: string;
   fotoUrl?: string;
 }
@@ -27,7 +29,8 @@ interface OwnerDTO {
 
 const toPerfil = (owner: OwnerDTO): Perfil => ({
   id: owner.id,
-  nombre: `${owner.firstName} ${owner.lastName}`.trim(),
+  nombres: owner.firstName,
+  apellidos: owner.lastName,
   email: owner.email,
   telefono: owner.phone ?? undefined,
   direccion: owner.address ?? undefined,
@@ -40,12 +43,11 @@ export const getProfile = async (): Promise<Perfil> => {
 };
 
 export const updateProfile = async (payload: UpdatePerfilPayload): Promise<Perfil> => {
-  const [firstName, ...rest] = payload.nombre.trim().split(/\s+/);
   const owner = await apiRequest<OwnerDTO>('/api/propietarios/me', {
     method: 'PUT',
     body: JSON.stringify({
-      firstName,
-      lastName: rest.join(' '),
+      firstName: payload.nombres.trim(),
+      lastName: payload.apellidos.trim(),
       phone: payload.telefono.trim(),
       photoUrl: payload.fotoUrl?.trim() ?? '',
     }),
