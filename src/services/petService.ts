@@ -4,7 +4,7 @@ export type Sexo = "macho" | "hembra";
 
 export interface Mascota {
   id: string;
-  propietarioId: string;
+  propietarioId?: string;
   nombre: string;
   especie: Especie;
   raza?: string;
