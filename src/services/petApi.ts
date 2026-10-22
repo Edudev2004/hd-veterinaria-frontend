@@ -35,7 +35,7 @@ const toPetRequest = (payload: RegisterPetPayload) => ({
 export const registerPet = async (payload: RegisterPetPayload): Promise<Mascota> => {
   const pet = await apiRequest<PetDTO>('/api/mascotas', {
     method: 'POST',
-    body: JSON.stringify(toPetRequest(payload)),
+    body: toPetRequest(payload),
   });
   return toMascota(pet);
 };
@@ -48,7 +48,7 @@ export const getMyPets = async (): Promise<Mascota[]> => {
 export const updatePet = async (id: string, payload: RegisterPetPayload): Promise<Mascota> => {
   const pet = await apiRequest<PetDTO>(`/api/mascotas/${id}`, {
     method: 'PUT',
-    body: JSON.stringify(toPetRequest(payload)),
+    body: toPetRequest(payload),
   });
   return toMascota(pet);
 };

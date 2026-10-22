@@ -45,12 +45,12 @@ export const getProfile = async (): Promise<Perfil> => {
 export const updateProfile = async (payload: UpdatePerfilPayload): Promise<Perfil> => {
   const owner = await apiRequest<OwnerDTO>('/api/propietarios/me', {
     method: 'PUT',
-    body: JSON.stringify({
+    body: {
       firstName: payload.nombres.trim(),
       lastName: payload.apellidos.trim(),
       phone: payload.telefono.trim(),
       photoUrl: payload.fotoUrl?.trim() ?? '',
-    }),
+    },
   });
   return toPerfil(owner);
 };
