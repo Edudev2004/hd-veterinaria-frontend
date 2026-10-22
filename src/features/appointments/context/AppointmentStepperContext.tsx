@@ -32,13 +32,26 @@ const initialState: StepperState = {
 const reducer = (state: StepperState, action: Action): StepperState => {
   switch (action.type) {
     case "SET_SPECIALTY":
-      return { ...state, selectedSpecialty: action.payload, currentStep: 2 };
+      return {
+        ...state,
+        selectedSpecialty: action.payload,
+        selectedVet: null,
+        selectedSlot: null,
+        currentStep: 2,
+      };
     case "SET_VET":
-      return { ...state, selectedVet: action.payload, currentStep: 3 };
+      return {
+        ...state,
+        selectedVet: action.payload,
+        selectedSlot: null,
+        currentStep: 3,
+      };
     case "SET_PET":
       return { ...state, selectedPet: action.payload };
     case "SET_SLOT":
       return { ...state, selectedSlot: action.payload, currentStep: 4 };
+    case "CLEAR_SLOT":
+      return { ...state, selectedSlot: null };
     case "SET_MOTIVO":
       return { ...state, motivo: action.payload };
     case "GO_TO_STEP":
@@ -57,13 +70,14 @@ export const AppointmentStepperProvider = ({ children }: ProviderProps) => {
   const setVet = (vet: Veterinarian) => dispatch({ type: "SET_VET", payload: vet });
   const setPet = (pet: Pet) => dispatch({ type: "SET_PET", payload: pet });
   const setSlot = (slot: AvailabilitySlot) => dispatch({ type: "SET_SLOT", payload: slot });
+  const clearSlot = () => dispatch({ type: "CLEAR_SLOT" });
   const setMotivo = (motivo: string) => dispatch({ type: "SET_MOTIVO", payload: motivo });
   const goToStep = (step: number) => dispatch({ type: "GO_TO_STEP", payload: step });
   const resetStepper = () => dispatch({ type: "RESET" });
 
   return (
     <AppointmentStepperContext.Provider
-      value={{ ...state, setSpecialty, setVet, setPet, setSlot, setMotivo, goToStep, resetStepper }}
+      value={{ ...state, setSpecialty, setVet, setPet, setSlot, clearSlot, setMotivo, goToStep, resetStepper }}
     >
       {children}
     </AppointmentStepperContext.Provider>
