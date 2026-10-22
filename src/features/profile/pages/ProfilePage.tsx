@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Mail,
   Phone,
@@ -6,27 +6,51 @@ import {
   AlertCircle,
   CheckCircle2,
 } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/Button";
 import { UnderlineInput } from "@/components/ui/UnderlineInput";
+import { getProfile, updateProfile, Perfil } from "@/services/profileApi";
 
 const DEFAULT_AVATAR =
   "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80";
 
 export const ProfilePage: React.FC = () => {
-  const { user, updateProfile } = useAuth();
+  const [perfil, setPerfil] = useState<Perfil | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    nombre: user?.nombre ?? "",
-    telefono: user?.telefono ?? "",
-    fotoUrl: user?.fotoUrl ?? "",
+    nombre: "",
+    telefono: "",
+    fotoUrl: "",
   });
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  if (!user) {
-    return null;
+  useEffect(() => {
+    const loadPerfil = async () => {
+      try {
+        setPerfil(await getProfile());
+      } catch (err: any) {
+        setLoadError(err?.message || "No se pudo cargar el perfil.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadPerfil();
+  }, []);
+
+  if (isLoading) {
+    return <p className="text-sm text-slate-500">Cargando perfil...</p>;
+  }
+
+  if (!perfil) {
+    return (
+      <div className="max-w-md bg-rose-50 border border-rose-200 rounded-xl p-3.5 flex items-start gap-3 text-rose-600 text-xs sm:text-sm">
+        <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+        <span>{loadError}</span>
+      </div>
+    );
   }
 
   const isNombreValid = formData.nombre.trim().length > 0;
@@ -39,9 +63,9 @@ export const ProfilePage: React.FC = () => {
 
   const handleEditClick = () => {
     setFormData({
-      nombre: user.nombre,
-      telefono: user.telefono ?? "",
-      fotoUrl: user.fotoUrl ?? "",
+      nombre: perfil.nombre,
+      telefono: perfil.telefono ?? "",
+      fotoUrl: perfil.fotoUrl ?? "",
     });
     setSuccess(false);
     setIsEditing(true);
@@ -62,7 +86,7 @@ export const ProfilePage: React.FC = () => {
     try {
       setIsSubmitting(true);
       setError(null);
-      await updateProfile(formData);
+      setPerfil(await updateProfile(formData));
       setIsEditing(false);
       setSuccess(true);
     } catch (err: any) {
@@ -92,8 +116,8 @@ export const ProfilePage: React.FC = () => {
 
       <div className="p-8 rounded-2xl border border-slate-200 bg-white max-w-md flex flex-col items-center text-center gap-4">
         <img
-          src={user.fotoUrl || DEFAULT_AVATAR}
-          alt={user.nombre}
+          src={perfil.fotoUrl || DEFAULT_AVATAR}
+          alt={perfil.nombre}
           className="w-24 h-24 rounded-full object-cover ring-4 ring-slate-100 shadow-sm"
         />
 
@@ -101,20 +125,20 @@ export const ProfilePage: React.FC = () => {
           <>
             <div>
               <h2 className="text-xl font-bold text-slate-900 font-outfit">
-                {user.nombre}
+                {perfil.nombre}
               </h2>
-              <p className="text-xs text-slate-500 capitalize">{user.rol}</p>
+              <p className="text-xs text-slate-500">Propietario</p>
             </div>
 
             <div className="w-full space-y-3 pt-4 border-t border-slate-100 text-left">
               <div className="flex items-center gap-3">
                 <Mail className="w-4 h-4 text-slate-400" />
-                <span className="text-sm text-slate-700">{user.email}</span>
+                <span className="text-sm text-slate-700">{perfil.email}</span>
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="w-4 h-4 text-slate-400" />
                 <span className="text-sm text-slate-700">
-                  {user.telefono || "No especificado"}
+                  {perfil.telefono || "No especificado"}
                 </span>
               </div>
             </div>
