@@ -1,25 +1,36 @@
 import React, { useEffect, useState } from "react";
-import { PawPrint, Plus } from "lucide-react";
+import { AlertCircle, PawPrint, Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { PetForm } from "../components/PetForm";
 import { PetCard } from "../components/PetCard";
 import { PetDetailModal } from "../components/PetDetailModal";
 import { HistorialClinicoModal } from "../components/HistorialClinicoModal";
-import { getMyPets, Mascota } from "@/services/petService";
+import { getMyPets } from "@/services/petApi";
+import { Mascota } from "@/services/petService";
 
 export const PetsPage: React.FC = () => {
   const [mascotas, setMascotas] = useState<Mascota[]>([]);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editingMascota, setEditingMascota] = useState<Mascota | null>(null);
   const [selectedMascota, setSelectedMascota] = useState<Mascota | null>(null);
   const [mascotaParaHistorial, setMascotaParaHistorial] = useState<Mascota | null>(null);
 
+  const loadMascotas = async () => {
+    try {
+      setMascotas(await getMyPets());
+      setLoadError(null);
+    } catch (err: any) {
+      setLoadError(err?.message || "No se pudieron cargar las mascotas.");
+    }
+  };
+
   useEffect(() => {
-    setMascotas(getMyPets());
+    loadMascotas();
   }, []);
 
   const handleSuccess = () => {
-    setMascotas(getMyPets());
+    loadMascotas();
     setShowForm(false);
     setEditingMascota(null);
   };
@@ -61,7 +72,14 @@ export const PetsPage: React.FC = () => {
         </div>
       )}
 
-      {mascotas.length === 0 ? (
+      {loadError && (
+        <div className="bg-rose-50 border border-rose-200 rounded-xl p-3.5 flex items-start gap-3 text-rose-600 text-xs sm:text-sm">
+          <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+          <span>{loadError}</span>
+        </div>
+      )}
+
+      {mascotas.length === 0 && !loadError ? (
         <div className="p-8 rounded-2xl border-2 border-dashed border-slate-200 bg-white text-center flex flex-col items-center justify-center gap-3">
           <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center">
             <PawPrint className="w-6 h-6" />

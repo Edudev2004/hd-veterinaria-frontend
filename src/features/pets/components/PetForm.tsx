@@ -2,9 +2,8 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { UnderlineInput } from "@/components/ui/UnderlineInput";
 import { AlertCircle, PawPrint } from "lucide-react";
+import { registerPet, updatePet } from "@/services/petApi";
 import {
-  registerPet,
-  updatePet,
   Especie,
   Sexo,
   RegisterPetPayload,
