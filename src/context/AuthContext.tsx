@@ -14,7 +14,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   register: (payload: RegisterPayload) => Promise<User>;
-  login: (payload: LoginPayload) => Promise<User>;
+  login: (payload: LoginPayload, remember?: boolean) => Promise<User>;
   logout: () => void;
 }
 
@@ -32,6 +32,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setUser(session);
     }
     setIsLoading(false);
+
+    // El cliente HTTP limpia la sesión y avisa cuando el backend responde 401.
+    const handleUnauthorized = () => setUser(null);
+    window.addEventListener("vethd:unauthorized", handleUnauthorized);
+
+    return () => {
+      window.removeEventListener("vethd:unauthorized", handleUnauthorized);
+    };
   }, []);
 
   const register = async (payload: RegisterPayload): Promise<User> => {
@@ -40,8 +48,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     return sessionUser;
   };
 
-  const login = async (payload: LoginPayload): Promise<User> => {
-    const sessionUser = await loginUser(payload);
+  const login = async (
+    payload: LoginPayload,
+    remember = true,
+  ): Promise<User> => {
+    const sessionUser = await loginUser(payload, remember);
     setUser(sessionUser);
     return sessionUser;
   };

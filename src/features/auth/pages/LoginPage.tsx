@@ -13,8 +13,6 @@ import {
   ArrowRight,
   ArrowLeft,
   Stethoscope,
-  ShieldCheck,
-  UserCheck,
   Sparkles
 } from 'lucide-react';
 import bgImage from '@/assets/images/vet_happy_pets_bg.jpg';
@@ -45,7 +43,7 @@ export const LoginPage: React.FC = () => {
     try {
       setIsSubmitting(true);
       setError(null);
-      const user = await login({ email: email.trim(), password });
+      const user = await login({ email: email.trim(), password }, rememberMe);
 
       // US-02: Redirigir con loader según el rol del usuario autenticado
       let targetPath = '/dashboard';
@@ -60,13 +58,6 @@ export const LoginPage: React.FC = () => {
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  // Ayudante para autocompletar credenciales de prueba
-  const handleQuickFill = (roleEmail: string) => {
-    setEmail(roleEmail);
-    setPassword('12345678');
-    setError(null);
   };
 
   return (
@@ -117,49 +108,6 @@ export const LoginPage: React.FC = () => {
               Ingresa a la plataforma integral de salud animal. Consulta expedientes, gestiona citas médicas y monitorea el bienestar de tus pacientes o mascotas.
             </p>
 
-            {/* Quick Demo Credentials Box */}
-            <div className="pt-2 space-y-3">
-              <p className="text-xs font-bold uppercase tracking-wider text-slate-300">
-                ⚡ Accesos de prueba rápida (1-click):
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => handleQuickFill('propietario@vethd.com')}
-                  className="px-3 py-2.5 rounded-xl bg-slate-900/60 hover:bg-[#0D7C84]/40 border border-slate-700/80 hover:border-[#0D7C84] text-left transition-all backdrop-blur-md group"
-                >
-                  <div className="flex items-center gap-1.5 text-[#F59E0B] text-xs font-bold">
-                    <UserCheck className="w-3.5 h-3.5" />
-                    <span>Propietario</span>
-                  </div>
-                  <p className="text-[10px] text-slate-300 mt-0.5 truncate">/dashboard</p>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleQuickFill('veterinario@vethd.com')}
-                  className="px-3 py-2.5 rounded-xl bg-slate-900/60 hover:bg-[#0D7C84]/40 border border-slate-700/80 hover:border-[#0D7C84] text-left transition-all backdrop-blur-md group"
-                >
-                  <div className="flex items-center gap-1.5 text-teal-300 text-xs font-bold">
-                    <Stethoscope className="w-3.5 h-3.5" />
-                    <span>Veterinario</span>
-                  </div>
-                  <p className="text-[10px] text-slate-300 mt-0.5 truncate">/agenda</p>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleQuickFill('admin@vethd.com')}
-                  className="px-3 py-2.5 rounded-xl bg-slate-900/60 hover:bg-[#0D7C84]/40 border border-slate-700/80 hover:border-[#0D7C84] text-left transition-all backdrop-blur-md group"
-                >
-                  <div className="flex items-center gap-1.5 text-amber-300 text-xs font-bold">
-                    <ShieldCheck className="w-3.5 h-3.5" />
-                    <span>Admin</span>
-                  </div>
-                  <p className="text-[10px] text-slate-300 mt-0.5 truncate">/admin</p>
-                </button>
-              </div>
-            </div>
           </div>
 
           {/* Footer Copyright */}
