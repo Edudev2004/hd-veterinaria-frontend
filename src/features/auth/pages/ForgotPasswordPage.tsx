@@ -141,7 +141,7 @@ export const ForgotPasswordPage: React.FC = () => {
               </div>
               <p className="text-xs sm:text-sm text-slate-500 font-medium">
                 {resetData
-                  ? 'Hemos simulado el envío del correo de recuperación.'
+                  ? 'Hemos procesado el envío del enlace de recuperación a tu correo.'
                   : 'Ingresa tu correo para recibir el enlace de restablecimiento seguro'}
               </p>
             </div>
@@ -194,7 +194,7 @@ export const ForgotPasswordPage: React.FC = () => {
                     </div>
                     <div>
                       <h4 className="text-sm font-bold text-slate-900">
-                        Simulación de Correo Saliente (Mock)
+                        Enlace de Recuperación Generado
                       </h4>
                       <p className="text-xs text-slate-500 truncate max-w-[240px]">
                         Destinatario: <strong className="text-slate-800">{resetData.email}</strong>
@@ -203,7 +203,7 @@ export const ForgotPasswordPage: React.FC = () => {
                   </div>
 
                   <p className="text-xs text-slate-600 leading-relaxed">
-                    En un entorno de producción real, este paso envía un correo con token criptográfico. Para evaluar y probar el flujo de inmediato, haz clic en el siguiente botón para continuar:
+                    Hemos enviado las instrucciones a tu correo electrónico vía Resend. También puedes continuar de inmediato haciendo clic en el siguiente botón:
                   </p>
 
                   <div className="pt-2">

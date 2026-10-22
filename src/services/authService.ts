@@ -68,76 +68,6 @@ const toUser = (response: AuthApiResponse): User => ({
   createdAt: response.createdAt,
 });
 
-const STORAGE_USERS_KEY = "vethd_db_usuarios";
-
-interface DBUsuario {
-  id: string;
-  nombre: string;
-  email: string;
-  password_hash: string;
-  rol: UserRole;
-  activo: boolean;
-  created_at: string;
-}
-
-// Cuentas iniciales de prueba para evaluar los 3 roles del sistema
-const DEFAULT_SEED_USERS: DBUsuario[] = [
-  {
-    id: "usr-seed-prop-01",
-    nombre: "Carlos Propietario",
-    email: "propietario@vethd.com",
-    password_hash: "12345678",
-    rol: "propietario",
-    activo: true,
-    created_at: new Date("2026-01-01").toISOString(),
-  },
-  {
-    id: "usr-seed-vet-01",
-    nombre: "Dra. Laura Veterinario",
-    email: "veterinario@vethd.com",
-    password_hash: "12345678",
-    rol: "veterinario",
-    activo: true,
-    created_at: new Date("2026-01-01").toISOString(),
-  },
-  {
-    id: "usr-seed-admin-01",
-    nombre: "Administrador VetHD",
-    email: "admin@vethd.com",
-    password_hash: "12345678",
-    rol: "admin",
-    activo: true,
-    created_at: new Date("2026-01-01").toISOString(),
-  },
-];
-
-const getStoredUsers = (): DBUsuario[] => {
-  const data = localStorage.getItem(STORAGE_USERS_KEY);
-  if (!data) {
-    // Inicializar con semillas por defecto si no existen
-    localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(DEFAULT_SEED_USERS));
-    return DEFAULT_SEED_USERS;
-  }
-  try {
-    const parsed: DBUsuario[] = JSON.parse(data);
-    // Asegurar que las cuentas por defecto existan siempre para pruebas
-    let modified = false;
-    DEFAULT_SEED_USERS.forEach((seed) => {
-      if (
-        !parsed.some((u) => u.email.toLowerCase() === seed.email.toLowerCase())
-      ) {
-        parsed.push(seed);
-        modified = true;
-      }
-    });
-    if (modified) {
-      localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(parsed));
-    }
-    return parsed;
-  } catch {
-    return DEFAULT_SEED_USERS;
-  }
-};
 
 export const registerOwner = async (
   payload: RegisterPayload,
@@ -196,49 +126,40 @@ export const logoutUser = (): void => {
   }).catch(() => undefined);
 };
 
-// US-05: Solicitar recuperación de contraseña (simula envío de correo y genera token)
+// US-05: Solicitar recuperación de contraseña vía API REST
 export const requestPasswordReset = async (
   email: string,
 ): Promise<{ email: string; token: string }> => {
-  await new Promise((resolve) => setTimeout(resolve, 400));
-
-  const users = getStoredUsers();
   const normalizedEmail = email.trim().toLowerCase();
-  const user = users.find((u) => u.email.toLowerCase() === normalizedEmail);
+  const response = await apiRequest<{ message: string; token?: string }>(
+    "/api/auth/recuperar-password",
+    {
+      method: "POST",
+      auth: false,
+      body: { email: normalizedEmail },
+    },
+  );
 
-  if (!user) {
-    throw new Error(
-      "No se encontró ninguna cuenta registrada con este correo electrónico.",
-    );
-  }
-
-  const token = crypto.randomUUID ? crypto.randomUUID() : `reset-${Date.now()}`;
-  return { email: normalizedEmail, token };
+  return { email: normalizedEmail, token: response?.token || "" };
 };
 
-// US-05: Actualizar la contraseña en localStorage
+// US-05: Restablecer contraseña vía API REST
 export const resetPassword = async (
-  email: string,
+  token: string,
   newPassword: string,
 ): Promise<boolean> => {
-  await new Promise((resolve) => setTimeout(resolve, 400));
-
   if (newPassword.length < 8) {
     throw new Error("La contraseña debe tener al menos 8 caracteres.");
   }
 
-  const users = getStoredUsers();
-  const normalizedEmail = email.trim().toLowerCase();
-  const userIndex = users.findIndex(
-    (u) => u.email.toLowerCase() === normalizedEmail,
-  );
-
-  if (userIndex === -1) {
-    throw new Error("No se encontró la cuenta para actualizar la contraseña.");
-  }
-
-  users[userIndex].password_hash = newPassword;
-  localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(users));
+  await apiRequest<{ message: string }>("/api/auth/reset-password", {
+    method: "POST",
+    auth: false,
+    body: {
+      token: token.trim(),
+      newPassword,
+    },
+  });
 
   return true;
 };

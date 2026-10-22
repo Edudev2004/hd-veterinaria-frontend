@@ -53,6 +53,7 @@ export const AppRoutes: React.FC = () => {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/recuperar-password" element={<ForgotPasswordPage />} />
       <Route path="/restablecer-password" element={<ResetPasswordPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/no-autorizado" element={<UnauthorizedPage />} />
 
       {/* 2. Rutas Protegidas del Sistema (Requieren Autenticación) */}
