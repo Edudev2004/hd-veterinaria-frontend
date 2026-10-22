@@ -8,7 +8,6 @@ import {
 } from '../../../types/cita.types';
 import { CitaEstadoBadge } from './CitaEstadoBadge';
 import { ModificarFechaHoraField } from './ModificarFechaHoraField';
-import { ModificarMotivoField } from './ModificarMotivoField';
 import { ModalConfirmarModificacion } from './ModalConfirmarModificacion';
 import { modificarCita, getVeterinarios } from '../../../services/citaService';
 
@@ -26,25 +25,58 @@ export const ModalModificarCita: React.FC<ModalModificarCitaProps> = ({
   onCitaModificada
 }) => {
   const [nuevaFechaHora, setNuevaFechaHora] = useState<string>('');
-  const [nuevoMotivo, setNuevoMotivo] = useState<string>('');
   const [veterinarioSeleccionadoId, setVeterinarioSeleccionadoId] = useState<string>('');
   const [listaVeterinarios, setListaVeterinarios] = useState<VeterinarioDetallado[]>([]);
   const [errors, setErrors] = useState<ModificarCitaValidationErrors>({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isLoadingVeterinarios, setIsLoadingVeterinarios] = useState<boolean>(false);
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
   // Inicializar estado cada vez que se abre la modal con una cita
   useEffect(() => {
-    if (cita) {
-      setNuevaFechaHora(cita.fecha_hora);
-      setNuevoMotivo(cita.motivo || '');
-      setVeterinarioSeleccionadoId(cita.veterinario_id);
-      setErrors({});
-      setServerError(null);
-      setShowConfirmModal(false);
-      setListaVeterinarios(getVeterinarios());
-    }
+    if (!cita || !isOpen) return;
+
+    let active = true;
+
+    setNuevaFechaHora(cita.fecha_hora);
+    setVeterinarioSeleccionadoId(cita.veterinario_id);
+    setErrors({});
+    setServerError(null);
+    setShowConfirmModal(false);
+    setIsLoadingVeterinarios(true);
+
+    const cargarVeterinarios = async () => {
+      try {
+        const especialidadId = cita.veterinario.especialidad_id || undefined;
+        const veterinarios = await getVeterinarios(especialidadId);
+
+        if (active) {
+          setListaVeterinarios(
+            veterinarios.length > 0 ? veterinarios : [cita.veterinario]
+          );
+        }
+      } catch (err) {
+        if (active) {
+          setListaVeterinarios([cita.veterinario]);
+          setServerError(
+            err instanceof Error
+              ? err.message
+              : 'No se pudieron cargar los veterinarios disponibles.'
+          );
+        }
+      } finally {
+        if (active) {
+          setIsLoadingVeterinarios(false);
+        }
+      }
+    };
+
+    void cargarVeterinarios();
+
+    return () => {
+      active = false;
+    };
   }, [cita, isOpen]);
 
   if (!isOpen || !cita) return null;
@@ -73,19 +105,15 @@ export const ModalModificarCita: React.FC<ModalModificarCitaProps> = ({
       }
     }
 
-    if (!nuevoMotivo.trim()) {
-      newErrors.motivo = 'El motivo de la cita es obligatorio.';
-    } else if (nuevoMotivo.trim().length < 5) {
-      newErrors.motivo = 'El motivo debe tener al menos 5 caracteres.';
-    }
+    const fechaNueva = nuevaFechaHora.slice(0, 16);
+    const fechaOriginal = cita.fecha_hora.slice(0, 16);
 
     const noHuboCambios =
-      nuevaFechaHora === cita.fecha_hora &&
-      nuevoMotivo.trim() === (cita.motivo || '').trim() &&
+      fechaNueva === fechaOriginal &&
       veterinarioSeleccionadoId === cita.veterinario_id;
 
     if (noHuboCambios) {
-      newErrors.general = 'No se ha detectado ningún cambio en la fecha, hora, veterinario ni motivo.';
+      newErrors.general = 'No se ha detectado ningún cambio en la fecha, hora ni veterinario.';
     }
 
     setErrors(newErrors);
@@ -104,7 +132,7 @@ export const ModalModificarCita: React.FC<ModalModificarCitaProps> = ({
       const citaActualizada = await modificarCita({
         id: cita.id,
         fecha_hora: nuevaFechaHora,
-        motivo: nuevoMotivo.trim(),
+        motivo: cita.motivo || '',
         veterinario_id: veterinarioSeleccionadoId
       });
 
@@ -200,7 +228,8 @@ export const ModalModificarCita: React.FC<ModalModificarCitaProps> = ({
                   <select
                     value={veterinarioSeleccionadoId}
                     onChange={(e) => setVeterinarioSeleccionadoId(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-800 outline-none focus:border-[#0d9488] focus:ring-2 focus:ring-[#0d9488]/20 transition-colors"
+                    disabled={isLoadingVeterinarios}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-800 outline-none focus:border-[#0d9488] focus:ring-2 focus:ring-[#0d9488]/20 transition-colors disabled:opacity-60"
                   >
                     {listaVeterinarios.map((vet) => (
                       <option key={vet.id} value={vet.id}>
@@ -208,6 +237,9 @@ export const ModalModificarCita: React.FC<ModalModificarCitaProps> = ({
                       </option>
                     ))}
                   </select>
+                  {isLoadingVeterinarios && (
+                    <p className="text-[11px] text-slate-400 mt-1">Cargando veterinarios...</p>
+                  )}
                 </div>
 
                 {/* Campo Fecha y Hora */}
@@ -223,16 +255,18 @@ export const ModalModificarCita: React.FC<ModalModificarCitaProps> = ({
                   error={errors.fecha_hora}
                 />
 
-                {/* Campo Motivo */}
-                <ModificarMotivoField
-                  motivoOriginal={cita.motivo}
-                  value={nuevoMotivo}
-                  onChange={(mot) => {
-                    setNuevoMotivo(mot);
-                    setErrors((prev) => ({ ...prev, motivo: undefined, general: undefined }));
-                  }}
-                  error={errors.motivo}
-                />
+                {/* Motivo original: solo lectura durante la reprogramación */}
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                    Motivo de la Cita
+                  </label>
+                  <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 text-sm text-slate-700 leading-relaxed">
+                    {cita.motivo || 'Sin motivo registrado'}
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-1">
+                    El motivo no se modifica al reprogramar la cita.
+                  </p>
+                </div>
 
                 {/* Footer de Acciones */}
                 <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
@@ -266,7 +300,7 @@ export const ModalModificarCita: React.FC<ModalModificarCitaProps> = ({
         onConfirm={handleConfirmarGuardado}
         citaOriginal={cita}
         nuevaFechaHora={nuevaFechaHora}
-        nuevoMotivo={nuevoMotivo}
+        nuevoMotivo={cita.motivo || ''}
         isLoading={isSubmitting}
       />
     </>

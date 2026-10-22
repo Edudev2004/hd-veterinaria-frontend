@@ -25,6 +25,7 @@ const AppointmentsContent: React.FC = () => {
 
   const [citas, setCitas] = useState<CitaDetallada[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Parámetro para apertura directa de detalle por ID en la URL (?detalle=ID o ?citaId=ID) (US-18)
   const citaIdDetalleParam = searchParams.get("detalle") || searchParams.get("citaId");
@@ -38,25 +39,32 @@ const AppointmentsContent: React.FC = () => {
     }
   };
 
-  const cargarCitas = () => {
+  const cargarCitas = async () => {
     setIsLoading(true);
+    setError(null);
+
     try {
-      const data = getCitas();
+      const data = await getCitas();
       setCitas(data);
     } catch (err) {
       console.error("Error al cargar las citas:", err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "No se pudieron cargar las citas."
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    cargarCitas();
+    void cargarCitas();
   }, [isCreating]);
 
   const handleBack = () => {
     setSearchParams({});
-    cargarCitas();
+    void cargarCitas();
   };
 
   const handleCitaActualizada = (citaActualizada: CitaDetallada) => {
@@ -120,7 +128,7 @@ const AppointmentsContent: React.FC = () => {
               )}
 
               <button
-                onClick={cargarCitas}
+                onClick={() => void cargarCitas()}
                 className="p-2.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-colors border border-slate-200"
                 title="Actualizar listado de citas"
               >
@@ -139,6 +147,18 @@ const AppointmentsContent: React.FC = () => {
               </button>
             </div>
           </div>
+
+          {error && (
+            <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-sm flex items-center justify-between shadow-sm">
+              <span className="font-semibold">{error}</span>
+              <button
+                onClick={() => void cargarCitas()}
+                className="text-xs font-bold text-rose-700 hover:text-rose-900 underline ml-3"
+              >
+                Reintentar
+              </button>
+            </div>
+          )}
 
           {/* Listado de Citas con capacidad de filtrado, modificación (US-15), cancelación (US-16) y detalle (US-18) */}
           <CitasList
