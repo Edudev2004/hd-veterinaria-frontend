@@ -19,7 +19,8 @@ export const ProfilePage: React.FC = () => {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    nombre: "",
+    nombres: "",
+    apellidos: "",
     telefono: "",
     fotoUrl: "",
   });
@@ -53,7 +54,9 @@ export const ProfilePage: React.FC = () => {
     );
   }
 
-  const isNombreValid = formData.nombre.trim().length > 0;
+  const nombreCompleto = `${perfil.nombres} ${perfil.apellidos}`.trim();
+  const isNombresValid = formData.nombres.trim().length > 0;
+  const isApellidosValid = formData.apellidos.trim().length > 0;
   const isTelefonoValid = formData.telefono.trim().length >= 7;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,7 +66,8 @@ export const ProfilePage: React.FC = () => {
 
   const handleEditClick = () => {
     setFormData({
-      nombre: perfil.nombre,
+      nombres: perfil.nombres,
+      apellidos: perfil.apellidos,
       telefono: perfil.telefono ?? "",
       fotoUrl: perfil.fotoUrl ?? "",
     });
@@ -74,8 +78,12 @@ export const ProfilePage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!isNombreValid) {
-      setError("El nombre es obligatorio.");
+    if (!isNombresValid) {
+      setError("Los nombres son obligatorios.");
+      return;
+    }
+    if (!isApellidosValid) {
+      setError("Los apellidos son obligatorios.");
       return;
     }
     if (!isTelefonoValid) {
@@ -117,7 +125,7 @@ export const ProfilePage: React.FC = () => {
       <div className="p-8 rounded-2xl border border-slate-200 bg-white max-w-md flex flex-col items-center text-center gap-4">
         <img
           src={perfil.fotoUrl || DEFAULT_AVATAR}
-          alt={perfil.nombre}
+          alt={nombreCompleto}
           className="w-24 h-24 rounded-full object-cover ring-4 ring-slate-100 shadow-sm"
         />
 
@@ -125,7 +133,7 @@ export const ProfilePage: React.FC = () => {
           <>
             <div>
               <h2 className="text-xl font-bold text-slate-900 font-outfit">
-                {perfil.nombre}
+                {nombreCompleto}
               </h2>
               <p className="text-xs text-slate-500">Propietario</p>
             </div>
@@ -157,15 +165,29 @@ export const ProfilePage: React.FC = () => {
             )}
 
             <UnderlineInput
-              label="Nombre"
-              name="nombre"
+              label="Nombres"
+              name="nombres"
               type="text"
-              value={formData.nombre}
+              value={formData.nombres}
               onChange={handleChange}
               icon={<UserIcon className="w-4 h-4" />}
               error={
-                !isNombreValid && formData.nombre.length > 0
-                  ? "El nombre no puede estar vacío."
+                !isNombresValid && formData.nombres.length > 0
+                  ? "Los nombres no pueden estar vacíos."
+                  : undefined
+              }
+            />
+
+            <UnderlineInput
+              label="Apellidos"
+              name="apellidos"
+              type="text"
+              value={formData.apellidos}
+              onChange={handleChange}
+              icon={<UserIcon className="w-4 h-4" />}
+              error={
+                !isApellidosValid && formData.apellidos.length > 0
+                  ? "Los apellidos no pueden estar vacíos."
                   : undefined
               }
             />
