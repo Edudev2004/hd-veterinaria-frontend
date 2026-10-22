@@ -3,16 +3,13 @@ import {
   User,
   RegisterPayload,
   LoginPayload,
-  UpdateProfilePayload,
   registerOwner,
   loginUser,
   getCurrentUser,
   logoutUser,
-  updateProfile,
 } from "@/services/authService";
 
 interface AuthContextType {
-  updateProfile: (payload: UpdateProfilePayload) => Promise<User>;
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
@@ -53,16 +50,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     logoutUser();
     setUser(null);
   };
-  const updateUserProfile = async (
-    payload: UpdateProfilePayload,
-  ): Promise<User> => {
-    if (!user) {
-      throw new Error("No hay sesión activa.");
-    }
-    const updatedUser = await updateProfile(user.id, payload);
-    setUser(updatedUser);
-    return updatedUser;
-  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -71,7 +59,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         isLoading,
         register,
         login,
-        updateProfile: updateUserProfile,
         logout,
       }}
     >

@@ -309,63 +309,7 @@ export const resetPassword = async (
 
   return true;
 };
-export interface UpdateProfilePayload {
-  nombre: string;
-  telefono: string;
-  fotoUrl?: string;
-}
 
-export const updateProfile = async (
-  userId: string,
-  payload: UpdateProfilePayload,
-): Promise<User> => {
-  await new Promise((resolve) => setTimeout(resolve, 300));
-
-  if (!payload.nombre.trim()) {
-    throw new Error("El nombre es obligatorio.");
-  }
-  if (payload.telefono.trim().length < 7) {
-    throw new Error("Ingresa un número de teléfono válido.");
-  }
-
-  const users = getStoredUsers();
-  const propietarios = getStoredPropietarios();
-
-  const userIndex = users.findIndex((u) => u.id === userId);
-  if (userIndex === -1) {
-    throw new Error("No se encontró la cuenta a actualizar.");
-  }
-
-  const propIndex = propietarios.findIndex((p) => p.usuario_id === userId);
-
-  users[userIndex].nombre = payload.nombre.trim();
-  localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(users));
-
-  if (propIndex !== -1) {
-    propietarios[propIndex].telefono = payload.telefono.trim();
-    propietarios[propIndex].foto_url = payload.fotoUrl || undefined;
-    localStorage.setItem(
-      STORAGE_PROPIETARIOS_KEY,
-      JSON.stringify(propietarios),
-    );
-  }
-
-  const sessionUser: User = {
-    id: users[userIndex].id,
-    propietarioId: propietarios[propIndex]?.id,
-    nombre: users[userIndex].nombre,
-    email: users[userIndex].email,
-    telefono: propietarios[propIndex]?.telefono,
-    direccion: propietarios[propIndex]?.direccion,
-    fotoUrl: propietarios[propIndex]?.foto_url,
-    rol: users[userIndex].rol,
-    activo: users[userIndex].activo,
-    createdAt: users[userIndex].created_at,
-  };
-
-  localStorage.setItem(STORAGE_CURRENT_USER_KEY, JSON.stringify(sessionUser));
-  return sessionUser;
-};
 export const authService = {
   register: registerOwner,
   login: loginUser,
@@ -373,5 +317,4 @@ export const authService = {
   logout: logoutUser,
   requestPasswordReset,
   resetPassword,
-  updateProfile,
 };
