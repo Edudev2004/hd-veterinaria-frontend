@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { UnderlineInput } from "@/components/ui/UnderlineInput";
+import { ImageUpload } from "@/components/ui/ImageUpload";
 import { AlertCircle, PawPrint } from "lucide-react";
 import { registerPet, updatePet } from "@/services/petApi";
 import {
@@ -135,13 +136,12 @@ export const PetForm: React.FC<PetFormProps> = ({ mascota, onSuccess }) => {
         value={formData.fechaNacimiento}
         onChange={handleChange}
       />
-      <UnderlineInput
-        label="URL de Foto (Opcional)"
-        name="fotoUrl"
-        type="url"
+      <ImageUpload
+        label="Foto de la Mascota (Opcional)"
         value={formData.fotoUrl}
-        onChange={handleChange}
-        placeholder="https://ejemplo.com/foto-mascota.jpg"
+        onChange={(url) => setFormData({ ...formData, fotoUrl: url })}
+        folder="mascotas"
+        helperText="Formatos: JPG, PNG o WEBP (máx. 10 MB)"
       />
       <Button
         type="submit"

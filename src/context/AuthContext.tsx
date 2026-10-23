@@ -8,6 +8,7 @@ import {
   getCurrentUser,
   logoutUser,
 } from "@/services/authService";
+import { updateStoredUser } from "@/services/tokenStorage";
 
 interface AuthContextType {
   user: User | null;
@@ -16,6 +17,7 @@ interface AuthContextType {
   register: (payload: RegisterPayload) => Promise<User>;
   login: (payload: LoginPayload, remember?: boolean) => Promise<User>;
   logout: () => void;
+  updateUserData: (updated: Partial<User>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -62,6 +64,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setUser(null);
   };
 
+  const updateUserData = (updated: Partial<User>) => {
+    setUser((prev) => {
+      if (!prev) return null;
+      const next: User = { ...prev, ...updated };
+      updateStoredUser(next);
+      return next;
+    });
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -71,6 +82,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         register,
         login,
         logout,
+        updateUserData,
       }}
     >
       {children}
