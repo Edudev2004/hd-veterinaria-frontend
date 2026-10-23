@@ -18,8 +18,33 @@ const DEFAULT_ERROR_MESSAGES: Record<number, string> = {
   401: "Credenciales incorrectas o sesión expirada.",
   403: "No tienes permisos para realizar esta acción.",
   404: "El recurso solicitado no existe.",
-  409: "El recurso ya se encuentra registrado.",
+  409: "El horario seleccionado ya no está disponible o existe un conflicto de agenda.",
   500: "Ocurrió un error interno en el servidor.",
+};
+
+const FRIENDLY_BACKEND_MESSAGES: Record<string, string> = {
+  "the veterinarian already has an appointment booked for this slot":
+    "El horario seleccionado ya no está disponible con este veterinario. Por favor elige otro horario o veterinario.",
+  "only pending appointments can be rescheduled":
+    "Solo las citas en estado pendiente pueden ser reprogramadas.",
+  "only pending appointments can be cancelled":
+    "Solo las citas en estado pendiente pueden ser canceladas.",
+  "you do not own this pet":
+    "No tienes permisos sobre la mascota seleccionada.",
+  "you do not own this appointment":
+    "No tienes permisos sobre esta cita.",
+  "specialty does not belong to veterinarian":
+    "La especialidad seleccionada no corresponde al veterinario.",
+  "pet not found": "La mascota seleccionada no fue encontrada.",
+  "veterinarian not found": "El veterinario seleccionado no fue encontrado.",
+  "appointment not found": "La cita solicitada no fue encontrada.",
+  "appointment cannot be in the past": "La cita debe ser programada en una fecha y hora futura.",
+  "appointment hour must be between 08:00 and 18:00": "El horario de atención es entre las 08:00 y las 18:00.",
+};
+
+const normalizeBackendMessage = (msg: string): string => {
+  const lower = msg.trim().toLowerCase();
+  return FRIENDLY_BACKEND_MESSAGES[lower] ?? msg.trim();
 };
 
 const NO_MESSAGE_AVAILABLE = "no message available";
@@ -38,13 +63,13 @@ export class ApiError extends Error {
 
 const extractErrorMessage = (data: unknown, status: number): string => {
   if (typeof data === "string" && data.trim()) {
-    return data.trim();
+    return normalizeBackendMessage(data);
   }
 
   if (data && typeof data === "object") {
     const payload = data as Record<string, unknown>;
 
-    for (const key of ["message", "detail"] as const) {
+    for (const key of ["message", "detail", "reason"] as const) {
       const value = payload[key];
 
       if (
@@ -52,7 +77,7 @@ const extractErrorMessage = (data: unknown, status: number): string => {
         value.trim() &&
         value.trim().toLowerCase() !== NO_MESSAGE_AVAILABLE
       ) {
-        return value.trim();
+        return normalizeBackendMessage(value);
       }
     }
 
