@@ -25,7 +25,8 @@ export const ResetPasswordPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!email) {
+    const resetToken = token || email;
+    if (!resetToken) {
       setError('Enlace inválido o incompleto. Solicita una nueva recuperación.');
       return;
     }
@@ -43,7 +44,7 @@ export const ResetPasswordPage: React.FC = () => {
     try {
       setIsSubmitting(true);
       setError(null);
-      await resetPassword(email, newPassword);
+      await resetPassword(resetToken, newPassword);
       setIsSuccess(true);
     } catch (err: any) {
       setError(err?.message || 'Error al restablecer la contraseña.');
@@ -141,27 +142,22 @@ export const ResetPasswordPage: React.FC = () => {
             </div>
 
             {/* Target Account Badge */}
-            {email && !isSuccess && (
+            {(email || token) && !isSuccess && (
               <div className="px-3.5 py-2.5 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-between text-xs gap-2">
                 <span className="text-slate-500 font-medium">Cuenta a actualizar:</span>
-                <div className="flex items-center gap-2">
-                  <strong className="text-slate-800 font-bold truncate max-w-[180px]">{email}</strong>
-                  {token && (
-                    <span className="text-[10px] font-mono bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-semibold">
-                      Token OK
-                    </span>
-                  )}
-                </div>
+                <strong className="text-slate-800 font-bold truncate max-w-[220px]">
+                  {email || 'Restablecimiento de credenciales'}
+                </strong>
               </div>
             )}
 
-            {/* Warning if no email provided */}
-            {!email && (
+            {/* Warning if no token/email provided */}
+            {!token && !email && (
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-3 text-amber-800 text-xs sm:text-sm">
                 <div className="flex items-start gap-2.5">
                   <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5 text-amber-600" />
                   <p>
-                    No se detectó un correo válido en el enlace. Es necesario solicitar un nuevo enlace de recuperación.
+                    No se detectó un token válido en el enlace. Es necesario solicitar un nuevo enlace de recuperación.
                   </p>
                 </div>
                 <Link
@@ -184,7 +180,7 @@ export const ResetPasswordPage: React.FC = () => {
 
             {/* FORM or SUCCESS CARD */}
             {!isSuccess ? (
-              email && (
+              (token || email) && (
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Nueva Contraseña */}
                   <UnderlineInput

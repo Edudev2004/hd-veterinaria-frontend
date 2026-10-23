@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
 import { NotificationDropdown } from '@/features/notifications/components/notificationdropdown';
+import { DEFAULT_AVATAR } from '@/constants/avatars';
 
 interface HeaderProps {
   userName?: string;
@@ -13,7 +14,7 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({
   userName = 'Carlos',
-  userAvatar = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80',
+  userAvatar,
 }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -96,9 +97,12 @@ export const Header: React.FC<HeaderProps> = ({
           {/* User Info (Avatar + Name) */}
           <div className="flex items-center gap-2.5 pl-2 sm:pl-3 border-l border-slate-200">
             <img
-              src={userAvatar}
+              src={user?.fotoUrl || userAvatar || DEFAULT_AVATAR}
               alt={fullName}
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover ring-2 ring-slate-200 shadow-sm"
+              onError={(e) => {
+                e.currentTarget.src = DEFAULT_AVATAR;
+              }}
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover ring-2 ring-[#0D7C84]/30 shadow-sm"
             />
             <div className="hidden lg:flex flex-col text-left">
               <span className="text-xs font-bold text-slate-900 truncate max-w-[130px]">

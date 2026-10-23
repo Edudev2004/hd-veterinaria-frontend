@@ -29,24 +29,49 @@ export const ModalDetalleCita: React.FC<ModalDetalleCitaProps> = ({
 }) => {
   const [cita, setCita] = useState<CitaDetallada | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const [historialMascotaOpen, setHistorialMascotaOpen] = useState<boolean>(false);
 
-  // Consulta directa de la cita por su ID desde el array 'appointments' en localStorage
   useEffect(() => {
+    let active = true;
+
     if (isOpen && citaId) {
       setIsLoading(true);
-      try {
-        const citaConsultada = getCitaById(citaId);
-        setCita(citaConsultada);
-      } catch (error) {
-        console.error('Error al consultar el detalle de la cita por ID:', error);
-        setCita(null);
-      } finally {
-        setIsLoading(false);
-      }
+      setError(null);
+      setCita(null);
+
+      const cargarCita = async () => {
+        try {
+          const citaConsultada = await getCitaById(citaId);
+          if (active) {
+            setCita(citaConsultada);
+          }
+        } catch (err) {
+          console.error('Error al consultar el detalle de la cita por ID:', err);
+          if (active) {
+            setCita(null);
+            setError(
+              err instanceof Error
+                ? err.message
+                : 'No se pudo consultar la cita.'
+            );
+          }
+        } finally {
+          if (active) {
+            setIsLoading(false);
+          }
+        }
+      };
+
+      void cargarCita();
     } else if (!isOpen) {
       setCita(null);
+      setError(null);
     }
+
+    return () => {
+      active = false;
+    };
   }, [isOpen, citaId]);
 
   if (!isOpen) return null;
@@ -54,7 +79,7 @@ export const ModalDetalleCita: React.FC<ModalDetalleCitaProps> = ({
   const estadoNormalizado = cita?.estado ? normalizarEstado(cita.estado) : 'pendiente';
   const esCancelada = estadoNormalizado === 'cancelada';
   const esModificable = estadoNormalizado === 'pendiente';
-  const esCancelable = estadoNormalizado === 'pendiente' || estadoNormalizado === 'confirmada';
+  const esCancelable = estadoNormalizado === 'pendiente';
 
   // Formateo de fecha y hora
   const { fechaFormateada, horaFormateada, fechaCreacionFormateada } = (() => {
@@ -153,7 +178,9 @@ export const ModalDetalleCita: React.FC<ModalDetalleCitaProps> = ({
                 </div>
                 <h4 className="text-base font-bold text-slate-800">Cita no encontrada</h4>
                 <p className="text-xs text-slate-500 max-w-sm mt-1">
-                  No se pudo encontrar ningún registro para el identificador "{citaId}" en el almacén de citas.
+                  {error
+                    ? error
+                    : `No se pudo encontrar ningún registro para el identificador "${citaId}" en el sistema.`}
                 </p>
               </div>
             ) : (

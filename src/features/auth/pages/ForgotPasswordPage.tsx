@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Mail, AlertCircle, ArrowRight, ArrowLeft, Stethoscope, MailCheck, Sparkles, ExternalLink } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Mail, AlertCircle, ArrowRight, ArrowLeft, Stethoscope, MailCheck, Sparkles } from 'lucide-react';
 import { requestPasswordReset } from '@/services/authService';
 import { Button } from '@/components/ui/Button';
 import { UnderlineInput } from '@/components/ui/UnderlineInput';
 import bgImage from '@/assets/images/vet_happy_pets_bg.jpg';
 
 export const ForgotPasswordPage: React.FC = () => {
-  const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -141,7 +140,7 @@ export const ForgotPasswordPage: React.FC = () => {
               </div>
               <p className="text-xs sm:text-sm text-slate-500 font-medium">
                 {resetData
-                  ? 'Hemos simulado el envío del correo de recuperación.'
+                  ? 'Hemos procesado el envío del enlace de recuperación a tu correo.'
                   : 'Ingresa tu correo para recibir el enlace de restablecimiento seguro'}
               </p>
             </div>
@@ -185,45 +184,30 @@ export const ForgotPasswordPage: React.FC = () => {
                 </div>
               </form>
             ) : (
-              /* Simulated Email Confirmation Box (DoD Criterio 2 y 3) */
+              /* Email Sent Confirmation Card */
               <div className="space-y-6 animate-in fade-in zoom-in-95 duration-300">
-                <div className="p-5 rounded-2xl bg-teal-50/80 border border-[#0D7C84]/30 space-y-4 text-left">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-[#0D7C84] text-white flex items-center justify-center shadow-md">
-                      <MailCheck className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-bold text-slate-900">
-                        Simulación de Correo Saliente (Mock)
-                      </h4>
-                      <p className="text-xs text-slate-500 truncate max-w-[240px]">
-                        Destinatario: <strong className="text-slate-800">{resetData.email}</strong>
-                      </p>
-                    </div>
+                <div className="p-6 rounded-2xl bg-teal-50/80 border border-[#0D7C84]/30 space-y-4 text-center">
+                  <div className="w-14 h-14 rounded-2xl bg-[#0D7C84] text-white flex items-center justify-center mx-auto shadow-lg shadow-[#0D7C84]/25">
+                    <MailCheck className="w-7 h-7" />
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className="text-base font-bold text-slate-900">
+                      Revisa tu correo electrónico
+                    </h4>
+                    <p className="text-xs text-slate-500">
+                      Hemos enviado las instrucciones de restablecimiento a:
+                    </p>
+                    <p className="text-sm font-bold text-[#0D7C84] truncate">
+                      {resetData.email}
+                    </p>
                   </div>
 
-                  <p className="text-xs text-slate-600 leading-relaxed">
-                    En un entorno de producción real, este paso envía un correo con token criptográfico. Para evaluar y probar el flujo de inmediato, haz clic en el siguiente botón para continuar:
+                  <p className="text-xs text-slate-600 leading-relaxed pt-1">
+                    Por favor abre tu bandeja de entrada y haz clic en el enlace seguro dentro del correo para definir tu nueva contraseña. Si no lo encuentras en un par de minutos, revisa tu carpeta de spam o correo no deseado.
                   </p>
-
-                  <div className="pt-2">
-                    <button
-                      onClick={() =>
-                        navigate(
-                          `/restablecer-password?email=${encodeURIComponent(
-                            resetData.email
-                          )}&token=${encodeURIComponent(resetData.token)}`
-                        )
-                      }
-                      className="w-full py-3 px-4 rounded-xl bg-[#0D7C84] hover:bg-[#0b686f] text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-md transition-all active:scale-95 cursor-pointer"
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                      <span>Abrir Pantalla de Nueva Contraseña</span>
-                    </button>
-                  </div>
                 </div>
 
-                <div className="text-center">
+                <div className="text-center pt-2">
                   <button
                     type="button"
                     onClick={() => {
@@ -232,7 +216,7 @@ export const ForgotPasswordPage: React.FC = () => {
                     }}
                     className="text-xs text-slate-500 hover:text-slate-800 underline font-semibold cursor-pointer"
                   >
-                    Intentar con otro correo electrónico
+                    ¿No recibiste el correo? Intentar con otra dirección
                   </button>
                 </div>
               </div>

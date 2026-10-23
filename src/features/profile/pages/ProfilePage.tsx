@@ -1,23 +1,31 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Mail,
   Phone,
   User as UserIcon,
   AlertCircle,
   CheckCircle2,
+  Camera,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { UnderlineInput } from "@/components/ui/UnderlineInput";
+import { ImageUpload } from "@/components/ui/ImageUpload";
 import { getProfile, updateProfile, Perfil } from "@/services/profileApi";
-
-const DEFAULT_AVATAR =
-  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80";
+import { uploadFile, validateImageFile } from "@/services/storageService";
+import { useAuth } from "@/context/AuthContext";
+import { DEFAULT_AVATAR } from "@/constants/avatars";
 
 export const ProfilePage: React.FC = () => {
+  const { updateUserData } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [perfil, setPerfil] = useState<Perfil | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+
   const [formData, setFormData] = useState({
     nombres: "",
     apellidos: "",
@@ -25,13 +33,14 @@ export const ProfilePage: React.FC = () => {
     fotoUrl: "",
   });
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+  const [success, setSuccess] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const loadPerfil = async () => {
       try {
-        setPerfil(await getProfile());
+        const data = await getProfile();
+        setPerfil(data);
       } catch (err: any) {
         setLoadError(err?.message || "No se pudo cargar el perfil.");
       } finally {
@@ -42,7 +51,12 @@ export const ProfilePage: React.FC = () => {
   }, []);
 
   if (isLoading) {
-    return <p className="text-sm text-slate-500">Cargando perfil...</p>;
+    return (
+      <div className="flex items-center gap-2 text-sm text-slate-500 py-6">
+        <Loader2 className="w-4 h-4 animate-spin text-[#0D7C84]" />
+        <span>Cargando perfil...</span>
+      </div>
+    );
   }
 
   if (!perfil) {
@@ -71,8 +85,55 @@ export const ProfilePage: React.FC = () => {
       telefono: perfil.telefono ?? "",
       fotoUrl: perfil.fotoUrl ?? "",
     });
-    setSuccess(false);
+    setSuccess(null);
     setIsEditing(true);
+  };
+
+  /**
+   * Sube la foto directamente a Supabase Storage desde el avatar circular.
+   */
+  const handleDirectAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const file = files[0];
+    const validation = validateImageFile(file);
+    if (!validation.valid) {
+      setError(validation.error || "Archivo no permitido");
+      return;
+    }
+
+    try {
+      setIsUploadingAvatar(true);
+      setError(null);
+      const res = await uploadFile(file, "avatares");
+
+      if (isEditing) {
+        setFormData((prev) => ({ ...prev, fotoUrl: res.url }));
+        setSuccess("Foto subida a Supabase. Recuerda guardar los cambios.");
+      } else {
+        // En modo vista, actualizamos y persistimos directamente en backend
+        const updated = await updateProfile({
+          nombres: perfil.nombres,
+          apellidos: perfil.apellidos,
+          telefono: perfil.telefono || "",
+          fotoUrl: res.url,
+        });
+        setPerfil(updated);
+        updateUserData({
+          fotoUrl: updated.fotoUrl,
+          nombre: `${updated.nombres} ${updated.apellidos}`,
+        });
+        setSuccess("Foto de perfil actualizada en Supabase Storage exitosamente.");
+      }
+    } catch (err: any) {
+      setError(err?.message || "No se pudo subir la foto a Supabase Storage.");
+    } finally {
+      setIsUploadingAvatar(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -94,15 +155,25 @@ export const ProfilePage: React.FC = () => {
     try {
       setIsSubmitting(true);
       setError(null);
-      setPerfil(await updateProfile(formData));
+      const updated = await updateProfile(formData);
+      setPerfil(updated);
+      updateUserData({
+        fotoUrl: updated.fotoUrl,
+        nombre: `${updated.nombres} ${updated.apellidos}`,
+      });
       setIsEditing(false);
-      setSuccess(true);
+      setSuccess("Perfil actualizado correctamente.");
     } catch (err: any) {
       setError(err?.message || "Ocurrió un error al actualizar el perfil.");
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  // Foto que se debe visualizar en el avatar
+  const displayedPhoto = isEditing
+    ? formData.fotoUrl || DEFAULT_AVATAR
+    : perfil.fotoUrl || DEFAULT_AVATAR;
 
   return (
     <div className="flex flex-col gap-6">
@@ -116,18 +187,73 @@ export const ProfilePage: React.FC = () => {
       </div>
 
       {success && (
-        <div className="max-w-md bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 flex items-start gap-3 text-emerald-700 text-xs sm:text-sm">
-          <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" />
-          <span>Perfil actualizado correctamente.</span>
+        <div className="max-w-md bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 flex items-start gap-3 text-emerald-700 text-xs sm:text-sm animate-in fade-in">
+          <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5 text-emerald-600" />
+          <span className="flex-1">{success}</span>
+          <button
+            type="button"
+            onClick={() => setSuccess(null)}
+            className="text-emerald-500 hover:text-emerald-800 text-xs font-bold"
+          >
+            ✕
+          </button>
         </div>
       )}
 
-      <div className="p-8 rounded-2xl border border-slate-200 bg-white max-w-md flex flex-col items-center text-center gap-4">
-        <img
-          src={perfil.fotoUrl || DEFAULT_AVATAR}
-          alt={nombreCompleto}
-          className="w-24 h-24 rounded-full object-cover ring-4 ring-slate-100 shadow-sm"
-        />
+      {error && (
+        <div className="max-w-md bg-rose-50 border border-rose-200 rounded-xl p-3.5 flex items-start gap-3 text-rose-600 text-xs sm:text-sm animate-in fade-in">
+          <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+          <span className="flex-1">{error}</span>
+          <button
+            type="button"
+            onClick={() => setError(null)}
+            className="text-rose-400 hover:text-rose-700 text-xs font-bold"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      <div className="p-8 rounded-2xl border border-slate-200 bg-white max-w-md flex flex-col items-center text-center gap-4 shadow-xs">
+        {/* Avatar interactivo con botón de carga a Supabase Storage */}
+        <div className="relative group">
+          <div className="w-28 h-28 rounded-full overflow-hidden ring-4 ring-[#0D7C84]/20 shadow-sm bg-slate-100 flex items-center justify-center">
+            {isUploadingAvatar ? (
+              <div className="w-full h-full flex flex-col items-center justify-center bg-slate-900/60 text-white gap-1">
+                <Loader2 className="w-6 h-6 animate-spin text-teal-300" />
+                <span className="text-[10px] font-semibold">Subiendo...</span>
+              </div>
+            ) : (
+              <img
+                src={displayedPhoto}
+                alt={nombreCompleto}
+                onError={(e) => {
+                  e.currentTarget.src = DEFAULT_AVATAR;
+                }}
+                className="w-full h-full object-cover"
+              />
+            )}
+          </div>
+
+          {/* Botón flotante para seleccionar archivo */}
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isUploadingAvatar}
+            className="absolute bottom-0 right-0 p-2.5 rounded-full bg-[#0D7C84] hover:bg-[#09575d] text-white shadow-md transition-all hover:scale-110 active:scale-95 cursor-pointer ring-2 ring-white"
+            title="Subir foto a Supabase Storage"
+          >
+            <Camera className="w-4 h-4" />
+          </button>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            onChange={handleDirectAvatarUpload}
+            className="hidden"
+          />
+        </div>
 
         {!isEditing ? (
           <>
@@ -157,13 +283,6 @@ export const ProfilePage: React.FC = () => {
           </>
         ) : (
           <form onSubmit={handleSubmit} className="w-full space-y-5 text-left">
-            {error && (
-              <div className="bg-rose-50 border border-rose-200 rounded-xl p-3.5 flex items-start gap-3 text-rose-600 text-xs sm:text-sm">
-                <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                <span>{error}</span>
-              </div>
-            )}
-
             <UnderlineInput
               label="Nombres"
               name="nombres"
@@ -206,13 +325,13 @@ export const ProfilePage: React.FC = () => {
               }
             />
 
-            <UnderlineInput
-              label="URL de Foto (Opcional)"
-              name="fotoUrl"
-              type="url"
+            <ImageUpload
+              label="Foto de Perfil (Opcional)"
               value={formData.fotoUrl}
-              onChange={handleChange}
-              placeholder="https://ejemplo.com/mi-foto.jpg"
+              onChange={(url) => setFormData({ ...formData, fotoUrl: url })}
+              folder="avatares"
+              shape="circle"
+              helperText="Sube tu foto de perfil a Supabase (JPG, PNG o WEBP)"
             />
 
             <div className="flex gap-3 pt-2">
@@ -227,7 +346,10 @@ export const ProfilePage: React.FC = () => {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setIsEditing(false)}
+                onClick={() => {
+                  setIsEditing(false);
+                  setError(null);
+                }}
               >
                 Cancelar
               </Button>
@@ -238,3 +360,5 @@ export const ProfilePage: React.FC = () => {
     </div>
   );
 };
+
+export default ProfilePage;

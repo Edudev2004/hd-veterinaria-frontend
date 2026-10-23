@@ -13,7 +13,11 @@ interface CitaCardProps {
 export const CitaCard: React.FC<CitaCardProps> = ({ cita, onModificar, onCancelar, onVerDetalle }) => {
   const estadoNormalizado = (cita.estado ? String(cita.estado).toLowerCase() : 'pendiente');
   const esModificable = estadoNormalizado === 'pendiente';
-  const esCancelable = estadoNormalizado === 'pendiente' || estadoNormalizado === 'confirmada';
+  const esCancelable = estadoNormalizado === 'pendiente';
+  const motivoMostrado =
+    estadoNormalizado === 'cancelada'
+      ? cita.motivo_cancelacion || cita.motivo
+      : cita.motivo;
 
   // Formatear fecha y hora
   const { fechaTexto, horaTexto } = (() => {
@@ -62,7 +66,7 @@ export const CitaCard: React.FC<CitaCardProps> = ({ cita, onModificar, onCancela
           </div>
         </div>
 
-        <CitaEstadoBadge estado={cita.estado} motivo={cita.motivo} />
+        <CitaEstadoBadge estado={cita.estado} motivo={motivoMostrado || undefined} />
       </div>
 
       {/* Datos Clave: Fecha/Hora y Veterinario */}
@@ -91,10 +95,10 @@ export const CitaCard: React.FC<CitaCardProps> = ({ cita, onModificar, onCancela
       </div>
 
       {/* Motivo de la Cita */}
-      {cita.motivo && (
+      {motivoMostrado && (
         <div className="text-xs text-slate-600">
           <span className="font-semibold text-slate-700 block mb-1">
-            {estadoNormalizado === 'cancelada' ? 'Motivo de cancelación / registro:' : 'Motivo:'}
+            {estadoNormalizado === 'cancelada' ? 'Motivo de cancelación:' : 'Motivo:'}
           </span>
           <p
             className={`p-2.5 rounded-xl border line-clamp-2 italic ${
@@ -103,7 +107,7 @@ export const CitaCard: React.FC<CitaCardProps> = ({ cita, onModificar, onCancela
                 : 'bg-slate-50/70 border-slate-100 text-slate-600'
             }`}
           >
-            "{cita.motivo}"
+            "{motivoMostrado}"
           </p>
         </div>
       )}

@@ -46,6 +46,7 @@ export interface VeterinarioDetallado {
   nombre: string; // usuarios.nombre
   email: string; // usuarios.email
   especialidad_nombre: string; // especialidades.nombre
+  average_rating?: number; // promedio de valoraciones para el paso de selección
 }
 
 /**
