@@ -62,6 +62,7 @@ export const StepVetSelection = () => {
         selectedSpecialty?.name ||
         "Medicina General",
       averageRating: veterinario.average_rating ?? 0,
+      photoUrl: veterinario.foto_url ?? null,
     };
 
     setVet(seleccionado);
@@ -138,8 +139,25 @@ export const StepVetSelection = () => {
                 onClick={() => seleccionarVeterinario(vet)}
                 className="flex items-center gap-4 p-4 rounded-xl border border-slate-200 hover:border-[#0d9488] hover:bg-teal-50/50 transition-all text-left group"
               >
-                <div className="w-12 h-12 rounded-full bg-slate-100 group-hover:bg-[#0d9488]/10 flex items-center justify-center flex-shrink-0 transition-colors">
-                  <User className="w-6 h-6 text-slate-400 group-hover:text-[#0d9488] transition-colors" />
+                <div className="w-12 h-12 rounded-full bg-slate-100 group-hover:bg-[#0d9488]/10 flex items-center justify-center flex-shrink-0 overflow-hidden transition-colors relative">
+                  {vet.foto_url ? (
+                    <img
+                      src={vet.foto_url}
+                      alt={vet.nombre}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                        const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                        if (fallback) fallback.style.display = "flex";
+                      }}
+                    />
+                  ) : null}
+                  <div
+                    style={{ display: vet.foto_url ? "none" : "flex" }}
+                    className="w-full h-full items-center justify-center"
+                  >
+                    <User className="w-6 h-6 text-slate-400 group-hover:text-[#0d9488] transition-colors" />
+                  </div>
                 </div>
                 <div className="min-w-0 flex-1">
                   <h3 className="text-sm font-bold text-slate-900 group-hover:text-[#0d9488] transition-colors">

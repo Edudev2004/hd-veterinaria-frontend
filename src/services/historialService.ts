@@ -12,7 +12,6 @@ import {
   VeterinarioTratante
 } from '../types/historial.types';
 import type { Mascota } from './petService';
-import vetsMock from '../features/appointments/mocks/veterinarians.json';
 
 /**
  * Mascotas de demostración para el expediente clínico (US-19).
@@ -313,13 +312,10 @@ export const getHistorialPorMascota = (
 
   // Mapear al modelo EntradaHistorialClinico
   const entradas: EntradaHistorialClinico[] = registrosFiltrados.map((item) => {
-    const vetIdNum = Number(item.veterinario_id) || 1;
-    const vetFound = (vetsMock as any[]).find((v) => v.id === vetIdNum);
-
     const veterinario: VeterinarioTratante = {
       id: String(item.veterinario_id),
-      nombre: item.veterinario_nombre || vetFound?.name || 'Dr. Médico Veterinario',
-      especialidad: item.especialidad || vetFound?.specialty || 'Medicina General',
+      nombre: item.veterinario_nombre || 'Dr. Médico Veterinario',
+      especialidad: item.especialidad || 'Medicina General',
       email: `${(item.veterinario_nombre || 'veterinario').toLowerCase().replace(/[^a-z0-9]/g, '.')}@vethd.com`
     };
 

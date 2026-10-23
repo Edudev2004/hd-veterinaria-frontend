@@ -11,6 +11,7 @@ export interface Veterinarian {
   name: string;
   specialty: string;
   averageRating: number;
+  photoUrl?: string | null;
 }
 
 export interface Pet {
