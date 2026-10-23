@@ -56,6 +56,13 @@ const extractErrorMessage = (data: unknown, status: number): string => {
       }
     }
 
+    if (payload.validationErrors && typeof payload.validationErrors === "object") {
+      const firstValidation = Object.values(payload.validationErrors as Record<string, unknown>)[0];
+      if (typeof firstValidation === "string" && firstValidation.trim()) {
+        return firstValidation.trim();
+      }
+    }
+
     const defaultMessage = DEFAULT_ERROR_MESSAGES[status];
 
     if (defaultMessage) {
@@ -74,7 +81,7 @@ const extractErrorMessage = (data: unknown, status: number): string => {
 
 /**
  * Cliente HTTP central del frontend.
- * Adjunta el token JWT, normaliza errores y notifica cuando la sesión expira.
+ * Adjunta el token JWT, normaliza errores y notifica cuando la sesión expira o el servidor falla.
  */
 export async function apiRequest<T>(
   path: string,
@@ -112,10 +119,19 @@ export async function apiRequest<T>(
       throw error;
     }
 
-    throw new ApiError(
-      0,
-      "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución.",
+    const connectionMessage =
+      "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución.";
+
+    window.dispatchEvent(
+      new CustomEvent("vethd:server-error", {
+        detail: {
+          status: 503,
+          message: connectionMessage,
+        },
+      }),
     );
+
+    throw new ApiError(0, connectionMessage);
   }
 
   if (response.status === 204) {
@@ -134,14 +150,27 @@ export async function apiRequest<T>(
   }
 
   if (!response.ok) {
+    const errorMessage = extractErrorMessage(data, response.status);
+
     if (response.status === 401 && auth) {
       clearSession();
       window.dispatchEvent(new CustomEvent("vethd:unauthorized"));
     }
 
+    if (response.status >= 500) {
+      window.dispatchEvent(
+        new CustomEvent("vethd:server-error", {
+          detail: {
+            status: response.status,
+            message: errorMessage,
+          },
+        }),
+      );
+    }
+
     throw new ApiError(
       response.status,
-      extractErrorMessage(data, response.status),
+      errorMessage,
       data,
     );
   }
