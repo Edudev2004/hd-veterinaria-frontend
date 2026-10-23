@@ -144,15 +144,10 @@ export const ResetPasswordPage: React.FC = () => {
             {/* Target Account Badge */}
             {(email || token) && !isSuccess && (
               <div className="px-3.5 py-2.5 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-between text-xs gap-2">
-                <span className="text-slate-500 font-medium">{email ? 'Cuenta a actualizar:' : 'Restablecimiento:'}</span>
-                <div className="flex items-center gap-2">
-                  {email && <strong className="text-slate-800 font-bold truncate max-w-[180px]">{email}</strong>}
-                  {token && (
-                    <span className="text-[10px] font-mono bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-semibold">
-                      Token Válido
-                    </span>
-                  )}
-                </div>
+                <span className="text-slate-500 font-medium">Cuenta a actualizar:</span>
+                <strong className="text-slate-800 font-bold truncate max-w-[220px]">
+                  {email || 'Restablecimiento de credenciales'}
+                </strong>
               </div>
             )}
 
