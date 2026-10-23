@@ -194,7 +194,8 @@ const toVeterinario = (
   nombre: vet.name,
   email: vet.email ?? '',
   especialidad_nombre: vet.specialtyName ?? '',
-  average_rating: vet.averageRating ?? 0
+  average_rating: vet.averageRating ?? 0,
+  foto_url: vet.photoUrl ?? null
 });
 
 const toCitaDetallada = (dto: AppointmentDTO): CitaDetallada => {
