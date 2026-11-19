@@ -201,6 +201,18 @@ const guardarAtencion = async (
   return registro;
 };
 
+const toRegistroAtencion = (
+  citaId: string,
+  dto: DiagnosisApiDTO
+): RegistroAtencion => ({
+  id: dto.id,
+  citaId,
+  diagnostico: dto.diagnosis,
+  tratamiento: dto.treatment ?? '',
+  notas: dto.notes ?? '',
+  createdAt: dto.createdAt
+});
+
 export const vetConsultationService = {
   iniciarAtencion,
   getAtencionesEnCurso,
