@@ -17,6 +17,37 @@ const normalizarEstado = (status: string): EstadoCita => {
   return ESTADOS_API[(status ?? '').toUpperCase()] ?? 'pendiente';
 };
 
+const calcularEdad = (birthDate: string | null): string => {
+  if (!birthDate) {
+    return 'Edad no registrada';
+  }
+
+  const nacimiento = new Date(`${birthDate}T00:00:00`);
+
+  if (Number.isNaN(nacimiento.getTime())) {
+    return 'Edad no registrada';
+  }
+
+  const hoy = new Date();
+  let meses =
+    (hoy.getFullYear() - nacimiento.getFullYear()) * 12 +
+    (hoy.getMonth() - nacimiento.getMonth());
+
+  if (hoy.getDate() < nacimiento.getDate()) {
+    meses -= 1;
+  }
+
+  meses = Math.max(meses, 0);
+
+  const anios = Math.floor(meses / 12);
+
+  if (anios >= 1) {
+    return `${anios} ${anios === 1 ? 'año' : 'años'}`;
+  }
+
+  return `${meses} ${meses === 1 ? 'mes' : 'meses'}`;
+};
+
 const STORAGE_CITAS_KEY = 'vethd_db_citas_veterinario';
 
 const getStoredCitas = (): CitaAgenda[] => {
