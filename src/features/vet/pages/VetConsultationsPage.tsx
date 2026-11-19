@@ -7,30 +7,32 @@ import type { CitaAgenda } from "../../appointments/types/vetSchedule.types";
 import { VetConsultationForm } from "../components/VetConsultationForm";
 import { VetConsultationSummary } from "../components/VetConsultationSummary";
 import { vetConsultationService } from "../services/vetConsultationService";
-import type { RegistroAtencion } from "../types/vetConsultation.types";
 import { MarkAsAttendedDialog } from "../components/MarkAsAttendedDialog";
 import { MarkAsNotAttendedDialog } from "../components/MarkAsNotAttendedDialog";
+
+type ValoresConsulta = {
+  diagnostico: string;
+  tratamiento: string;
+  notas: string;
+};
+
+interface ConsultaPendiente {
+  cita: CitaAgenda;
+  values: ValoresConsulta;
+}
 
 export const VetConsultationsPage: React.FC = () => {
   const { citaId } = useParams<{ citaId: string }>();
   const { user } = useAuth();
 
   const [citasEnCurso, setCitasEnCurso] = useState<CitaAgenda[]>([]);
-  const [registros, setRegistros] = useState<
-    Record<string, RegistroAtencion | null>
-  >({});
   const [citaExpandidaId, setCitaExpandidaId] = useState<string | null>(null);
   const [cargando, setCargando] = useState(true);
   const [citaGuardandoId, setCitaGuardandoId] = useState<string | null>(null);
-  const [mensajesExito, setMensajesExito] = useState<Record<string, string>>(
-    {},
-  );
-
-  const [citaPorConfirmar, setCitaPorConfirmar] = useState<CitaAgenda | null>(
-    null,
-  );
-  const [marcandoAtendida, setMarcandoAtendida] = useState(false);
+  const [consultaPorConfirmar, setConsultaPorConfirmar] =
+    useState<ConsultaPendiente | null>(null);
   const [mensajeAccion, setMensajeAccion] = useState("");
+  const [errorAccion, setErrorAccion] = useState("");
 
   const [citaPorNoAtender, setCitaPorNoAtender] = useState<CitaAgenda | null>(
     null,
@@ -40,43 +42,60 @@ export const VetConsultationsPage: React.FC = () => {
   useEffect(() => {
     if (!user) {
       setCitasEnCurso([]);
-      setRegistros({});
       setCargando(false);
       return;
     }
 
     const cargarAtencionesEnCurso = async (): Promise<void> => {
       setCargando(true);
+      setErrorAccion("");
 
-      const atencionesEnCurso = vetConsultationService.getAtencionesEnCurso(
-        user.id,
-      );
+      try {
+        const atencionesEnCurso = vetConsultationService.getAtencionesEnCurso(
+          user.id,
+        );
 
-      const citas = await Promise.all(
-        atencionesEnCurso.map((atencion) =>
-          vetScheduleService.getCitaById(atencion.citaId, user.id),
-        ),
-      );
+        const citas = await Promise.all(
+          atencionesEnCurso.map((atencion) =>
+            vetScheduleService.getCitaById(atencion.citaId),
+          ),
+        );
 
-      const citasEncontradas = citas.filter(
-        (cita): cita is CitaAgenda => cita !== null,
-      );
+        const vigentes: CitaAgenda[] = [];
 
-      const registrosCargados = await Promise.all(
-        citasEncontradas.map(async (cita) => [
-          cita.id,
-          await vetConsultationService.getAtencionByCita(cita.id, user.id),
-        ]),
-      );
+        citas.forEach((cita, indice) => {
+          // Sigue en curso si está pendiente o si fue marcada atendida
+          // pero todavía no tiene diagnóstico registrado.
+          const requiereAtencion =
+            cita !== null &&
+            (cita.estado === "pendiente" ||
+              (cita.estado === "atendida" && !cita.diagnostico));
 
-      setCitasEnCurso(citasEncontradas);
-      setRegistros(Object.fromEntries(registrosCargados));
+          if (cita && requiereAtencion) {
+            vigentes.push(cita);
+            return;
+          }
 
-      if (citaId && citasEncontradas.some((cita) => cita.id === citaId)) {
-        setCitaExpandidaId(citaId);
+          vetConsultationService.limpiarAtencionActiva(
+            user.id,
+            atencionesEnCurso[indice].citaId,
+          );
+        });
+
+        setCitasEnCurso(vigentes);
+
+        if (citaId && vigentes.some((cita) => cita.id === citaId)) {
+          setCitaExpandidaId(citaId);
+        }
+      } catch (error) {
+        setErrorAccion(
+          error instanceof Error
+            ? error.message
+            : "No se pudieron cargar las atenciones en curso.",
+        );
+      } finally {
+        setCargando(false);
       }
-
-      setCargando(false);
     };
 
     void cargarAtencionesEnCurso();
@@ -86,59 +105,94 @@ export const VetConsultationsPage: React.FC = () => {
     setCitaExpandidaId((idActual) => (idActual === id ? null : id));
   };
 
-  const confirmarCitaAtendida = async (): Promise<void> => {
-    if (!user || !citaPorConfirmar) {
+  const guardarConsulta = async (
+    cita: CitaAgenda,
+    values: ValoresConsulta,
+  ): Promise<void> => {
+    if (!user) {
       return;
     }
 
-    setMarcandoAtendida(true);
+    setCitaGuardandoId(cita.id);
+    setErrorAccion("");
+    setMensajeAccion("");
 
     try {
-      const citaActualizada = await vetScheduleService.marcarCitaComoAtendida(
-        citaPorConfirmar.id,
-        user.id,
-      );
+      // El backend solo acepta la consulta en citas ya ATENDIDAS:
+      // primero se marca la cita y luego se registra el diagnóstico.
+      if (cita.estado === "pendiente") {
+        const citaAtendida = await vetScheduleService.marcarCitaComoAtendida(
+          cita.id,
+        );
 
-      if (!citaActualizada) {
-        return;
+        // Si el diagnóstico falla, la cita ya quedó atendida y se reintenta solo la consulta.
+        setCitasEnCurso((citas) =>
+          citas.map((item) =>
+            item.id === cita.id ? { ...item, estado: citaAtendida.estado } : item,
+          ),
+        );
       }
 
-      vetConsultationService.limpiarAtencionActiva(
-        user.id,
-        citaPorConfirmar.id,
-      );
+      await vetConsultationService.registrarConsulta({
+        citaId: cita.id,
+        ...values,
+      });
 
-      setCitasEnCurso((citas) =>
-        citas.filter((cita) => cita.id !== citaPorConfirmar.id),
-      );
+      vetConsultationService.limpiarAtencionActiva(user.id, cita.id);
 
+      setCitasEnCurso((citas) => citas.filter((item) => item.id !== cita.id));
       setCitaExpandidaId(null);
       setMensajeAccion(
-        `${citaPorConfirmar.mascota.nombre} fue marcada como atendida.`,
+        `${cita.mascota.nombre} fue marcada como atendida y su consulta quedó registrada.`,
       );
-      setCitaPorConfirmar(null);
+    } catch (error) {
+      setErrorAccion(
+        error instanceof Error
+          ? error.message
+          : "No se pudo registrar la consulta.",
+      );
     } finally {
-      setMarcandoAtendida(false);
+      setCitaGuardandoId(null);
     }
   };
 
-  const confirmarCitaNoAtendida = async (): Promise<void> => {
+  const solicitarGuardado = async (
+    cita: CitaAgenda,
+    values: ValoresConsulta,
+  ): Promise<void> => {
+    if (cita.estado === "pendiente") {
+      setConsultaPorConfirmar({ cita, values });
+      return;
+    }
+
+    await guardarConsulta(cita, values);
+  };
+
+  const confirmarCitaAtendida = async (): Promise<void> => {
+    if (!consultaPorConfirmar) {
+      return;
+    }
+
+    const { cita, values } = consultaPorConfirmar;
+
+    await guardarConsulta(cita, values);
+    setConsultaPorConfirmar(null);
+  };
+
+  const confirmarCitaNoAtendida = async (motivo: string): Promise<void> => {
     if (!user || !citaPorNoAtender) {
       return;
     }
 
     setMarcandoNoAtendida(true);
+    setErrorAccion("");
+    setMensajeAccion("");
 
     try {
-      const citaActualizada =
-        await vetScheduleService.marcarCitaComoNoAtendida(
-          citaPorNoAtender.id,
-          user.id,
-        );
-
-      if (!citaActualizada) {
-        return;
-      }
+      await vetScheduleService.marcarCitaComoNoAtendida(
+        citaPorNoAtender.id,
+        motivo,
+      );
 
       vetConsultationService.limpiarAtencionActiva(
         user.id,
@@ -153,48 +207,15 @@ export const VetConsultationsPage: React.FC = () => {
       setMensajeAccion(
         `${citaPorNoAtender.mascota.nombre} fue marcada como no atendida.`,
       );
-      setCitaPorNoAtender(null);
+    } catch (error) {
+      setErrorAccion(
+        error instanceof Error
+          ? error.message
+          : "No se pudo marcar la cita como no atendida.",
+      );
     } finally {
       setMarcandoNoAtendida(false);
-    }
-  };
-
-  const guardarRegistro = async (
-    citaSeleccionada: CitaAgenda,
-    values: {
-      diagnostico: string;
-      tratamiento: string;
-      notas: string;
-    },
-  ): Promise<void> => {
-    if (!user) {
-      return;
-    }
-
-    setCitaGuardandoId(citaSeleccionada.id);
-    setMensajesExito((mensajes) => ({
-      ...mensajes,
-      [citaSeleccionada.id]: "",
-    }));
-
-    try {
-      const registroGuardado = await vetConsultationService.guardarAtencion({
-        citaId: citaSeleccionada.id,
-        veterinarioId: user.id,
-        ...values,
-      });
-
-      setRegistros((registrosActuales) => ({
-        ...registrosActuales,
-        [citaSeleccionada.id]: registroGuardado,
-      }));
-
-      setMensajesExito((mensajes) => ({
-        ...mensajes,
-        [citaSeleccionada.id]: "Atención registrada correctamente.",
-      }));
-    } finally {
-      setCitaGuardandoId(null);
+      setCitaPorNoAtender(null);
     }
   };
 
@@ -224,6 +245,12 @@ export const VetConsultationsPage: React.FC = () => {
         </p>
       )}
 
+      {errorAccion && (
+        <p className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
+          {errorAccion}
+        </p>
+      )}
+
       {citasEnCurso.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed border-slate-200 bg-white p-10 text-center">
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-tertiary text-primary">
@@ -244,7 +271,6 @@ export const VetConsultationsPage: React.FC = () => {
         <div className="flex flex-col gap-4">
           {citasEnCurso.map((cita) => {
             const detalleVisible = citaExpandidaId === cita.id;
-            const registro = registros[cita.id];
             const hora = new Date(cita.fecha_hora).toLocaleTimeString("es-PE", {
               hour: "2-digit",
               minute: "2-digit",
@@ -285,9 +311,9 @@ export const VetConsultationsPage: React.FC = () => {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    {registro && (
+                    {cita.estado === "atendida" && (
                       <span className="hidden rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 sm:inline">
-                        Registrada
+                        Atendida · falta diagnóstico
                       </span>
                     )}
 
@@ -303,23 +329,17 @@ export const VetConsultationsPage: React.FC = () => {
                   <div className="flex flex-col gap-5 border-t border-slate-100 bg-slate-50/70 p-5">
                     <VetConsultationSummary cita={cita} />
 
-                    {mensajesExito[cita.id] && (
-                      <p className="rounded-xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
-                        {mensajesExito[cita.id]}
-                      </p>
-                    )}
-
                     <VetConsultationForm
-                      initialValues={{
-                        diagnostico: registro?.diagnostico ?? "",
-                        tratamiento: registro?.tratamiento ?? "",
-                        notas: registro?.notas ?? "",
-                      }}
                       guardando={citaGuardandoId === cita.id}
-                      onSubmit={(values) => guardarRegistro(cita, values)}
+                      textoBoton={
+                        cita.estado === "pendiente"
+                          ? "Guardar y marcar como atendida"
+                          : "Guardar consulta"
+                      }
+                      onSubmit={(values) => solicitarGuardado(cita, values)}
                     />
-                    {registro ? (
-                      <div className="flex items-center justify-between border-t border-slate-200 pt-5">
+                    <div className="flex items-center justify-between gap-4 border-t border-slate-200 pt-5">
+                      {cita.estado === "pendiente" ? (
                         <button
                           type="button"
                           onClick={() => setCitaPorNoAtender(cita)}
@@ -327,31 +347,15 @@ export const VetConsultationsPage: React.FC = () => {
                         >
                           Marcar como no atendida
                         </button>
-
-                        <button
-                          type="button"
-                          onClick={() => setCitaPorConfirmar(cita)}
-                          className="rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700"
-                        >
-                          Marcar como atendida
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-between border-t border-slate-200 pt-5">
-                        <button
-                          type="button"
-                          onClick={() => setCitaPorNoAtender(cita)}
-                          className="rounded-xl border border-rose-200 bg-rose-50 px-5 py-2.5 text-sm font-semibold text-rose-700 transition-colors hover:bg-rose-100"
-                        >
-                          Marcar como no atendida
-                        </button>
-
-                        <p className="text-sm text-slate-500">
-                          Guarda el diagnóstico y tratamiento antes de finalizar
-                          la atención.
-                        </p>
-                      </div>
-                    )}
+                      ) : (
+                        <span />
+                      )}
+                      <p className="text-right text-sm text-slate-500">
+                        {cita.estado === "pendiente"
+                          ? "Al guardar, la cita se marcará como atendida."
+                          : "La cita ya está atendida; falta registrar el diagnóstico."}
+                      </p>
+                    </div>
                   </div>
                 )}
               </article>
@@ -371,10 +375,10 @@ export const VetConsultationsPage: React.FC = () => {
       )}
 
       <MarkAsAttendedDialog
-        abierto={Boolean(citaPorConfirmar)}
-        nombreMascota={citaPorConfirmar?.mascota.nombre ?? ""}
-        cargando={marcandoAtendida}
-        onCancelar={() => setCitaPorConfirmar(null)}
+        abierto={Boolean(consultaPorConfirmar)}
+        nombreMascota={consultaPorConfirmar?.cita.mascota.nombre ?? ""}
+        cargando={citaGuardandoId !== null}
+        onCancelar={() => setConsultaPorConfirmar(null)}
         onConfirmar={confirmarCitaAtendida}
       />
 

@@ -28,6 +28,23 @@ const ESTADO_BADGE: Record<
   cancelada: { texto: "Cancelada", variant: "warning" },
 };
 
+const hoyISO = (): string => {
+  const ahora = new Date();
+
+  return [
+    ahora.getFullYear(),
+    String(ahora.getMonth() + 1).padStart(2, "0"),
+    String(ahora.getDate()).padStart(2, "0"),
+  ].join("-");
+};
+
+const formatearFechaLarga = (fechaISO: string): string =>
+  new Date(`${fechaISO}T00:00:00`).toLocaleDateString("es-PE", {
+    weekday: "long",
+    day: "2-digit",
+    month: "long",
+  });
+
 const cumpleFiltro = (cita: CitaAgenda, filtro: Filtro): boolean => {
   if (filtro === "todas") return true;
   if (filtro === "pendientes") return cita.estado === "pendiente";
@@ -43,26 +60,44 @@ export const VetSchedulePage: React.FC = () => {
   const [filtro, setFiltro] = useState<Filtro>("todas");
   const [citaExpandidaId, setCitaExpandidaId] = useState<string | null>(null);
   const [cargando, setCargando] = useState(true);
+  const [fecha, setFecha] = useState<string>(hoyISO());
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!user) return;
 
-    setCargando(true);
+    let activo = true;
 
-    vetScheduleService.getAgendaDiaria(user.id).then((data) => {
-      setCitas(data);
-      setCargando(false);
-    });
-  }, [user]);
+    setCargando(true);
+    setError("");
+
+    vetScheduleService
+      .getAgendaDiaria(fecha)
+      .then((data) => {
+        if (activo) setCitas(data);
+      })
+      .catch((e: unknown) => {
+        if (!activo) return;
+
+        setCitas([]);
+        setError(
+          e instanceof Error ? e.message : "No se pudo cargar la agenda.",
+        );
+      })
+      .finally(() => {
+        if (activo) setCargando(false);
+      });
+
+    return () => {
+      activo = false;
+    };
+  }, [user, fecha]);
 
   const citasFiltradas = citas.filter((cita) => cumpleFiltro(cita, filtro));
   const atendidas = citas.filter((cita) => cita.estado === "atendida").length;
   const pendientes = citas.filter((cita) => cita.estado === "pendiente").length;
 
-  const hoy = new Date().toLocaleDateString("es-PE", {
-    day: "2-digit",
-    month: "long",
-  });
+  const fechaLarga = formatearFechaLarga(fecha);
 
   const alternarDetalle = (citaId: string) => {
     setCitaExpandidaId((citaActual) => (citaActual === citaId ? null : citaId));
@@ -76,11 +111,20 @@ export const VetSchedulePage: React.FC = () => {
             Agenda Diaria del Veterinario
           </h1>
           <p className="text-sm text-slate-500">
-            Hoy, {hoy} · {citas.length} citas programadas
+            {fechaLarga} · {citas.length} citas programadas
           </p>
         </div>
 
         <div className="flex gap-3">
+          <label className="flex flex-col justify-center text-xs text-slate-500">
+            Fecha
+            <input
+              type="date"
+              value={fecha}
+              onChange={(e) => e.target.value && setFecha(e.target.value)}
+              className="mt-1 rounded-lg border border-slate-200 px-2 py-1 text-sm text-slate-700 outline-none focus:border-primary"
+            />
+          </label>
           <div className="rounded-xl bg-tertiary px-4 py-2 text-center">
             <p className="text-xs text-slate-500">Atendidas</p>
             <p className="text-lg font-bold text-primary">{atendidas}</p>
@@ -94,6 +138,12 @@ export const VetSchedulePage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {error && (
+        <p className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
+          {error}
+        </p>
+      )}
 
       <div className="rounded-2xl border border-slate-100 bg-white p-4">
         <div className="mb-3 flex gap-2 border-b border-slate-100 pb-3">

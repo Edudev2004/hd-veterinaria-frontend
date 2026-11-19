@@ -1,35 +1,52 @@
+import { apiRequest } from '@/services/apiClient';
+import type {
+  ResumenValoraciones,
+  ReviewApiDTO,
+  ValoracionVeterinario,
+  VeterinarianProfileApiDTO,
+  VeterinarianReviewsApiDTO
+} from '../types/valoracion.types';
 
-import valoracionesSeed from '../mocks/valoracionesVeterinario.json';
-import type { ValoracionVeterinario } from '../types/valoracion.types';
+const toValoracion = (dto: ReviewApiDTO): ValoracionVeterinario => ({
+  id: dto.id,
+  cita_id: dto.appointmentId ?? '',
+  puntuacion: dto.rating,
+  comentario: dto.comment ?? '',
+  created_at: dto.createdAt,
+  mascotaNombre: dto.petName ?? 'Paciente',
+  mascotaFotoUrl: dto.petPhotoUrl ?? undefined,
+  propietarioNombre: dto.ownerName ?? 'Propietario'
+});
 
-const STORAGE_VALORACIONES_KEY = 'vethd_db_valoraciones_veterinario';
+/**
+ * Obtiene el veterinario autenticado (GET /api/veterinarios/me).
+ */
+export const getPerfilVeterinario =
+  async (): Promise<VeterinarianProfileApiDTO> => {
+    return apiRequest<VeterinarianProfileApiDTO>('/api/veterinarios/me');
+  };
 
-const getStoredValoraciones = (): ValoracionVeterinario[] => {
-  const data = localStorage.getItem(STORAGE_VALORACIONES_KEY);
-  if (!data) {
-    localStorage.setItem(STORAGE_VALORACIONES_KEY, JSON.stringify(valoracionesSeed));
-    return valoracionesSeed as ValoracionVeterinario[];
-  }
-  try {
-    return JSON.parse(data) as ValoracionVeterinario[];
-  } catch {
-    return valoracionesSeed as ValoracionVeterinario[];
-  }
-};
+/**
+ * Valoraciones y promedio del veterinario autenticado
+ * (GET /api/veterinarios/{id}/valoraciones).
+ */
+export const getMisValoraciones = async (): Promise<ResumenValoraciones> => {
+  const perfil = await getPerfilVeterinario();
 
-export const getMisValoraciones = async (): Promise<ValoracionVeterinario[]> => {
-  await new Promise((resolve) => setTimeout(resolve, 200));
-  return getStoredValoraciones();
-};
+  const respuesta = await apiRequest<VeterinarianReviewsApiDTO>(
+    `/api/veterinarios/${perfil.id}/valoraciones`
+  );
 
-export const getPromedioValoraciones = async (): Promise<number> => {
-  const valoraciones = getStoredValoraciones();
-  if (valoraciones.length === 0) return 0;
-  const suma = valoraciones.reduce((acc, v) => acc + v.puntuacion, 0);
-  return Number((suma / valoraciones.length).toFixed(1));
+  const valoraciones = (respuesta.valoraciones ?? []).map(toValoracion);
+
+  return {
+    promedio: respuesta.promedio ?? 0,
+    total: respuesta.totalValoraciones ?? valoraciones.length,
+    valoraciones
+  };
 };
 
 export const vetReviewsService = {
-  getMisValoraciones,
-  getPromedioValoraciones
+  getPerfilVeterinario,
+  getMisValoraciones
 };
