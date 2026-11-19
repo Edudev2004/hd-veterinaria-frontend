@@ -69,6 +69,23 @@ function MarkAsNotAttendedDialog(props: MarkAsNotAttendedDialogProps) {
             pudo realizarse. La cita dejará de aparecer en Atenciones en
             curso.
           </p>
+
+          <label className="mt-4 flex flex-col gap-2">
+            <span className="text-sm font-semibold text-slate-700">
+              Motivo (obligatorio)
+            </span>
+            <textarea
+              value={motivo}
+              onChange={(event) => setMotivo(event.target.value)}
+              rows={3}
+              disabled={cargando}
+              placeholder="Ej: El propietario no se presentó a la cita."
+              className="resize-y rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-700 outline-none transition-colors placeholder:text-slate-400 focus:border-primary disabled:opacity-60"
+            />
+            <span className="text-xs text-slate-400">
+              Mínimo 5 caracteres.
+            </span>
+          </label>
         </div>
 
         <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
@@ -83,8 +100,8 @@ function MarkAsNotAttendedDialog(props: MarkAsNotAttendedDialogProps) {
 
           <button
             type="button"
-            onClick={() => onConfirmar(motivo)}
-            disabled={cargando}
+            onClick={() => onConfirmar(motivo.trim())}
+            disabled={cargando || !motivoValido}
             className="rounded-xl bg-amber-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {cargando ? 'Marcando...' : 'Sí, marcar como no atendida'}
