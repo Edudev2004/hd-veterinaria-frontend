@@ -30,11 +30,13 @@ export const VetMedicalHistoryPage: React.FC = () => {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState<boolean>(false);
   const [isLoadingPacientes, setIsLoadingPacientes] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Cargar lista de pacientes reales del veterinario al montar
   useEffect(() => {
     let active = true;
     setIsLoadingPacientes(true);
+    setError(null);
 
     getMisPacientes()
       .then((list) => {
@@ -47,6 +49,8 @@ export const VetMedicalHistoryPage: React.FC = () => {
       .catch((err: unknown) => {
         if (!active) return;
         console.error('Error al cargar pacientes del veterinario:', err);
+        setError(err instanceof Error ? err.message : 'No se pudo cargar la lista de pacientes.');
+        setPacientes([]);
       })
       .finally(() => {
         if (active) setIsLoadingPacientes(false);
@@ -209,6 +213,10 @@ export const VetMedicalHistoryPage: React.FC = () => {
             {isLoadingPacientes ? (
               <div className="p-6 text-center text-xs text-slate-400 bg-slate-50 rounded-2xl border border-slate-100">
                 Cargando pacientes...
+              </div>
+            ) : error ? (
+              <div className="p-6 text-center text-xs text-red-600 bg-red-50 rounded-2xl border border-red-100">
+                {error}
               </div>
             ) : pacientesFiltrados.length === 0 ? (
               <div className="p-6 text-center text-xs text-slate-400 bg-slate-50 rounded-2xl border border-slate-100">
