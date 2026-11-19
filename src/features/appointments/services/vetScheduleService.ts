@@ -114,18 +114,23 @@ export const getAgendaDiaria = async (fecha: string): Promise<CitaAgenda[]> => {
   return citas.map(toCitaAgenda);
 };
 
+/**
+ * Detalle de una cita (incluye el diagnóstico si ya fue registrado).
+ */
 export const getCitaById = async (
-  citaId: string,
-  veterinarioId: string
+  citaId: string
 ): Promise<CitaAgenda | null> => {
-  await new Promise((resolve) => setTimeout(resolve, 200));
+  try {
+    const cita = await apiRequest<AppointmentApiDTO>(`/api/citas/${citaId}`);
 
-  return (
-    getStoredCitas().find(
-      (cita) =>
-        cita.id === citaId && cita.veterinario_id === veterinarioId
-    ) ?? null
-  );
+    return toCitaAgenda(cita);
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      return null;
+    }
+
+    throw error;
+  }
 };
 
 export const marcarCitaComoAtendida = async (
