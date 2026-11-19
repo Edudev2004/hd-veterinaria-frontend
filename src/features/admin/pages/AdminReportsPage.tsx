@@ -1,728 +1,466 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
+  AlertCircle,
   BarChart3,
   CalendarDays,
+  Loader2,
   PawPrint,
+  RefreshCw,
   Stethoscope,
 } from 'lucide-react';
+import {
+  getMascotasPorEspecie,
+  getRankingVeterinarios,
+  getReporteCitas,
+  MascotasPorEspecie,
+  ReporteCitas,
+  VeterinarioRanking,
+} from '@/services/adminReportApi';
 
-interface AppointmentReport {
-  id: string;
-  date: string;
-  owner: string;
-  pet: string;
-  veterinarian: string;
-  specialty: string;
-  status: string;
-}
+// ---- Utilidades ----
 
-interface VeterinarianReport {
-  id: string;
-  name: string;
-  specialty: string;
-  appointments: number;
-}
+const toIsoDate = (date: Date): string => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+};
 
-interface SpeciesReport {
-  species: string;
-  count: number;
-}
+const primerDiaDelMes = (): string => {
+  const hoy = new Date();
+  return toIsoDate(new Date(hoy.getFullYear(), hoy.getMonth(), 1));
+};
 
-export const mockAppointments: AppointmentReport[] = [
-  {
-    id: '1',
-    date: '2026-09-01',
-    owner: 'Carlos Mendoza',
-    pet: 'Max',
-    veterinarian: 'Dr. Juan Pérez',
-    specialty: 'Medicina General',
-    status: 'Atendida',
-  },
-  {
-    id: '2',
-    date: '2026-09-03',
-    owner: 'María López',
-    pet: 'Luna',
-    veterinarian: 'Dra. Ana Torres',
-    specialty: 'Dermatología',
-    status: 'Atendida',
-  },
-  {
-    id: '3',
-    date: '2026-09-05',
-    owner: 'Pedro Ramírez',
-    pet: 'Rocky',
-    veterinarian: 'Dr. Juan Pérez',
-    specialty: 'Medicina General',
-    status: 'Pendiente',
-  },
-  {
-    id: '4',
-    date: '2026-09-08',
-    owner: 'Laura García',
-    pet: 'Milo',
-    veterinarian: 'Dr. Carlos Ruiz',
-    specialty: 'Cirugía Veterinaria',
-    status: 'Atendida',
-  },
-  {
-    id: '5',
-    date: '2026-09-10',
-    owner: 'José Fernández',
-    pet: 'Nala',
-    veterinarian: 'Dra. Ana Torres',
-    specialty: 'Dermatología',
-    status: 'Atendida',
-  },
-  {
-    id: '6',
-    date: '2026-09-12',
-    owner: 'Andrea Castillo',
-    pet: 'Simba',
-    veterinarian: 'Dr. Carlos Ruiz',
-    specialty: 'Odontología',
-    status: 'Pendiente',
-  },
-];
+const ultimoDiaDelMes = (): string => {
+  const hoy = new Date();
+  return toIsoDate(new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0));
+};
 
-export const mockVeterinarians: VeterinarianReport[] = [
-  {
-    id: '1',
-    name: 'Dr. Juan Pérez',
-    specialty: 'Medicina General',
-    appointments: 24,
-  },
-  {
-    id: '2',
-    name: 'Dra. Ana Torres',
-    specialty: 'Dermatología',
-    appointments: 19,
-  },
-  {
-    id: '3',
-    name: 'Dr. Carlos Ruiz',
-    specialty: 'Cirugía Veterinaria',
-    appointments: 15,
-  },
-  {
-    id: '4',
-    name: 'Dra. Elena Vargas',
-    specialty: 'Odontología',
-    appointments: 11,
-  },
-];
+const mensajeDeError = (error: unknown): string =>
+  error instanceof Error && error.message
+    ? error.message
+    : 'No se pudo cargar la información. Intenta nuevamente.';
 
-export const mockSpecies: SpeciesReport[] = [
-  {
-    species: 'Perros',
-    count: 42,
-  },
-  {
-    species: 'Gatos',
-    count: 28,
-  },
-  {
-    species: 'Aves',
-    count: 10,
-  },
-  {
-    species: 'Otros',
-    count: 5,
-  },
-];
+const csvCell = (value: string | number): string => `"${String(value).replace(/"/g, '""')}"`;
+
+const downloadCsv = (filename: string, headers: string[], rows: (string | number)[][]) => {
+  const csv = [headers, ...rows].map((row) => row.map(csvCell).join(',')).join('\n');
+  // BOM para que Excel respete las tildes.
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+};
+
+const porcentaje = (parte: number, total: number): number => (total > 0 ? (parte / total) * 100 : 0);
+
+const COLORES_ESTADO: Record<string, string> = {
+  ATENDIDA: 'bg-green-500',
+  PENDIENTE: 'bg-amber-400',
+  CONFIRMADA: 'bg-blue-500',
+  CANCELADA: 'bg-red-400',
+  NO_ATENDIDA: 'bg-slate-400',
+};
+
+// ---- Componentes pequeños ----
+
+const EstadoCarga: React.FC = () => (
+  <div className="flex items-center justify-center gap-2 py-10 text-sm text-slate-500">
+    <Loader2 className="h-4 w-4 animate-spin" />
+    Cargando...
+  </div>
+);
+
+const EstadoError: React.FC<{ mensaje: string; onRetry: () => void }> = ({ mensaje, onRetry }) => (
+  <div className="flex flex-col items-center gap-3 rounded-xl border border-red-100 bg-red-50 p-6 text-center">
+    <div className="flex items-center gap-2 text-sm text-red-700">
+      <AlertCircle className="h-4 w-4" />
+      {mensaje}
+    </div>
+    <button
+      type="button"
+      onClick={onRetry}
+      className="inline-flex items-center gap-1 rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100"
+    >
+      <RefreshCw className="h-3 w-3" />
+      Reintentar
+    </button>
+  </div>
+);
+
+const EstadoVacio: React.FC<{ mensaje: string }> = ({ mensaje }) => (
+  <div className="rounded-xl border border-dashed border-slate-200 p-8 text-center">
+    <p className="text-sm text-slate-500">{mensaje}</p>
+  </div>
+);
+
+// ---- Página ----
 
 export const AdminReportsPage: React.FC = () => {
-  const [startDate, setStartDate] = useState('2026-09-01');
-  const [endDate, setEndDate] = useState('2026-09-30');
+  const [startDate, setStartDate] = useState(primerDiaDelMes);
+  const [endDate, setEndDate] = useState(ultimoDiaDelMes);
 
-  const filteredAppointments = mockAppointments.filter((appointment) => {
-    const appointmentDate = new Date(`${appointment.date}T00:00:00`);
+  const [reporteCitas, setReporteCitas] = useState<ReporteCitas | null>(null);
+  const [cargandoCitas, setCargandoCitas] = useState(true);
+  const [errorCitas, setErrorCitas] = useState<string | null>(null);
 
-    const start = startDate
-      ? new Date(`${startDate}T00:00:00`)
-      : null;
+  const [ranking, setRanking] = useState<VeterinarioRanking[]>([]);
+  const [especies, setEspecies] = useState<MascotasPorEspecie[]>([]);
+  const [cargandoGenerales, setCargandoGenerales] = useState(true);
+  const [errorGenerales, setErrorGenerales] = useState<string | null>(null);
 
-    const end = endDate
-      ? new Date(`${endDate}T23:59:59`)
-      : null;
+  const rangoInvalido = Boolean(startDate && endDate && startDate > endDate);
+  const rangoIncompleto = !startDate || !endDate;
 
-    return (
-      (!start || appointmentDate >= start) &&
-      (!end || appointmentDate <= end)
-    );
-  });
+  const cargarCitas = useCallback(async () => {
+    if (rangoInvalido || rangoIncompleto) return;
+    setCargandoCitas(true);
+    setErrorCitas(null);
+    try {
+      setReporteCitas(await getReporteCitas(startDate, endDate));
+    } catch (error) {
+      setErrorCitas(mensajeDeError(error));
+    } finally {
+      setCargandoCitas(false);
+    }
+  }, [startDate, endDate, rangoInvalido, rangoIncompleto]);
 
-  const downloadCsv = (filename: string, content: string) => {
-    const blob = new Blob([content], {
-      type: 'text/csv;charset=utf-8;',
-    });
-
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-
-    link.href = url;
-    link.download = filename;
-    link.click();
-
-    URL.revokeObjectURL(url);
-  };
-
-  const exportAppointments = () => {
-    const headers = [
-      'Fecha',
-      'Propietario',
-      'Mascota',
-      'Veterinario',
-      'Especialidad',
-      'Estado',
-    ];
-
-    const rows = filteredAppointments.map((appointment) => [
-      appointment.date,
-      appointment.owner,
-      appointment.pet,
-      appointment.veterinarian,
-      appointment.specialty,
-      appointment.status,
-    ]);
-
-    const csv = [
-      headers.join(','),
-      ...rows.map((row) => row.map((value) => `"${value}"`).join(',')),
-    ].join('\n');
-
-    downloadCsv('reporte-citas.csv', csv);
-  };
-
-  const exportVeterinarians = () => {
-    const headers = [
-      'Posición',
-      'Veterinario',
-      'Especialidad',
-      'Atenciones',
-    ];
-
-    const rows = [...mockVeterinarians]
-      .sort((a, b) => b.appointments - a.appointments)
-      .map((veterinarian, index) => [
-        index + 1,
-        veterinarian.name,
-        veterinarian.specialty,
-        veterinarian.appointments,
+  const cargarGenerales = useCallback(async () => {
+    setCargandoGenerales(true);
+    setErrorGenerales(null);
+    try {
+      const [rankingData, especiesData] = await Promise.all([
+        getRankingVeterinarios(),
+        getMascotasPorEspecie(),
       ]);
+      setRanking(rankingData);
+      setEspecies(especiesData);
+    } catch (error) {
+      setErrorGenerales(mensajeDeError(error));
+    } finally {
+      setCargandoGenerales(false);
+    }
+  }, []);
 
-    const csv = [
-      headers.join(','),
-      ...rows.map((row) => row.map((value) => `"${value}"`).join(',')),
-    ].join('\n');
+  useEffect(() => {
+    cargarCitas();
+  }, [cargarCitas]);
 
-    downloadCsv('ranking-veterinarios.csv', csv);
+  useEffect(() => {
+    cargarGenerales();
+  }, [cargarGenerales]);
+
+  const totalMascotas = especies.reduce((sum, item) => sum + item.cantidad, 0);
+  const maxAtenciones = Math.max(1, ...ranking.map((vet) => vet.atenciones));
+  const contarEstado = (estado: string) =>
+    reporteCitas?.porEstado.find((item) => item.estado === estado)?.cantidad ?? 0;
+
+  // ---- Exportación CSV con datos reales ----
+
+  const exportCitas = () => {
+    if (!reporteCitas) return;
+    downloadCsv(
+      `reporte-citas_${reporteCitas.fechaInicio}_${reporteCitas.fechaFin}.csv`,
+      ['Estado', 'Cantidad', 'Porcentaje'],
+      [
+        ...reporteCitas.porEstado.map((item) => [
+          item.etiqueta,
+          item.cantidad,
+          `${porcentaje(item.cantidad, reporteCitas.total).toFixed(1)}%`,
+        ]),
+        ['Total', reporteCitas.total, '100%'],
+      ],
+    );
   };
 
-  const exportSpecies = () => {
-    const headers = ['Especie', 'Mascotas atendidas'];
-
-    const rows = mockSpecies.map((item) => [
-      item.species,
-      item.count,
-    ]);
-
-    const csv = [
-      headers.join(','),
-      ...rows.map((row) => row.map((value) => `"${value}"`).join(',')),
-    ].join('\n');
-
-    downloadCsv('estadisticas-especies.csv', csv);
+  const exportVeterinarios = () => {
+    downloadCsv(
+      'ranking-veterinarios.csv',
+      ['Posición', 'Veterinario', 'Atenciones'],
+      ranking.map((vet, index) => [index + 1, vet.nombre, vet.atenciones]),
+    );
   };
+
+  const exportEspecies = () => {
+    downloadCsv(
+      'mascotas-por-especie.csv',
+      ['Especie', 'Mascotas', 'Porcentaje'],
+      especies.map((item) => [
+        item.especie,
+        item.cantidad,
+        `${porcentaje(item.cantidad, totalMascotas).toFixed(1)}%`,
+      ]),
+    );
+  };
+
+  const tarjetas = [
+    {
+      titulo: 'Citas del período',
+      valor: reporteCitas?.total,
+      detalle: 'Total registradas',
+      icono: <CalendarDays size={24} />,
+    },
+    {
+      titulo: 'Citas atendidas',
+      valor: reporteCitas ? contarEstado('ATENDIDA') : undefined,
+      detalle: 'En el período seleccionado',
+      icono: <Stethoscope size={24} />,
+    },
+    {
+      titulo: 'Citas canceladas',
+      valor: reporteCitas ? contarEstado('CANCELADA') : undefined,
+      detalle: 'En el período seleccionado',
+      icono: <BarChart3 size={24} />,
+    },
+    {
+      titulo: 'Mascotas activas',
+      valor: cargandoGenerales || errorGenerales ? undefined : totalMascotas,
+      detalle: 'Registradas en el sistema',
+      icono: <PawPrint size={24} />,
+    },
+  ];
 
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-800">
-          Reportes y Estadísticas
-        </h1>
-
+        <h1 className="text-2xl font-bold text-slate-800">Reportes y Estadísticas</h1>
         <p className="mt-1 text-sm text-slate-500">
           Consulta información estadística y reportes del sistema veterinario.
         </p>
       </div>
 
+      {/* Filtro por período */}
       <div className="rounded-2xl bg-white p-6 shadow-sm">
         <div className="mb-5">
-          <h2 className="text-lg font-bold text-slate-800">
-            Filtro por período
-          </h2>
-
+          <h2 className="text-lg font-bold text-slate-800">Filtro por período</h2>
           <p className="mt-1 text-sm text-slate-500">
-            Selecciona el período que deseas consultar en los reportes.
+            Selecciona el período que deseas consultar en el reporte de citas.
           </p>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
           <div>
-            <label
-              htmlFor="startDate"
-              className="mb-2 block text-sm font-medium text-slate-700"
-            >
+            <label htmlFor="startDate" className="mb-2 block text-sm font-medium text-slate-700">
               Fecha de inicio
             </label>
-
             <input
               id="startDate"
               type="date"
               value={startDate}
+              max={endDate || undefined}
               onChange={(event) => setStartDate(event.target.value)}
               className="w-full rounded-lg border border-slate-200 px-4 py-2 text-sm outline-none transition focus:border-slate-400"
             />
           </div>
 
           <div>
-            <label
-              htmlFor="endDate"
-              className="mb-2 block text-sm font-medium text-slate-700"
-            >
+            <label htmlFor="endDate" className="mb-2 block text-sm font-medium text-slate-700">
               Fecha de fin
             </label>
-
             <input
               id="endDate"
               type="date"
               value={endDate}
+              min={startDate || undefined}
               onChange={(event) => setEndDate(event.target.value)}
               className="w-full rounded-lg border border-slate-200 px-4 py-2 text-sm outline-none transition focus:border-slate-400"
             />
           </div>
         </div>
-      </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-2xl bg-white p-5 shadow-sm">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-700">
-            <CalendarDays size={24} />
-          </div>
-
-          <h2 className="mt-4 text-lg font-bold text-slate-800">
-            Citas por período
-          </h2>
-
-          <p className="mt-2 text-sm text-slate-500">
-            Consulta las citas registradas durante un período determinado.
+        {rangoInvalido && (
+          <p className="mt-3 text-sm text-red-600">
+            La fecha de inicio no puede ser posterior a la fecha de fin.
           </p>
-        </div>
-
-        <div className="rounded-2xl bg-white p-5 shadow-sm">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-700">
-            <Stethoscope size={24} />
-          </div>
-
-          <h2 className="mt-4 text-lg font-bold text-slate-800">
-            Veterinarios más solicitados
-          </h2>
-
-          <p className="mt-2 text-sm text-slate-500">
-            Consulta el ranking de veterinarios según las atenciones.
-          </p>
-        </div>
-
-        <div className="rounded-2xl bg-white p-5 shadow-sm">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-700">
-            <PawPrint size={24} />
-          </div>
-
-          <h2 className="mt-4 text-lg font-bold text-slate-800">
-            Mascotas por especie
-          </h2>
-
-          <p className="mt-2 text-sm text-slate-500">
-            Visualiza las mascotas atendidas agrupadas por especie.
-          </p>
-        </div>
-
-        <div className="rounded-2xl bg-white p-5 shadow-sm">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-700">
-            <BarChart3 size={24} />
-          </div>
-
-          <h2 className="mt-4 text-lg font-bold text-slate-800">
-            Estadísticas generales
-          </h2>
-
-          <p className="mt-2 text-sm text-slate-500">
-            Consulta los principales indicadores del sistema.
-          </p>
-        </div>
-      </div>
-
-      <div className="rounded-2xl bg-white p-6 shadow-sm">
-        <div className="mb-5 flex flex-col gap-1">
-          <h2 className="text-lg font-bold text-slate-800">
-            Citas por período
-          </h2>
-
-          <p className="text-sm text-slate-500">
-            Citas registradas entre {startDate} y {endDate}.
-          </p>
-
-          <p className="mt-2 text-sm font-medium text-slate-700">
-            Citas encontradas: {filteredAppointments.length}
-          </p>
-        </div>
-
-        {filteredAppointments.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[900px] text-left text-sm">
-              <thead>
-                <tr className="border-b border-slate-200">
-                  <th className="px-4 py-3 font-semibold text-slate-700">
-                    Fecha
-                  </th>
-
-                  <th className="px-4 py-3 font-semibold text-slate-700">
-                    Propietario
-                  </th>
-
-                  <th className="px-4 py-3 font-semibold text-slate-700">
-                    Mascota
-                  </th>
-
-                  <th className="px-4 py-3 font-semibold text-slate-700">
-                    Veterinario
-                  </th>
-
-                  <th className="px-4 py-3 font-semibold text-slate-700">
-                    Especialidad
-                  </th>
-
-                  <th className="px-4 py-3 font-semibold text-slate-700">
-                    Estado
-                  </th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {filteredAppointments.map((appointment) => (
-                  <tr
-                    key={appointment.id}
-                    className="border-b border-slate-100 last:border-b-0"
-                  >
-                    <td className="px-4 py-4 text-slate-600">
-                      {appointment.date}
-                    </td>
-
-                    <td className="px-4 py-4 text-slate-600">
-                      {appointment.owner}
-                    </td>
-
-                    <td className="px-4 py-4 font-medium text-slate-800">
-                      {appointment.pet}
-                    </td>
-
-                    <td className="px-4 py-4 text-slate-600">
-                      {appointment.veterinarian}
-                    </td>
-
-                    <td className="px-4 py-4 text-slate-600">
-                      {appointment.specialty}
-                    </td>
-
-                    <td className="px-4 py-4">
-                      <span
-                        className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
-                          appointment.status === 'Atendida'
-                            ? 'bg-slate-100 text-slate-700'
-                            : 'bg-amber-100 text-amber-700'
-                        }`}
-                      >
-                        {appointment.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className="rounded-xl border border-dashed border-slate-200 p-8 text-center">
-            <p className="text-sm text-slate-500">
-              No se encontraron citas para el período seleccionado.
-            </p>
-          </div>
+        )}
+        {rangoIncompleto && (
+          <p className="mt-3 text-sm text-amber-600">Selecciona ambas fechas para ver el reporte.</p>
         )}
       </div>
 
-      <div className="rounded-2xl bg-white p-6 shadow-sm">
-        <div className="mb-5">
-          <h2 className="text-lg font-bold text-slate-800">
-            Veterinarios más solicitados
-          </h2>
-
-          <p className="mt-1 text-sm text-slate-500">
-            Ranking de veterinarios según la cantidad de atenciones registradas.
-          </p>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[600px] text-left text-sm">
-            <thead>
-              <tr className="border-b border-slate-200">
-                <th className="px-4 py-3 font-semibold text-slate-700">
-                  Posición
-                </th>
-
-                <th className="px-4 py-3 font-semibold text-slate-700">
-                  Veterinario
-                </th>
-
-                <th className="px-4 py-3 font-semibold text-slate-700">
-                  Especialidad
-                </th>
-
-                <th className="px-4 py-3 text-center font-semibold text-slate-700">
-                  Atenciones
-                </th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {[...mockVeterinarians]
-                .sort((a, b) => b.appointments - a.appointments)
-                .map((veterinarian, index) => (
-                  <tr
-                    key={veterinarian.id}
-                    className="border-b border-slate-100 last:border-b-0"
-                  >
-                    <td className="px-4 py-4 font-semibold text-slate-700">
-                      #{index + 1}
-                    </td>
-
-                    <td className="px-4 py-4 font-medium text-slate-800">
-                      {veterinarian.name}
-                    </td>
-
-                    <td className="px-4 py-4 text-slate-600">
-                      {veterinarian.specialty}
-                    </td>
-
-                    <td className="px-4 py-4 text-center font-semibold text-slate-800">
-                      {veterinarian.appointments}
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div className="rounded-2xl bg-white p-6 shadow-sm">
-        <div className="mb-5">
-          <h2 className="text-lg font-bold text-slate-800">
-            Mascotas atendidas por especie
-          </h2>
-
-          <p className="mt-1 text-sm text-slate-500">
-            Distribución de mascotas atendidas agrupadas por especie.
-          </p>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {mockSpecies.map((item) => (
-            <div
-              key={item.species}
-              className="rounded-xl border border-slate-200 p-5"
-            >
-              <p className="text-sm font-medium text-slate-500">
-                {item.species}
-              </p>
-
-              <p className="mt-2 text-3xl font-bold text-slate-800">
-                {item.count}
-              </p>
-
-              <p className="mt-1 text-xs text-slate-500">
-                mascotas atendidas
-              </p>
+      {/* Tarjetas resumen */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {tarjetas.map((tarjeta) => (
+          <div key={tarjeta.titulo} className="rounded-2xl bg-white p-5 shadow-sm">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-700">
+              {tarjeta.icono}
             </div>
-          ))}
-        </div>
-
-        <div className="mt-6 overflow-x-auto">
-          <table className="w-full min-w-[500px] text-left text-sm">
-            <thead>
-              <tr className="border-b border-slate-200">
-                <th className="px-4 py-3 font-semibold text-slate-700">
-                  Especie
-                </th>
-
-                <th className="px-4 py-3 text-center font-semibold text-slate-700">
-                  Mascotas atendidas
-                </th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {mockSpecies.map((item) => (
-                <tr
-                  key={item.species}
-                  className="border-b border-slate-100 last:border-b-0"
-                >
-                  <td className="px-4 py-4 font-medium text-slate-800">
-                    {item.species}
-                  </td>
-
-                  <td className="px-4 py-4 text-center font-semibold text-slate-700">
-                    {item.count}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            <p className="mt-4 text-sm font-medium text-slate-500">{tarjeta.titulo}</p>
+            <p className="mt-1 text-3xl font-bold text-slate-800">{tarjeta.valor ?? '—'}</p>
+            <p className="mt-1 text-xs text-slate-400">{tarjeta.detalle}</p>
+          </div>
+        ))}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-2xl bg-white p-6 shadow-sm">
-          <div className="mb-5">
-            <h2 className="text-lg font-bold text-slate-800">
-              Atenciones por veterinario
-            </h2>
-
-            <p className="mt-1 text-sm text-slate-500">
-              Visualización de las atenciones registradas por veterinario.
-            </p>
-          </div>
-
-          <div className="flex h-64 items-end gap-4 border-b border-l border-slate-200 px-4 pb-0">
-            {mockVeterinarians.map((veterinarian) => {
-              const maxAppointments = Math.max(
-                ...mockVeterinarians.map((item) => item.appointments)
-              );
-
-              const height =
-                (veterinarian.appointments / maxAppointments) * 100;
-
-              return (
-                <div
-                  key={veterinarian.id}
-                  className="flex h-full flex-1 flex-col items-center justify-end gap-2"
-                >
-                  <span className="text-xs font-semibold text-slate-700">
-                    {veterinarian.appointments}
-                  </span>
-
-                  <div
-                    className="w-full rounded-t-lg bg-slate-500"
-                    style={{ height: `${height}%` }}
-                    title={`${veterinarian.name}: ${veterinarian.appointments} atenciones`}
-                  />
-
-                  <span className="w-full truncate text-center text-xs text-slate-500">
-                    {veterinarian.name
-                      .replace('Dr. ', '')
-                      .replace('Dra. ', '')}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
+      {/* Citas por estado */}
+      <div className="rounded-2xl bg-white p-6 shadow-sm">
+        <div className="mb-5 flex flex-col gap-1">
+          <h2 className="text-lg font-bold text-slate-800">Citas por período</h2>
+          <p className="text-sm text-slate-500">
+            Citas registradas entre {startDate || '—'} y {endDate || '—'}, agrupadas por estado.
+          </p>
         </div>
 
-        <div className="rounded-2xl bg-white p-6 shadow-sm">
-          <div className="mb-5">
-            <h2 className="text-lg font-bold text-slate-800">
-              Mascotas por especie
-            </h2>
-
-            <p className="mt-1 text-sm text-slate-500">
-              Visualización de mascotas atendidas agrupadas por especie.
-            </p>
-          </div>
-
+        {rangoInvalido || rangoIncompleto ? (
+          <EstadoVacio mensaje="Corrige el período seleccionado para consultar el reporte." />
+        ) : cargandoCitas ? (
+          <EstadoCarga />
+        ) : errorCitas ? (
+          <EstadoError mensaje={errorCitas} onRetry={cargarCitas} />
+        ) : !reporteCitas || reporteCitas.total === 0 ? (
+          <EstadoVacio mensaje="No se encontraron citas para el período seleccionado." />
+        ) : (
           <div className="flex flex-col gap-5">
-            {mockSpecies.map((item) => {
-              const total = mockSpecies.reduce(
-                (sum, species) => sum + species.count,
-                0
-              );
-
-              const percentage = (item.count / total) * 100;
-
+            {reporteCitas.porEstado.map((item) => {
+              const pct = porcentaje(item.cantidad, reporteCitas.total);
               return (
-                <div key={item.species}>
+                <div key={item.estado}>
                   <div className="mb-2 flex items-center justify-between">
-                    <span className="text-sm font-medium text-slate-700">
-                      {item.species}
-                    </span>
-
+                    <span className="text-sm font-medium text-slate-700">{item.etiqueta}</span>
                     <span className="text-sm font-semibold text-slate-800">
-                      {item.count} ({percentage.toFixed(1)}%)
+                      {item.cantidad} ({pct.toFixed(1)}%)
                     </span>
                   </div>
-
                   <div className="h-3 overflow-hidden rounded-full bg-slate-100">
                     <div
-                      className="h-full rounded-full bg-slate-500"
-                      style={{ width: `${percentage}%` }}
+                      className={`h-full rounded-full ${COLORES_ESTADO[item.estado] ?? 'bg-slate-500'}`}
+                      style={{ width: `${pct}%` }}
                     />
                   </div>
                 </div>
               );
             })}
+            <p className="text-sm font-medium text-slate-700">
+              Total de citas: {reporteCitas.total}
+            </p>
           </div>
-        </div>
+        )}
       </div>
 
+      {/* Ranking de veterinarios + Mascotas por especie */}
+      {cargandoGenerales ? (
+        <div className="rounded-2xl bg-white p-6 shadow-sm">
+          <EstadoCarga />
+        </div>
+      ) : errorGenerales ? (
+        <div className="rounded-2xl bg-white p-6 shadow-sm">
+          <EstadoError mensaje={errorGenerales} onRetry={cargarGenerales} />
+        </div>
+      ) : (
+        <div className="grid gap-6 lg:grid-cols-2">
+          <div className="rounded-2xl bg-white p-6 shadow-sm">
+            <div className="mb-5">
+              <h2 className="text-lg font-bold text-slate-800">Veterinarios más solicitados</h2>
+              <p className="mt-1 text-sm text-slate-500">
+                Ranking según la cantidad de citas atendidas (histórico).
+              </p>
+            </div>
+
+            {ranking.length === 0 ? (
+              <EstadoVacio mensaje="Aún no hay citas atendidas para generar el ranking." />
+            ) : (
+              <div className="flex flex-col gap-4">
+                {ranking.map((vet, index) => (
+                  <div key={vet.id}>
+                    <div className="mb-2 flex items-center justify-between gap-2">
+                      <span className="truncate text-sm font-medium text-slate-800">
+                        <span className="mr-2 font-semibold text-slate-500">#{index + 1}</span>
+                        {vet.nombre}
+                      </span>
+                      <span className="shrink-0 text-sm font-semibold text-slate-800">
+                        {vet.atenciones} {vet.atenciones === 1 ? 'atención' : 'atenciones'}
+                      </span>
+                    </div>
+                    <div className="h-3 overflow-hidden rounded-full bg-slate-100">
+                      <div
+                        className="h-full rounded-full bg-blue-500"
+                        style={{ width: `${(vet.atenciones / maxAtenciones) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="rounded-2xl bg-white p-6 shadow-sm">
+            <div className="mb-5">
+              <h2 className="text-lg font-bold text-slate-800">Mascotas por especie</h2>
+              <p className="mt-1 text-sm text-slate-500">
+                Distribución de mascotas activas registradas en el sistema.
+              </p>
+            </div>
+
+            {especies.length === 0 ? (
+              <EstadoVacio mensaje="Aún no hay mascotas registradas." />
+            ) : (
+              <div className="flex flex-col gap-5">
+                {especies.map((item) => {
+                  const pct = porcentaje(item.cantidad, totalMascotas);
+                  return (
+                    <div key={item.especie}>
+                      <div className="mb-2 flex items-center justify-between">
+                        <span className="text-sm font-medium text-slate-700">{item.especie}</span>
+                        <span className="text-sm font-semibold text-slate-800">
+                          {item.cantidad} ({pct.toFixed(1)}%)
+                        </span>
+                      </div>
+                      <div className="h-3 overflow-hidden rounded-full bg-slate-100">
+                        <div
+                          className="h-full rounded-full bg-emerald-500"
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Exportación */}
       <div className="rounded-2xl bg-white p-6 shadow-sm">
         <div className="mb-5">
-          <h2 className="text-lg font-bold text-slate-800">
-            Exportar reportes
-          </h2>
-
+          <h2 className="text-lg font-bold text-slate-800">Exportar reportes</h2>
           <p className="mt-1 text-sm text-slate-500">
-            Descarga los reportes generados en formato CSV.
+            Descarga los reportes con los datos actuales en formato CSV.
           </p>
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
           <button
             type="button"
-            onClick={exportAppointments}
-            className="rounded-xl border border-slate-200 p-4 text-left transition hover:bg-slate-50"
+            onClick={exportCitas}
+            disabled={!reporteCitas || cargandoCitas || Boolean(errorCitas) || rangoInvalido}
+            className="rounded-xl border border-slate-200 p-4 text-left transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <p className="font-semibold text-slate-800">
-              Exportar citas
-            </p>
-
-            <p className="mt-1 text-sm text-slate-500">
-              Descargar las citas del período seleccionado.
-            </p>
+            <p className="font-semibold text-slate-800">Exportar citas</p>
+            <p className="mt-1 text-sm text-slate-500">Resumen por estado del período seleccionado.</p>
           </button>
 
           <button
             type="button"
-            onClick={exportVeterinarians}
-            className="rounded-xl border border-slate-200 p-4 text-left transition hover:bg-slate-50"
+            onClick={exportVeterinarios}
+            disabled={cargandoGenerales || Boolean(errorGenerales) || ranking.length === 0}
+            className="rounded-xl border border-slate-200 p-4 text-left transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <p className="font-semibold text-slate-800">
-              Exportar veterinarios
-            </p>
-
-            <p className="mt-1 text-sm text-slate-500">
-              Descargar el ranking de veterinarios.
-            </p>
+            <p className="font-semibold text-slate-800">Exportar veterinarios</p>
+            <p className="mt-1 text-sm text-slate-500">Ranking de veterinarios por atenciones.</p>
           </button>
 
           <button
             type="button"
-            onClick={exportSpecies}
-            className="rounded-xl border border-slate-200 p-4 text-left transition hover:bg-slate-50"
+            onClick={exportEspecies}
+            disabled={cargandoGenerales || Boolean(errorGenerales) || especies.length === 0}
+            className="rounded-xl border border-slate-200 p-4 text-left transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <p className="font-semibold text-slate-800">
-              Exportar especies
-            </p>
-
-            <p className="mt-1 text-sm text-slate-500">
-              Descargar las estadísticas por especie.
-            </p>
+            <p className="font-semibold text-slate-800">Exportar especies</p>
+            <p className="mt-1 text-sm text-slate-500">Mascotas activas agrupadas por especie.</p>
           </button>
         </div>
       </div>
