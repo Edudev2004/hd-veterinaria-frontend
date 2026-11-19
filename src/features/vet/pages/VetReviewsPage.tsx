@@ -32,15 +32,29 @@ export const VetReviewsPage: React.FC = () => {
   const [promedio, setPromedio] = useState(0);
   const [filtro, setFiltro] = useState<FiltroEstrellas>('todas');
   const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    Promise.all([vetReviewsService.getMisValoraciones(), vetReviewsService.getPromedioValoraciones()]).then(
-      ([lista, prom]) => {
-        setValoraciones(lista);
-        setPromedio(prom);
-        setCargando(false);
-      }
-    );
+    let activo = true;
+
+    vetReviewsService
+      .getMisValoraciones()
+      .then((resumen) => {
+        if (!activo) return;
+        setValoraciones(resumen.valoraciones);
+        setPromedio(resumen.promedio);
+      })
+      .catch((e: unknown) => {
+        if (!activo) return;
+        setError(e instanceof Error ? e.message : 'No se pudieron cargar las valoraciones.');
+      })
+      .finally(() => {
+        if (activo) setCargando(false);
+      });
+
+    return () => {
+      activo = false;
+    };
   }, []);
 
   const distribucion = useMemo(() => {
