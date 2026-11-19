@@ -134,30 +134,14 @@ export const getCitaById = async (
 };
 
 export const marcarCitaComoAtendida = async (
-  citaId: string,
-  veterinarioId: string
-): Promise<CitaAgenda | null> => {
-  await new Promise((resolve) => setTimeout(resolve, 200));
-
-  const citas = getStoredCitas();
-  const indice = citas.findIndex(
-    (cita) =>
-      cita.id === citaId && cita.veterinario_id === veterinarioId
+  citaId: string
+): Promise<CitaAgenda> => {
+  const cita = await apiRequest<AppointmentApiDTO>(
+    `/api/citas/${citaId}/atendida`,
+    { method: 'PATCH' }
   );
 
-  if (indice < 0) {
-    return null;
-  }
-
-  const citaActualizada: CitaAgenda = {
-    ...citas[indice],
-    estado: 'atendida'
-  };
-
-  citas[indice] = citaActualizada;
-  saveStoredCitas(citas);
-
-  return citaActualizada;
+  return toCitaAgenda(cita);
 };
 
 export const marcarCitaComoNoAtendida = async (
