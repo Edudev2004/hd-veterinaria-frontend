@@ -105,113 +105,52 @@ export const VetConsultationsPage: React.FC = () => {
     setCitaExpandidaId((idActual) => (idActual === id ? null : id));
   };
 
-  const confirmarCitaAtendida = async (): Promise<void> => {
-    if (!user || !citaPorConfirmar) {
-      return;
-    }
-
-    setMarcandoAtendida(true);
-
-    try {
-      const citaActualizada = await vetScheduleService.marcarCitaComoAtendida(
-        citaPorConfirmar.id,
-        user.id,
-      );
-
-      if (!citaActualizada) {
-        return;
-      }
-
-      vetConsultationService.limpiarAtencionActiva(
-        user.id,
-        citaPorConfirmar.id,
-      );
-
-      setCitasEnCurso((citas) =>
-        citas.filter((cita) => cita.id !== citaPorConfirmar.id),
-      );
-
-      setCitaExpandidaId(null);
-      setMensajeAccion(
-        `${citaPorConfirmar.mascota.nombre} fue marcada como atendida.`,
-      );
-      setCitaPorConfirmar(null);
-    } finally {
-      setMarcandoAtendida(false);
-    }
-  };
-
-  const confirmarCitaNoAtendida = async (): Promise<void> => {
-    if (!user || !citaPorNoAtender) {
-      return;
-    }
-
-    setMarcandoNoAtendida(true);
-
-    try {
-      const citaActualizada =
-        await vetScheduleService.marcarCitaComoNoAtendida(
-          citaPorNoAtender.id,
-          user.id,
-        );
-
-      if (!citaActualizada) {
-        return;
-      }
-
-      vetConsultationService.limpiarAtencionActiva(
-        user.id,
-        citaPorNoAtender.id,
-      );
-
-      setCitasEnCurso((citas) =>
-        citas.filter((cita) => cita.id !== citaPorNoAtender.id),
-      );
-
-      setCitaExpandidaId(null);
-      setMensajeAccion(
-        `${citaPorNoAtender.mascota.nombre} fue marcada como no atendida.`,
-      );
-      setCitaPorNoAtender(null);
-    } finally {
-      setMarcandoNoAtendida(false);
-    }
-  };
-
-  const guardarRegistro = async (
-    citaSeleccionada: CitaAgenda,
-    values: {
-      diagnostico: string;
-      tratamiento: string;
-      notas: string;
-    },
+  const guardarConsulta = async (
+    cita: CitaAgenda,
+    values: ValoresConsulta,
   ): Promise<void> => {
     if (!user) {
       return;
     }
 
-    setCitaGuardandoId(citaSeleccionada.id);
-    setMensajesExito((mensajes) => ({
-      ...mensajes,
-      [citaSeleccionada.id]: "",
-    }));
+    setCitaGuardandoId(cita.id);
+    setErrorAccion("");
+    setMensajeAccion("");
 
     try {
-      const registroGuardado = await vetConsultationService.guardarAtencion({
-        citaId: citaSeleccionada.id,
-        veterinarioId: user.id,
+      // El backend solo acepta la consulta en citas ya ATENDIDAS:
+      // primero se marca la cita y luego se registra el diagnóstico.
+      if (cita.estado === "pendiente") {
+        const citaAtendida = await vetScheduleService.marcarCitaComoAtendida(
+          cita.id,
+        );
+
+        // Si el diagnóstico falla, la cita ya quedó atendida y se reintenta solo la consulta.
+        setCitasEnCurso((citas) =>
+          citas.map((item) =>
+            item.id === cita.id ? { ...item, estado: citaAtendida.estado } : item,
+          ),
+        );
+      }
+
+      await vetConsultationService.registrarConsulta({
+        citaId: cita.id,
         ...values,
       });
 
-      setRegistros((registrosActuales) => ({
-        ...registrosActuales,
-        [citaSeleccionada.id]: registroGuardado,
-      }));
+      vetConsultationService.limpiarAtencionActiva(user.id, cita.id);
 
-      setMensajesExito((mensajes) => ({
-        ...mensajes,
-        [citaSeleccionada.id]: "Atención registrada correctamente.",
-      }));
+      setCitasEnCurso((citas) => citas.filter((item) => item.id !== cita.id));
+      setCitaExpandidaId(null);
+      setMensajeAccion(
+        `${cita.mascota.nombre} fue marcada como atendida y su consulta quedó registrada.`,
+      );
+    } catch (error) {
+      setErrorAccion(
+        error instanceof Error
+          ? error.message
+          : "No se pudo registrar la consulta.",
+      );
     } finally {
       setCitaGuardandoId(null);
     }
