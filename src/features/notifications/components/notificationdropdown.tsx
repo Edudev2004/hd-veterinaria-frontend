@@ -28,6 +28,15 @@ export const NotificationDropdown: React.FC = () => {
 
   useEffect(() => {
     void cargarNotificaciones();
+
+    const handleSync = () => {
+      void cargarNotificaciones();
+    };
+
+    window.addEventListener('notifications-updated', handleSync);
+    return () => {
+      window.removeEventListener('notifications-updated', handleSync);
+    };
   }, [cargarNotificaciones]);
 
   const handleMarcarLeida = async (id: string) => {
