@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { AlertTriangle, X } from 'lucide-react';
 
 interface MarkAsNotAttendedDialogProps {
@@ -5,7 +6,7 @@ interface MarkAsNotAttendedDialogProps {
   nombreMascota: string;
   cargando?: boolean;
   onCancelar: () => void;
-  onConfirmar: () => void;
+  onConfirmar: (motivo: string) => void;
 }
 
 function MarkAsNotAttendedDialog(props: MarkAsNotAttendedDialogProps) {
@@ -17,9 +18,19 @@ function MarkAsNotAttendedDialog(props: MarkAsNotAttendedDialogProps) {
     onConfirmar
   } = props;
 
+  const [motivo, setMotivo] = useState('');
+
+  useEffect(() => {
+    if (!abierto) {
+      setMotivo('');
+    }
+  }, [abierto]);
+
   if (!abierto) {
     return null;
   }
+
+  const motivoValido = motivo.trim().length >= 5;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4">
@@ -72,7 +83,7 @@ function MarkAsNotAttendedDialog(props: MarkAsNotAttendedDialogProps) {
 
           <button
             type="button"
-            onClick={onConfirmar}
+            onClick={() => onConfirmar(motivo)}
             disabled={cargando}
             className="rounded-xl bg-amber-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
