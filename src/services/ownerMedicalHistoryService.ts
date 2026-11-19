@@ -1,4 +1,4 @@
-import { apiRequest } from './apiClient';
+import { apiRequestWithTimeout } from './apiClient';
 import {
   EntradaHistorialClinico,
   HistorialMascotaResumen,
@@ -31,7 +31,7 @@ interface MedicalHistoryEntryResponse {
   consultationReason: string | null;
   diagnosis: string;
   details: string | null;
-  treatment: string;
+  treatment: string | null;
   notes: string | null;
   createdAt: string;
 }
@@ -79,7 +79,7 @@ const toEntradaHistorial = (
   mascota,
   motivo_consulta: entry.consultationReason,
   diagnostico: entry.diagnosis,
-  tratamiento: entry.treatment,
+  tratamiento: entry.treatment ?? '',
   observaciones: entry.notes ?? '',
   datos: entry.details,
   created_at: entry.createdAt
@@ -92,8 +92,10 @@ export const getHistorialClinicoPropietario = async (
     throw new Error('No se recibió el identificador de la mascota.');
   }
 
-  const response = await apiRequest<MedicalHistoryResponse>(
-    `/api/mascotas/${encodeURIComponent(mascotaId)}/historial`
+  const response = await apiRequestWithTimeout<MedicalHistoryResponse>(
+    `/api/mascotas/${encodeURIComponent(mascotaId)}/historial`,
+    {},
+    15000
   );
   const mascota = toMascotaExpediente(response.pet);
   const entries = response.entries ?? response.entradas ?? [];

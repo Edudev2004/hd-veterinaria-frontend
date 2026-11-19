@@ -99,7 +99,7 @@ export const HistorialClinicoModal: React.FC<ModalHistorialClinicoProps> = ({
     return entradas.filter(
       (e) =>
         e.diagnostico.toLowerCase().includes(term) ||
-        e.tratamiento.toLowerCase().includes(term) ||
+        (e.tratamiento ?? '').toLowerCase().includes(term) ||
         e.observaciones.toLowerCase().includes(term) ||
         e.veterinario.nombre.toLowerCase().includes(term) ||
         e.veterinario.especialidad.toLowerCase().includes(term) ||

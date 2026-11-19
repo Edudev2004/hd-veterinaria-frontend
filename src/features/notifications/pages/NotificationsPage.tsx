@@ -8,6 +8,7 @@ export const NotificationsPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const loadReminders = useCallback(async () => {
+    setIsLoading(true);
     setError(null);
     try {
       setReminders(await notificationService.obtenerRecordatorios());

@@ -1,4 +1,4 @@
-import { apiRequest } from './apiClient';
+import { apiRequest, apiRequestWithTimeout } from './apiClient';
 import { Notificacion } from '../features/notifications/notification';
 
 interface NotificationResponse {
@@ -61,7 +61,11 @@ export const notificationService = {
   },
 
   async obtenerRecordatorios(): Promise<RecordatorioCita[]> {
-    const appointments = await apiRequest<ReminderAppointmentResponse[]>('/api/recordatorios');
+    const appointments = await apiRequestWithTimeout<ReminderAppointmentResponse[]>(
+      '/api/recordatorios',
+      {},
+      15000
+    );
     return appointments.map((appointment) => ({
       id: appointment.id,
       service: appointment.specialty?.name || appointment.reason || 'Cita veterinaria',
