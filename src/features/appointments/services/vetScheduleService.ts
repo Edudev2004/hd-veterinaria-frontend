@@ -1,4 +1,3 @@
-import citasSeed from '../mocks/citasVeterinario.json';
 import { ApiError, apiRequest } from '@/services/apiClient';
 import type {
   AppointmentApiDTO,
@@ -80,27 +79,6 @@ const toCitaAgenda = (dto: AppointmentApiDTO): CitaAgenda => {
     motivo_cancelacion: dto.cancellationReason ?? undefined,
     diagnostico: dto.diagnosis ?? null
   };
-};
-
-const STORAGE_CITAS_KEY = 'vethd_db_citas_veterinario';
-
-const getStoredCitas = (): CitaAgenda[] => {
-  const data = localStorage.getItem(STORAGE_CITAS_KEY);
-
-  if (!data) {
-    localStorage.setItem(STORAGE_CITAS_KEY, JSON.stringify(citasSeed));
-    return citasSeed as CitaAgenda[];
-  }
-
-  try {
-    return JSON.parse(data) as CitaAgenda[];
-  } catch {
-    return citasSeed as CitaAgenda[];
-  }
-};
-
-const saveStoredCitas = (citas: CitaAgenda[]): void => {
-  localStorage.setItem(STORAGE_CITAS_KEY, JSON.stringify(citas));
 };
 
 /**
