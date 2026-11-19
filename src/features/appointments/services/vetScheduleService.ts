@@ -48,6 +48,40 @@ const calcularEdad = (birthDate: string | null): string => {
   return `${meses} ${meses === 1 ? 'mes' : 'meses'}`;
 };
 
+const toCitaAgenda = (dto: AppointmentApiDTO): CitaAgenda => {
+  const owner = dto.owner;
+
+  return {
+    id: dto.id,
+    mascota_id: dto.pet.id,
+    veterinario_id: dto.veterinarian?.id ?? '',
+    fecha_hora: dto.scheduledAt,
+    estado: normalizarEstado(dto.status),
+    motivo: dto.reason ?? '',
+    created_at: dto.createdAt ?? dto.scheduledAt,
+    mascota: {
+      id: dto.pet.id,
+      nombre: dto.pet.name,
+      especie: dto.pet.species,
+      raza: dto.pet.breed ?? 'Sin raza registrada',
+      edad: calcularEdad(dto.pet.birthDate),
+      descripcion:
+        dto.pet.observations?.trim() || 'Sin observaciones registradas.',
+      fotoUrl: dto.pet.photoUrl ?? undefined
+    },
+    propietario: {
+      id: owner?.id ?? '',
+      nombre: owner
+        ? `${owner.firstName} ${owner.lastName}`.trim()
+        : 'Propietario no disponible',
+      telefono: owner?.phone ?? 'Sin teléfono',
+      fotoUrl: owner?.photoUrl ?? undefined
+    },
+    motivo_cancelacion: dto.cancellationReason ?? undefined,
+    diagnostico: dto.diagnosis ?? null
+  };
+};
+
 const STORAGE_CITAS_KEY = 'vethd_db_citas_veterinario';
 
 const getStoredCitas = (): CitaAgenda[] => {
