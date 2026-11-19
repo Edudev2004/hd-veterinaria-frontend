@@ -103,14 +103,15 @@ const saveStoredCitas = (citas: CitaAgenda[]): void => {
   localStorage.setItem(STORAGE_CITAS_KEY, JSON.stringify(citas));
 };
 
-export const getAgendaDiaria = async (
-  veterinarioId: string
-): Promise<CitaAgenda[]> => {
-  await new Promise((resolve) => setTimeout(resolve, 250));
-
-  return getStoredCitas().filter(
-    (cita) => cita.veterinario_id === veterinarioId
+/**
+ * Agenda del veterinario autenticado para una fecha (YYYY-MM-DD).
+ */
+export const getAgendaDiaria = async (fecha: string): Promise<CitaAgenda[]> => {
+  const citas = await apiRequest<AppointmentApiDTO[]>(
+    `/api/veterinarios/me/agenda?fecha=${encodeURIComponent(fecha)}`
   );
+
+  return citas.map(toCitaAgenda);
 };
 
 export const getCitaById = async (
