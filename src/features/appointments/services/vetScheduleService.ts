@@ -6,6 +6,17 @@ import type {
   EstadoCita
 } from '../types/vetSchedule.types';
 
+const ESTADOS_API: Record<string, EstadoCita> = {
+  PENDIENTE: 'pendiente',
+  ATENDIDA: 'atendida',
+  NO_ATENDIDA: 'no_atendida',
+  CANCELADA: 'cancelada'
+};
+
+const normalizarEstado = (status: string): EstadoCita => {
+  return ESTADOS_API[(status ?? '').toUpperCase()] ?? 'pendiente';
+};
+
 const STORAGE_CITAS_KEY = 'vethd_db_citas_veterinario';
 
 const getStoredCitas = (): CitaAgenda[] => {
