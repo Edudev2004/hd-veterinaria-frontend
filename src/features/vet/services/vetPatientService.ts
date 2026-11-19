@@ -1,5 +1,6 @@
 import { apiRequestWithTimeout } from '../../../services/apiClient';
-import type { MascotaExpediente } from '../../../types/historial.types';
+import { getHistorialClinicoPropietario } from '../../../services/ownerMedicalHistoryService';
+import type { HistorialMascotaResumen, MascotaExpediente } from '../../../types/historial.types';
 
 export interface PetResponse {
   id: string;
@@ -66,3 +67,7 @@ export const getMisPacientes = async (): Promise<PacienteVeterinario[]> => {
 
   return (response ?? []).map(toPaciente);
 };
+
+// El backend permite al veterinario consultar el historial de cualquier mascota (GET /api/mascotas/{id}/historial)
+export const getHistorialPaciente = (mascotaId: string): Promise<HistorialMascotaResumen> =>
+  getHistorialClinicoPropietario(mascotaId);
