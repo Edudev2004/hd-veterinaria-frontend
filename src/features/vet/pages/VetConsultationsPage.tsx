@@ -42,43 +42,60 @@ export const VetConsultationsPage: React.FC = () => {
   useEffect(() => {
     if (!user) {
       setCitasEnCurso([]);
-      setRegistros({});
       setCargando(false);
       return;
     }
 
     const cargarAtencionesEnCurso = async (): Promise<void> => {
       setCargando(true);
+      setErrorAccion("");
 
-      const atencionesEnCurso = vetConsultationService.getAtencionesEnCurso(
-        user.id,
-      );
+      try {
+        const atencionesEnCurso = vetConsultationService.getAtencionesEnCurso(
+          user.id,
+        );
 
-      const citas = await Promise.all(
-        atencionesEnCurso.map((atencion) =>
-          vetScheduleService.getCitaById(atencion.citaId, user.id),
-        ),
-      );
+        const citas = await Promise.all(
+          atencionesEnCurso.map((atencion) =>
+            vetScheduleService.getCitaById(atencion.citaId),
+          ),
+        );
 
-      const citasEncontradas = citas.filter(
-        (cita): cita is CitaAgenda => cita !== null,
-      );
+        const vigentes: CitaAgenda[] = [];
 
-      const registrosCargados = await Promise.all(
-        citasEncontradas.map(async (cita) => [
-          cita.id,
-          await vetConsultationService.getAtencionByCita(cita.id, user.id),
-        ]),
-      );
+        citas.forEach((cita, indice) => {
+          // Sigue en curso si está pendiente o si fue marcada atendida
+          // pero todavía no tiene diagnóstico registrado.
+          const requiereAtencion =
+            cita !== null &&
+            (cita.estado === "pendiente" ||
+              (cita.estado === "atendida" && !cita.diagnostico));
 
-      setCitasEnCurso(citasEncontradas);
-      setRegistros(Object.fromEntries(registrosCargados));
+          if (cita && requiereAtencion) {
+            vigentes.push(cita);
+            return;
+          }
 
-      if (citaId && citasEncontradas.some((cita) => cita.id === citaId)) {
-        setCitaExpandidaId(citaId);
+          vetConsultationService.limpiarAtencionActiva(
+            user.id,
+            atencionesEnCurso[indice].citaId,
+          );
+        });
+
+        setCitasEnCurso(vigentes);
+
+        if (citaId && vigentes.some((cita) => cita.id === citaId)) {
+          setCitaExpandidaId(citaId);
+        }
+      } catch (error) {
+        setErrorAccion(
+          error instanceof Error
+            ? error.message
+            : "No se pudieron cargar las atenciones en curso.",
+        );
+      } finally {
+        setCargando(false);
       }
-
-      setCargando(false);
     };
 
     void cargarAtencionesEnCurso();
