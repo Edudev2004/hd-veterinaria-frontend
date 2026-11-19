@@ -28,6 +28,23 @@ const ESTADO_BADGE: Record<
   cancelada: { texto: "Cancelada", variant: "warning" },
 };
 
+const hoyISO = (): string => {
+  const ahora = new Date();
+
+  return [
+    ahora.getFullYear(),
+    String(ahora.getMonth() + 1).padStart(2, "0"),
+    String(ahora.getDate()).padStart(2, "0"),
+  ].join("-");
+};
+
+const formatearFechaLarga = (fechaISO: string): string =>
+  new Date(`${fechaISO}T00:00:00`).toLocaleDateString("es-PE", {
+    weekday: "long",
+    day: "2-digit",
+    month: "long",
+  });
+
 const cumpleFiltro = (cita: CitaAgenda, filtro: Filtro): boolean => {
   if (filtro === "todas") return true;
   if (filtro === "pendientes") return cita.estado === "pendiente";
