@@ -60,17 +60,38 @@ export const VetSchedulePage: React.FC = () => {
   const [filtro, setFiltro] = useState<Filtro>("todas");
   const [citaExpandidaId, setCitaExpandidaId] = useState<string | null>(null);
   const [cargando, setCargando] = useState(true);
+  const [fecha, setFecha] = useState<string>(hoyISO());
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!user) return;
 
-    setCargando(true);
+    let activo = true;
 
-    vetScheduleService.getAgendaDiaria(user.id).then((data) => {
-      setCitas(data);
-      setCargando(false);
-    });
-  }, [user]);
+    setCargando(true);
+    setError("");
+
+    vetScheduleService
+      .getAgendaDiaria(fecha)
+      .then((data) => {
+        if (activo) setCitas(data);
+      })
+      .catch((e: unknown) => {
+        if (!activo) return;
+
+        setCitas([]);
+        setError(
+          e instanceof Error ? e.message : "No se pudo cargar la agenda.",
+        );
+      })
+      .finally(() => {
+        if (activo) setCargando(false);
+      });
+
+    return () => {
+      activo = false;
+    };
+  }, [user, fecha]);
 
   const citasFiltradas = citas.filter((cita) => cumpleFiltro(cita, filtro));
   const atendidas = citas.filter((cita) => cita.estado === "atendida").length;
