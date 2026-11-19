@@ -245,6 +245,12 @@ export const VetConsultationsPage: React.FC = () => {
         </p>
       )}
 
+      {errorAccion && (
+        <p className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
+          {errorAccion}
+        </p>
+      )}
+
       {citasEnCurso.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed border-slate-200 bg-white p-10 text-center">
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-tertiary text-primary">
@@ -265,7 +271,6 @@ export const VetConsultationsPage: React.FC = () => {
         <div className="flex flex-col gap-4">
           {citasEnCurso.map((cita) => {
             const detalleVisible = citaExpandidaId === cita.id;
-            const registro = registros[cita.id];
             const hora = new Date(cita.fecha_hora).toLocaleTimeString("es-PE", {
               hour: "2-digit",
               minute: "2-digit",
@@ -306,9 +311,9 @@ export const VetConsultationsPage: React.FC = () => {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    {registro && (
+                    {cita.estado === "atendida" && (
                       <span className="hidden rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 sm:inline">
-                        Registrada
+                        Atendida · falta diagnóstico
                       </span>
                     )}
 
@@ -324,23 +329,17 @@ export const VetConsultationsPage: React.FC = () => {
                   <div className="flex flex-col gap-5 border-t border-slate-100 bg-slate-50/70 p-5">
                     <VetConsultationSummary cita={cita} />
 
-                    {mensajesExito[cita.id] && (
-                      <p className="rounded-xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
-                        {mensajesExito[cita.id]}
-                      </p>
-                    )}
-
                     <VetConsultationForm
-                      initialValues={{
-                        diagnostico: registro?.diagnostico ?? "",
-                        tratamiento: registro?.tratamiento ?? "",
-                        notas: registro?.notas ?? "",
-                      }}
                       guardando={citaGuardandoId === cita.id}
-                      onSubmit={(values) => guardarRegistro(cita, values)}
+                      textoBoton={
+                        cita.estado === "pendiente"
+                          ? "Guardar y marcar como atendida"
+                          : "Guardar consulta"
+                      }
+                      onSubmit={(values) => solicitarGuardado(cita, values)}
                     />
-                    {registro ? (
-                      <div className="flex items-center justify-between border-t border-slate-200 pt-5">
+                    <div className="flex items-center justify-between gap-4 border-t border-slate-200 pt-5">
+                      {cita.estado === "pendiente" ? (
                         <button
                           type="button"
                           onClick={() => setCitaPorNoAtender(cita)}
@@ -348,31 +347,15 @@ export const VetConsultationsPage: React.FC = () => {
                         >
                           Marcar como no atendida
                         </button>
-
-                        <button
-                          type="button"
-                          onClick={() => setCitaPorConfirmar(cita)}
-                          className="rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700"
-                        >
-                          Marcar como atendida
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-between border-t border-slate-200 pt-5">
-                        <button
-                          type="button"
-                          onClick={() => setCitaPorNoAtender(cita)}
-                          className="rounded-xl border border-rose-200 bg-rose-50 px-5 py-2.5 text-sm font-semibold text-rose-700 transition-colors hover:bg-rose-100"
-                        >
-                          Marcar como no atendida
-                        </button>
-
-                        <p className="text-sm text-slate-500">
-                          Guarda el diagnóstico y tratamiento antes de finalizar
-                          la atención.
-                        </p>
-                      </div>
-                    )}
+                      ) : (
+                        <span />
+                      )}
+                      <p className="text-right text-sm text-slate-500">
+                        {cita.estado === "pendiente"
+                          ? "Al guardar, la cita se marcará como atendida."
+                          : "La cita ya está atendida; falta registrar el diagnóstico."}
+                      </p>
+                    </div>
                   </div>
                 )}
               </article>
@@ -392,10 +375,10 @@ export const VetConsultationsPage: React.FC = () => {
       )}
 
       <MarkAsAttendedDialog
-        abierto={Boolean(citaPorConfirmar)}
-        nombreMascota={citaPorConfirmar?.mascota.nombre ?? ""}
-        cargando={marcandoAtendida}
-        onCancelar={() => setCitaPorConfirmar(null)}
+        abierto={Boolean(consultaPorConfirmar)}
+        nombreMascota={consultaPorConfirmar?.cita.mascota.nombre ?? ""}
+        cargando={citaGuardandoId !== null}
+        onCancelar={() => setConsultaPorConfirmar(null)}
         onConfirmar={confirmarCitaAtendida}
       />
 
