@@ -16,51 +16,70 @@ import {
   Sparkles,
   ClipboardList
 } from 'lucide-react';
-import { EntradaHistorialClinico, ModalHistorialClinicoProps } from '../../../types/historial.types';
-import { getHistorialPorMascota, findMascotaInfo } from '../../../services/historialService';
+import {
+  EntradaHistorialClinico,
+  MascotaExpediente,
+  ModalHistorialClinicoProps
+} from '../../../types/historial.types';
+import { getHistorialClinicoPropietario } from '../../../services/ownerMedicalHistoryService';
 
 export const HistorialClinicoModal: React.FC<ModalHistorialClinicoProps> = ({
   isOpen,
   onClose,
   mascotaId,
-  mascotaNombre,
 }) => {
   const [entradas, setEntradas] = useState<EntradaHistorialClinico[]>([]);
+  const [mascotaInfo, setMascotaInfo] = useState<MascotaExpediente | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({});
   const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  // Identificador o nombre de búsqueda prioritario
-  const targetPetRef = mascotaId || mascotaNombre || '';
-  const mascotaInfo = useMemo(() => {
-    if (!targetPetRef) return null;
-    return findMascotaInfo(targetPetRef);
-  }, [targetPetRef]);
+  const [error, setError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
   // Cargar historial clínico al abrir modal o cambiar mascota
   useEffect(() => {
-    if (isOpen && targetPetRef) {
+    if (isOpen) {
       setIsLoading(true);
-      try {
-        const history = getHistorialPorMascota(targetPetRef);
-        setEntradas(history);
-        // Expandir por defecto todas las entradas para visualización inmediata
-        const initialExpanded: Record<string, boolean> = {};
-        history.forEach((e) => {
-          initialExpanded[e.id] = true;
-        });
-        setExpandedIds(initialExpanded);
-      } catch (err) {
-        console.error('Error al cargar historial clínico:', err);
-        setEntradas([]);
-      } finally {
+      setError(null);
+      if (!mascotaId) {
+        setError('No se recibió el identificador de la mascota para consultar su historial.');
         setIsLoading(false);
+        return;
       }
+
+      let active = true;
+      getHistorialClinicoPropietario(mascotaId)
+        .then((history) => {
+          if (!active) return;
+          setMascotaInfo(history.mascota);
+          setEntradas(history.entradas);
+          const initialExpanded: Record<string, boolean> = {};
+          history.entradas.forEach((entry) => {
+            initialExpanded[entry.id] = true;
+          });
+          setExpandedIds(initialExpanded);
+        })
+        .catch((err: unknown) => {
+          if (!active) return;
+          console.error('Error al cargar historial clínico:', err);
+          setError(err instanceof Error ? err.message : 'No se pudo cargar el historial clínico.');
+          setEntradas([]);
+          setMascotaInfo(null);
+        })
+        .finally(() => {
+          if (active) setIsLoading(false);
+        });
+
+      return () => {
+        active = false;
+      };
     } else if (!isOpen) {
       setSearchTerm('');
       setEntradas([]);
+      setMascotaInfo(null);
+      setError(null);
     }
-  }, [isOpen, targetPetRef]);
+  }, [isOpen, mascotaId, reloadKey]);
 
   // Cerrar al pulsar Escape
   useEffect(() => {
@@ -255,6 +274,17 @@ export const HistorialClinicoModal: React.FC<ModalHistorialClinicoProps> = ({
               <div className="py-12 text-center flex flex-col items-center justify-center gap-3">
                 <div className="w-8 h-8 border-3 border-[#0d9488] border-t-transparent rounded-full animate-spin" />
                 <p className="text-xs text-slate-500">Cargando expediente clínico...</p>
+              </div>
+            ) : error ? (
+              <div className="py-10 px-4 text-center rounded-2xl border border-rose-200 bg-rose-50 text-rose-800">
+                <p className="text-sm font-semibold">{error}</p>
+                <button
+                  type="button"
+                  onClick={() => setReloadKey((key) => key + 1)}
+                  className="mt-3 text-xs font-bold underline"
+                >
+                  Reintentar
+                </button>
               </div>
             ) : entradasFiltradas.length === 0 ? (
               <div className="py-12 px-4 text-center rounded-2xl border-2 border-dashed border-slate-200 bg-white flex flex-col items-center justify-center gap-3">

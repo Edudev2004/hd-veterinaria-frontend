@@ -1,37 +1,58 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Notificacion } from '../notification';
 import { notificationService } from '../../../services/notificationService';
 
-// Se define la interfaz para las propiedades que recibirá el componente
-interface NotificationDropdownProps {
-  role?: string; // Ejemplo: 'propietario' | 'veterinario' | 'admin'
-}
-
-export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ role = 'propietario' }) => {
+export const NotificationDropdown: React.FC = () => {
   const [notificaciones, setNotificaciones] = useState<Notificacion[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [noLeidasCount, setNoLeidasCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
 
-  // Cada vez que cambie el rol, volvemos a cargar las notificaciones correspondientes
+  const cargarNotificaciones = useCallback(async () => {
+    setError(null);
+    try {
+      const [data, count] = await Promise.all([
+        notificationService.obtenerNotificaciones(),
+        notificationService.obtenerConteoNoLeidas()
+      ]);
+      setNotificaciones(data);
+      setNoLeidasCount(count);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No se pudieron cargar las notificaciones.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
-    cargarNotificaciones();
-  }, [role]);
+    void cargarNotificaciones();
+  }, [cargarNotificaciones]);
 
-  const cargarNotificaciones = () => {
-    const data = notificationService.obtenerNotificaciones(role);
-    setNotificaciones(data);
+  const handleMarcarLeida = async (id: string) => {
+    setIsUpdating(true);
+    try {
+      await notificationService.marcarComoLeida(id);
+      await cargarNotificaciones();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No se pudo actualizar la notificación.');
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
-  const handleMarcarLeida = (id: string) => {
-    const actualizadas = notificationService.marcarComoLeida(id, role);
-    setNotificaciones(actualizadas);
+  const handleMarcarTodas = async () => {
+    setIsUpdating(true);
+    try {
+      await notificationService.marcarTodasComoLeidas();
+      await cargarNotificaciones();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No se pudieron actualizar las notificaciones.');
+    } finally {
+      setIsUpdating(false);
+    }
   };
-
-  const handleMarcarTodas = () => {
-    const actualizadas = notificationService.marcarTodasComoLeidas(role);
-    setNotificaciones(actualizadas);
-  };
-
-  const noLeidasCount = notificaciones.filter((n) => !n.leido).length;
 
   return (
     <div className="relative">
@@ -63,7 +84,8 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ role
             <h3 className="font-semibold text-gray-800">Notificaciones</h3>
             {noLeidasCount > 0 && (
               <button
-                onClick={handleMarcarTodas}
+                onClick={() => void handleMarcarTodas()}
+                disabled={isUpdating}
                 className="text-xs font-medium text-amber-600 hover:text-amber-700 transition-colors"
               >
                 Marcar todas como leídas
@@ -72,13 +94,23 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ role
           </div>
 
           <div className="max-h-80 overflow-y-auto divide-y divide-gray-50">
-            {notificaciones.length === 0 ? (
+            {error && (
+              <div className="p-3 text-xs text-rose-700 bg-rose-50">
+                <p>{error}</p>
+                <button type="button" onClick={() => void cargarNotificaciones()} className="mt-1 font-semibold underline">
+                  Reintentar
+                </button>
+              </div>
+            )}
+            {isLoading ? (
+              <p className="py-6 text-center text-sm text-gray-500">Cargando notificaciones...</p>
+            ) : error ? null : notificaciones.length === 0 ? (
               <p className="py-6 text-center text-sm text-gray-500">No hay notificaciones</p>
             ) : (
               notificaciones.map((notif) => (
                 <div
                   key={notif.id}
-                  onClick={() => !notif.leido && handleMarcarLeida(notif.id)}
+                  onClick={() => !notif.leido && !isUpdating && void handleMarcarLeida(notif.id)}
                   className={`p-4 transition-colors cursor-pointer flex gap-3 items-start ${
                     notif.leido ? 'bg-white opacity-70' : 'bg-amber-50/40 hover:bg-amber-50/70'
                   }`}
