@@ -179,6 +179,46 @@ export const VetConsultationsPage: React.FC = () => {
     setConsultaPorConfirmar(null);
   };
 
+  const confirmarCitaNoAtendida = async (motivo: string): Promise<void> => {
+    if (!user || !citaPorNoAtender) {
+      return;
+    }
+
+    setMarcandoNoAtendida(true);
+    setErrorAccion("");
+    setMensajeAccion("");
+
+    try {
+      await vetScheduleService.marcarCitaComoNoAtendida(
+        citaPorNoAtender.id,
+        motivo,
+      );
+
+      vetConsultationService.limpiarAtencionActiva(
+        user.id,
+        citaPorNoAtender.id,
+      );
+
+      setCitasEnCurso((citas) =>
+        citas.filter((cita) => cita.id !== citaPorNoAtender.id),
+      );
+
+      setCitaExpandidaId(null);
+      setMensajeAccion(
+        `${citaPorNoAtender.mascota.nombre} fue marcada como no atendida.`,
+      );
+    } catch (error) {
+      setErrorAccion(
+        error instanceof Error
+          ? error.message
+          : "No se pudo marcar la cita como no atendida.",
+      );
+    } finally {
+      setMarcandoNoAtendida(false);
+      setCitaPorNoAtender(null);
+    }
+  };
+
   if (cargando) {
     return (
       <p className="py-12 text-center text-sm text-slate-400">
