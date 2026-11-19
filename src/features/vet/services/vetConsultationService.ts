@@ -1,3 +1,5 @@
+import { apiRequest } from '@/services/apiClient';
+import type { DiagnosisApiDTO } from '../../appointments/types/vetSchedule.types';
 import type {
   GuardarAtencionInput,
   RegistroAtencion
