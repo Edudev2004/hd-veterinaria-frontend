@@ -1,8 +1,10 @@
 import { apiRequest } from '@/services/apiClient';
 import type {
+  ResumenValoraciones,
   ReviewApiDTO,
   ValoracionVeterinario,
-  VeterinarianProfileApiDTO
+  VeterinarianProfileApiDTO,
+  VeterinarianReviewsApiDTO
 } from '../types/valoracion.types';
 
 const toValoracion = (dto: ReviewApiDTO): ValoracionVeterinario => ({
@@ -24,6 +26,27 @@ export const getPerfilVeterinario =
     return apiRequest<VeterinarianProfileApiDTO>('/api/veterinarios/me');
   };
 
+/**
+ * Valoraciones y promedio del veterinario autenticado
+ * (GET /api/veterinarios/{id}/valoraciones).
+ */
+export const getMisValoraciones = async (): Promise<ResumenValoraciones> => {
+  const perfil = await getPerfilVeterinario();
+
+  const respuesta = await apiRequest<VeterinarianReviewsApiDTO>(
+    `/api/veterinarios/${perfil.id}/valoraciones`
+  );
+
+  const valoraciones = (respuesta.valoraciones ?? []).map(toValoracion);
+
+  return {
+    promedio: respuesta.promedio ?? 0,
+    total: respuesta.totalValoraciones ?? valoraciones.length,
+    valoraciones
+  };
+};
+
 export const vetReviewsService = {
-  getPerfilVeterinario
+  getPerfilVeterinario,
+  getMisValoraciones
 };
