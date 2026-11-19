@@ -13,8 +13,7 @@ import {
   Sparkles,
   AlertCircle
 } from 'lucide-react';
-import { getHistorialPorMascota } from '../../../services/historialService';
-import { getMisPacientes } from '../services/vetPatientService';
+import { getMisPacientes, getHistorialPaciente } from '../services/vetPatientService';
 import { EntradaHistorialClinico, MascotaExpediente } from '../../../types/historial.types';
 import { HistorialClinicoModal } from '../../pets/components/HistorialClinicoModal';
 
@@ -61,22 +60,32 @@ export const VetMedicalHistoryPage: React.FC = () => {
     };
   }, []);
 
-  // Cargar historial médico cuando cambia la mascota seleccionada
+  // Cargar historial médico real cuando cambia la mascota seleccionada
   useEffect(() => {
-    if (selectedPet) {
-      setIsLoadingHistory(true);
-      try {
-        const data = getHistorialPorMascota(selectedPet.id);
-        setEntradas(data);
-      } catch (err) {
+    if (!selectedPet) {
+      setEntradas([]);
+      return;
+    }
+
+    let active = true;
+    setIsLoadingHistory(true);
+
+    getHistorialPaciente(selectedPet.id)
+      .then((data) => {
+        if (active) setEntradas(data.entradas);
+      })
+      .catch((err: unknown) => {
+        if (!active) return;
         console.error('Error al cargar historial del paciente:', err);
         setEntradas([]);
-      } finally {
-        setIsLoadingHistory(false);
-      }
-    } else {
-      setEntradas([]);
-    }
+      })
+      .finally(() => {
+        if (active) setIsLoadingHistory(false);
+      });
+
+    return () => {
+      active = false;
+    };
   }, [selectedPet]);
 
   // Filtrar lista de pacientes por término y especie
