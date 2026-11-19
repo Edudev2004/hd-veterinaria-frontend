@@ -13,10 +13,7 @@ import {
   Sparkles,
   AlertCircle
 } from 'lucide-react';
-import {
-  getTodasLasMascotasConHistorial,
-  getHistorialPorMascota
-} from '../../../services/historialService';
+import { getMisPacientes, getHistorialPaciente } from '../services/vetPatientService';
 import { EntradaHistorialClinico, MascotaExpediente } from '../../../types/historial.types';
 import { HistorialClinicoModal } from '../../pets/components/HistorialClinicoModal';
 
@@ -31,32 +28,64 @@ export const VetMedicalHistoryPage: React.FC = () => {
   const [speciesFilter, setSpeciesFilter] = useState<'todas' | 'perro' | 'gato' | 'otro'>('todas');
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState<boolean>(false);
+  const [isLoadingPacientes, setIsLoadingPacientes] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Cargar lista de pacientes al montar
+  // Cargar lista de pacientes reales del veterinario al montar
   useEffect(() => {
-    const list = getTodasLasMascotasConHistorial();
-    setPacientes(list);
-    if (list.length > 0 && !selectedPet) {
-      setSelectedPet(list[0].mascota);
-    }
+    let active = true;
+    setIsLoadingPacientes(true);
+    setError(null);
+
+    getMisPacientes()
+      .then((list) => {
+        if (!active) return;
+        setPacientes(list);
+        if (list.length > 0) {
+          setSelectedPet(list[0].mascota);
+        }
+      })
+      .catch((err: unknown) => {
+        if (!active) return;
+        console.error('Error al cargar pacientes del veterinario:', err);
+        setError(err instanceof Error ? err.message : 'No se pudo cargar la lista de pacientes.');
+        setPacientes([]);
+      })
+      .finally(() => {
+        if (active) setIsLoadingPacientes(false);
+      });
+
+    return () => {
+      active = false;
+    };
   }, []);
 
-  // Cargar historial médico cuando cambia la mascota seleccionada
+  // Cargar historial médico real cuando cambia la mascota seleccionada
   useEffect(() => {
-    if (selectedPet) {
-      setIsLoadingHistory(true);
-      try {
-        const data = getHistorialPorMascota(selectedPet.id);
-        setEntradas(data);
-      } catch (err) {
+    if (!selectedPet) {
+      setEntradas([]);
+      return;
+    }
+
+    let active = true;
+    setIsLoadingHistory(true);
+
+    getHistorialPaciente(selectedPet.id)
+      .then((data) => {
+        if (active) setEntradas(data.entradas);
+      })
+      .catch((err: unknown) => {
+        if (!active) return;
         console.error('Error al cargar historial del paciente:', err);
         setEntradas([]);
-      } finally {
-        setIsLoadingHistory(false);
-      }
-    } else {
-      setEntradas([]);
-    }
+      })
+      .finally(() => {
+        if (active) setIsLoadingHistory(false);
+      });
+
+    return () => {
+      active = false;
+    };
   }, [selectedPet]);
 
   // Filtrar lista de pacientes por término y especie
@@ -190,9 +219,19 @@ export const VetMedicalHistoryPage: React.FC = () => {
 
           {/* Listado scrolleable de mascotas */}
           <div className="space-y-2 max-h-[520px] overflow-y-auto pr-1">
-            {pacientesFiltrados.length === 0 ? (
+            {isLoadingPacientes ? (
               <div className="p-6 text-center text-xs text-slate-400 bg-slate-50 rounded-2xl border border-slate-100">
-                No se encontraron pacientes que coincidan con la búsqueda.
+                Cargando pacientes...
+              </div>
+            ) : error ? (
+              <div className="p-6 text-center text-xs text-red-600 bg-red-50 rounded-2xl border border-red-100">
+                {error}
+              </div>
+            ) : pacientesFiltrados.length === 0 ? (
+              <div className="p-6 text-center text-xs text-slate-400 bg-slate-50 rounded-2xl border border-slate-100">
+                {pacientes.length === 0
+                  ? 'Aún no tienes pacientes con citas registradas.'
+                  : 'No se encontraron pacientes que coincidan con la búsqueda.'}
               </div>
             ) : (
               pacientesFiltrados.map((item) => {
@@ -230,7 +269,7 @@ export const VetMedicalHistoryPage: React.FC = () => {
                           </span>
                         </div>
                         <p className="text-xs text-slate-500 truncate mt-0.5">
-                          {item.mascota.raza || 'Mestizo'} • Dueño: {item.mascota.propietario_nombre || 'Registrado'}
+                          {item.mascota.raza || 'Mestizo'} • Dueño: {item.mascota.propietario_nombre || 'No registrado'}
                         </p>
                       </div>
                     </div>
@@ -280,7 +319,7 @@ export const VetMedicalHistoryPage: React.FC = () => {
                         {selectedPet.raza || 'Sin raza registrada'}
                         {selectedPet.sexo ? ` • ${selectedPet.sexo === 'hembra' ? 'Hembra' : 'Macho'}` : ''}
                         {' • '}
-                        Tutor: <span className="font-semibold text-slate-700">{selectedPet.propietario_nombre || 'Carlos Propietario'}</span>
+                        Tutor: <span className="font-semibold text-slate-700">{selectedPet.propietario_nombre || 'No registrado'}</span>
                       </p>
                     </div>
                   </div>
