@@ -213,11 +213,35 @@ const toRegistroAtencion = (
   createdAt: dto.createdAt
 });
 
+/**
+ * Registra el diagnóstico de una cita ya ATENDIDA (POST /api/citas/{id}/consulta).
+ */
+const registrarConsulta = async (
+  input: GuardarAtencionInput
+): Promise<RegistroAtencion> => {
+  const notas = input.notas.trim();
+
+  const diagnostico = await apiRequest<DiagnosisApiDTO>(
+    `/api/citas/${input.citaId}/consulta`,
+    {
+      method: 'POST',
+      body: {
+        diagnosis: input.diagnostico.trim(),
+        treatment: input.tratamiento.trim(),
+        notes: notas || undefined
+      }
+    }
+  );
+
+  return toRegistroAtencion(input.citaId, diagnostico);
+};
+
 export const vetConsultationService = {
   iniciarAtencion,
   getAtencionesEnCurso,
   getAtencionActiva,
   limpiarAtencionActiva,
   getAtencionByCita,
-  guardarAtencion
+  guardarAtencion,
+  registrarConsulta
 };
