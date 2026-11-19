@@ -29,10 +29,12 @@ export const VetMedicalHistoryPage: React.FC = () => {
   const [speciesFilter, setSpeciesFilter] = useState<'todas' | 'perro' | 'gato' | 'otro'>('todas');
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState<boolean>(false);
+  const [isLoadingPacientes, setIsLoadingPacientes] = useState<boolean>(true);
 
   // Cargar lista de pacientes reales del veterinario al montar
   useEffect(() => {
     let active = true;
+    setIsLoadingPacientes(true);
 
     getMisPacientes()
       .then((list) => {
@@ -45,6 +47,9 @@ export const VetMedicalHistoryPage: React.FC = () => {
       .catch((err: unknown) => {
         if (!active) return;
         console.error('Error al cargar pacientes del veterinario:', err);
+      })
+      .finally(() => {
+        if (active) setIsLoadingPacientes(false);
       });
 
     return () => {
@@ -201,7 +206,11 @@ export const VetMedicalHistoryPage: React.FC = () => {
 
           {/* Listado scrolleable de mascotas */}
           <div className="space-y-2 max-h-[520px] overflow-y-auto pr-1">
-            {pacientesFiltrados.length === 0 ? (
+            {isLoadingPacientes ? (
+              <div className="p-6 text-center text-xs text-slate-400 bg-slate-50 rounded-2xl border border-slate-100">
+                Cargando pacientes...
+              </div>
+            ) : pacientesFiltrados.length === 0 ? (
               <div className="p-6 text-center text-xs text-slate-400 bg-slate-50 rounded-2xl border border-slate-100">
                 No se encontraron pacientes que coincidan con la búsqueda.
               </div>
