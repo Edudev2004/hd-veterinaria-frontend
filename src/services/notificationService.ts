@@ -1,77 +1,87 @@
+import { apiRequest, apiRequestWithTimeout } from './apiClient';
 import { Notificacion } from '../features/notifications/notification';
 
-// Datos iniciales específicos para cada rol
-const mockNotificationsByRole: Record<string, Notificacion[]> = {
-  propietario: [
-    {
-      id: '1',
-      usuario_id: 'propietario',
-      mensaje: 'Su cita para "Max" ha sido programada con éxito para mañana a las 10:00 AM.',
-      tipo: 'cita',
-      leido: false,
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: '2',
-      usuario_id: 'propietario',
-      mensaje: 'Recuerde traer la cartilla de vacunación en su próxima visita.',
-      tipo: 'recordatorio',
-      leido: false,
-      created_at: new Date().toISOString(),
-    },
-  ],
-  veterinario: [
-    {
-      id: '3',
-      usuario_id: 'veterinario',
-      mensaje: 'Nueva cita asignada con el paciente "Luna" a las 11:30 AM.',
-      tipo: 'cita',
-      leido: false,
-      created_at: new Date().toISOString(),
-    },
-  ],
-  admin: [
-    {
-      id: '4',
-      usuario_id: 'admin',
-      mensaje: 'Se ha registrado un nuevo usuario en el sistema.',
-      tipo: 'sistema',
-      leido: false,
-      created_at: new Date().toISOString(),
-    },
-  ],
+interface NotificationResponse {
+  id: string;
+  title: string | null;
+  message: string;
+  type: string;
+  read: boolean;
+  scheduledAt: string | null;
+  createdAt: string;
+}
+
+interface UnreadCountResponse {
+  noLeidas: number;
+}
+
+interface ReminderAppointmentResponse {
+  id: string;
+  pet: { name: string };
+  veterinarian: { name: string };
+  specialty: { name: string } | null;
+  scheduledAt: string;
+  reason: string | null;
+}
+
+export interface RecordatorioCita {
+  id: string;
+  service: string;
+  petName: string;
+  vetName: string;
+  scheduledAt: string;
+}
+
+const toNotification = (notification: NotificationResponse): Notificacion => {
+  const normalizedType = notification.type.toLowerCase();
+  const tipo: Notificacion['tipo'] = normalizedType.includes('cita') || normalizedType.includes('appointment')
+    ? 'cita'
+    : normalizedType.includes('recordatorio') || normalizedType.includes('reminder')
+      ? 'recordatorio'
+      : 'sistema';
+
+  return {
+    id: notification.id,
+    mensaje: notification.message,
+    tipo,
+    leido: notification.read,
+    created_at: notification.createdAt
+  };
 };
 
-const getStorageKey = (role: string = 'propietario') => `hd_veterinaria_notificaciones_${role}`;
-
 export const notificationService = {
-  obtenerNotificaciones(role: string = 'propietario'): Notificacion[] {
-    const STORAGE_KEY = getStorageKey(role);
-    const data = localStorage.getItem(STORAGE_KEY);
-    
-    if (!data) {
-      const initialData = mockNotificationsByRole[role] || mockNotificationsByRole['propietario'];
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(initialData));
-      return initialData;
-    }
-    return JSON.parse(data);
+  async obtenerNotificaciones(): Promise<Notificacion[]> {
+    const notifications = await apiRequest<NotificationResponse[]>('/api/notificaciones');
+    return notifications.map(toNotification);
   },
 
-  marcarComoLeida(id: string, role: string = 'propietario'): Notificacion[] {
-    const STORAGE_KEY = getStorageKey(role);
-    const notificaciones = this.obtenerNotificaciones(role);
-    const actualizadas = notificaciones.map((notif) =>
-      notif.id === id ? { ...notif, leido: true } : notif
+  async obtenerConteoNoLeidas(): Promise<number> {
+    const response = await apiRequest<UnreadCountResponse>('/api/notificaciones/no-leidas');
+    return response.noLeidas;
+  },
+
+  async obtenerRecordatorios(): Promise<RecordatorioCita[]> {
+    const appointments = await apiRequestWithTimeout<ReminderAppointmentResponse[]>(
+      '/api/recordatorios',
+      {},
+      15000
     );
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(actualizadas));
-    return actualizadas;
+    return appointments.map((appointment) => ({
+      id: appointment.id,
+      service: appointment.specialty?.name || appointment.reason || 'Cita veterinaria',
+      petName: appointment.pet.name,
+      vetName: appointment.veterinarian.name,
+      scheduledAt: appointment.scheduledAt
+    }));
   },
 
-  marcarTodasComoLeidas(role: string = 'propietario'): Notificacion[] {
-    const STORAGE_KEY = getStorageKey(role);
-    const notificaciones = this.obtenerNotificaciones(role);
-    const actualizadas = notificaciones.map((notif) => ({ ...notif, leido: true }));
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(actualizadas));
-    return actualizadas;
+  async marcarComoLeida(id: string): Promise<void> {
+    await apiRequest<void>(`/api/notificaciones/${encodeURIComponent(id)}/leer`, {
+      method: 'PATCH'
+    });
+  },
+
+  async marcarTodasComoLeidas(): Promise<void> {
+    await apiRequest<void>('/api/notificaciones/leer-todas', { method: 'PATCH' });
   }
 };
