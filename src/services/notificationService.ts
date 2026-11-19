@@ -42,6 +42,7 @@ const toNotification = (notification: NotificationResponse): Notificacion => {
 
   return {
     id: notification.id,
+    titulo: notification.title || undefined,
     mensaje: notification.message,
     tipo,
     leido: notification.read,
