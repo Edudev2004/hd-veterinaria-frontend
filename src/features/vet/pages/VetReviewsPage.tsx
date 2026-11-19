@@ -81,7 +81,7 @@ export const VetReviewsPage: React.FC = () => {
           <div className="w-16 h-16 rounded-full bg-tertiary flex items-center justify-center text-primary">
             <Award className="w-8 h-8" />
           </div>
-          <p className="text-4xl font-bold text-slate-900">{promedio || '—'}</p>
+          <p className="text-4xl font-bold text-slate-900">{promedio > 0 ? promedio.toFixed(1) : '—'}</p>
           <Estrellas puntuacion={Math.round(promedio)} tamaño="w-4 h-4" />
           <p className="text-xs text-slate-400">{total} valoraciones en total</p>
         </div>
@@ -117,6 +117,10 @@ export const VetReviewsPage: React.FC = () => {
             Ver todas
           </button>
         </div>
+      )}
+
+      {error && (
+        <p className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-600">{error}</p>
       )}
 
       <div className="rounded-2xl bg-white border border-slate-100 p-4">
