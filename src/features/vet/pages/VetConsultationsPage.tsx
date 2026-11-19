@@ -7,30 +7,32 @@ import type { CitaAgenda } from "../../appointments/types/vetSchedule.types";
 import { VetConsultationForm } from "../components/VetConsultationForm";
 import { VetConsultationSummary } from "../components/VetConsultationSummary";
 import { vetConsultationService } from "../services/vetConsultationService";
-import type { RegistroAtencion } from "../types/vetConsultation.types";
 import { MarkAsAttendedDialog } from "../components/MarkAsAttendedDialog";
 import { MarkAsNotAttendedDialog } from "../components/MarkAsNotAttendedDialog";
+
+type ValoresConsulta = {
+  diagnostico: string;
+  tratamiento: string;
+  notas: string;
+};
+
+interface ConsultaPendiente {
+  cita: CitaAgenda;
+  values: ValoresConsulta;
+}
 
 export const VetConsultationsPage: React.FC = () => {
   const { citaId } = useParams<{ citaId: string }>();
   const { user } = useAuth();
 
   const [citasEnCurso, setCitasEnCurso] = useState<CitaAgenda[]>([]);
-  const [registros, setRegistros] = useState<
-    Record<string, RegistroAtencion | null>
-  >({});
   const [citaExpandidaId, setCitaExpandidaId] = useState<string | null>(null);
   const [cargando, setCargando] = useState(true);
   const [citaGuardandoId, setCitaGuardandoId] = useState<string | null>(null);
-  const [mensajesExito, setMensajesExito] = useState<Record<string, string>>(
-    {},
-  );
-
-  const [citaPorConfirmar, setCitaPorConfirmar] = useState<CitaAgenda | null>(
-    null,
-  );
-  const [marcandoAtendida, setMarcandoAtendida] = useState(false);
+  const [consultaPorConfirmar, setConsultaPorConfirmar] =
+    useState<ConsultaPendiente | null>(null);
   const [mensajeAccion, setMensajeAccion] = useState("");
+  const [errorAccion, setErrorAccion] = useState("");
 
   const [citaPorNoAtender, setCitaPorNoAtender] = useState<CitaAgenda | null>(
     null,
