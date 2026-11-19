@@ -269,7 +269,7 @@ export const VetMedicalHistoryPage: React.FC = () => {
                           </span>
                         </div>
                         <p className="text-xs text-slate-500 truncate mt-0.5">
-                          {item.mascota.raza || 'Mestizo'} • Dueño: {item.mascota.propietario_nombre || 'Registrado'}
+                          {item.mascota.raza || 'Mestizo'} • Dueño: {item.mascota.propietario_nombre || 'No registrado'}
                         </p>
                       </div>
                     </div>
