@@ -28,3 +28,30 @@ export interface PacienteVeterinario {
   totalAtenciones: number;
   ultimaAtencion?: string | null;
 }
+
+export const toPaciente = (item: VetPatientResponse): PacienteVeterinario => {
+  const nombreTutor = [item.owner?.firstName, item.owner?.lastName]
+    .filter(Boolean)
+    .join(' ')
+    .trim();
+
+  return {
+    mascota: {
+      id: item.pet.id,
+      nombre: item.pet.name,
+      especie: item.pet.species,
+      raza: item.pet.breed ?? undefined,
+      sexo: item.pet.gender
+        ? item.pet.gender.toLowerCase() === 'hembra'
+          ? 'hembra'
+          : 'macho'
+        : undefined,
+      fecha_nacimiento: item.pet.birthDate ?? undefined,
+      foto_url: item.pet.photoUrl ?? undefined,
+      propietario_id: item.owner?.id,
+      propietario_nombre: nombreTutor || undefined
+    },
+    totalAtenciones: item.totalAtenciones ?? 0,
+    ultimaAtencion: item.ultimaAtencion
+  };
+};
