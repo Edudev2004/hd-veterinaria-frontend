@@ -1,5 +1,10 @@
 import citasSeed from '../mocks/citasVeterinario.json';
-import type { CitaAgenda } from '../types/vetSchedule.types';
+import { ApiError, apiRequest } from '@/services/apiClient';
+import type {
+  AppointmentApiDTO,
+  CitaAgenda,
+  EstadoCita
+} from '../types/vetSchedule.types';
 
 const STORAGE_CITAS_KEY = 'vethd_db_citas_veterinario';
 
