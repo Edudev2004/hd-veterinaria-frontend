@@ -319,7 +319,7 @@ export const VetMedicalHistoryPage: React.FC = () => {
                         {selectedPet.raza || 'Sin raza registrada'}
                         {selectedPet.sexo ? ` • ${selectedPet.sexo === 'hembra' ? 'Hembra' : 'Macho'}` : ''}
                         {' • '}
-                        Tutor: <span className="font-semibold text-slate-700">{selectedPet.propietario_nombre || 'Carlos Propietario'}</span>
+                        Tutor: <span className="font-semibold text-slate-700">{selectedPet.propietario_nombre || 'No registrado'}</span>
                       </p>
                     </div>
                   </div>
