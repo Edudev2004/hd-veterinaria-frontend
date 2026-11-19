@@ -156,6 +156,29 @@ export const VetConsultationsPage: React.FC = () => {
     }
   };
 
+  const solicitarGuardado = async (
+    cita: CitaAgenda,
+    values: ValoresConsulta,
+  ): Promise<void> => {
+    if (cita.estado === "pendiente") {
+      setConsultaPorConfirmar({ cita, values });
+      return;
+    }
+
+    await guardarConsulta(cita, values);
+  };
+
+  const confirmarCitaAtendida = async (): Promise<void> => {
+    if (!consultaPorConfirmar) {
+      return;
+    }
+
+    const { cita, values } = consultaPorConfirmar;
+
+    await guardarConsulta(cita, values);
+    setConsultaPorConfirmar(null);
+  };
+
   if (cargando) {
     return (
       <p className="py-12 text-center text-sm text-slate-400">
