@@ -1,4 +1,4 @@
-import { apiRequest } from './apiClient';
+import { apiRequestWithTimeout } from './apiClient';
 
 export interface CreateReviewPayload {
   rating: number;
@@ -7,6 +7,7 @@ export interface CreateReviewPayload {
 
 export interface ReviewDTO {
   id: string;
+  appointmentId?: string;
   rating: number;
   comment: string | null;
   createdAt: string | null;
@@ -20,27 +21,38 @@ export interface VeterinarianReviewsDTO {
 
 /**
  * Registra la valoración de una cita ATENDIDA del propietario autenticado.
+ * Aplica timeout acotado de 15 segundos para evitar bloqueos indefinidos.
  * El backend responde 409 si la cita ya fue valorada.
  */
 export const createReview = async (
   citaId: string,
-  payload: CreateReviewPayload
+  payload: CreateReviewPayload,
+  timeoutMs = 15000
 ): Promise<ReviewDTO> => {
-  return apiRequest<ReviewDTO>(`/api/citas/${citaId}/valoracion`, {
-    method: 'POST',
-    body: {
-      rating: payload.rating,
-      comment: payload.comment?.trim() || null,
+  return apiRequestWithTimeout<ReviewDTO>(
+    `/api/citas/${citaId}/valoracion`,
+    {
+      method: 'POST',
+      body: {
+        rating: payload.rating,
+        comment: payload.comment?.trim() || null,
+      },
     },
-  });
+    timeoutMs
+  );
 };
 
+/**
+ * Consulta las valoraciones públicas de un veterinario con timeout acotado.
+ */
 export const getVeterinarianReviews = async (
-  veterinarioId: string
+  veterinarioId: string,
+  timeoutMs = 15000
 ): Promise<VeterinarianReviewsDTO> => {
-  return apiRequest<VeterinarianReviewsDTO>(
+  return apiRequestWithTimeout<VeterinarianReviewsDTO>(
     `/api/veterinarios/${veterinarioId}/valoraciones`,
-    { auth: false }
+    { auth: false },
+    timeoutMs
   );
 };
 

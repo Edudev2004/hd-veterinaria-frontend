@@ -18,13 +18,17 @@ export const NotificationsPage: React.FC = () => {
     setError(null);
     try {
       const [notifs, recs] = await Promise.all([
-        notificationService.obtenerNotificaciones().catch(() => []),
-        notificationService.obtenerRecordatorios().catch(() => [])
+        notificationService.obtenerNotificaciones(),
+        notificationService.obtenerRecordatorios()
       ]);
       setNotificaciones(notifs);
       setReminders(recs);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'No se pudieron cargar las notificaciones.');
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'No se pudieron cargar las notificaciones y recordatorios. Inténtalo de nuevo.'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -32,6 +36,15 @@ export const NotificationsPage: React.FC = () => {
 
   useEffect(() => {
     void cargarDatos();
+
+    const handleSync = () => {
+      void cargarDatos();
+    };
+
+    window.addEventListener('notifications-updated', handleSync);
+    return () => {
+      window.removeEventListener('notifications-updated', handleSync);
+    };
   }, [cargarDatos]);
 
   const handleMarcarLeida = async (id: string) => {
@@ -40,8 +53,13 @@ export const NotificationsPage: React.FC = () => {
       setNotificaciones((prev) =>
         prev.map((n) => (n.id === id ? { ...n, leido: true } : n))
       );
-    } catch {
-      // fallo silencioso
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'No se pudo marcar la notificación como leída. Inténtalo de nuevo.'
+      );
+      void cargarDatos();
     }
   };
 
@@ -50,8 +68,13 @@ export const NotificationsPage: React.FC = () => {
     try {
       await notificationService.marcarTodasComoLeidas();
       setNotificaciones((prev) => prev.map((n) => ({ ...n, leido: true })));
-    } catch {
-      // fallo silencioso
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'No se pudieron marcar las notificaciones como leídas. Inténtalo de nuevo.'
+      );
+      void cargarDatos();
     } finally {
       setIsUpdating(false);
     }

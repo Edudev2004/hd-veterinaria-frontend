@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Star, CheckCircle2, Calendar, User, MessageSquare, AlertCircle } from 'lucide-react';
 import { ApiError } from '../../../services/apiClient';
 import { getCitas } from '../../../services/citaService';
-import { createReview } from '../../../services/reviewApi';
+import { createReview, reviewService } from '../../../services/reviewApi';
 
 interface AppointmentReview {
   id: string;
@@ -41,31 +41,65 @@ export const ReviewsPage: React.FC = () => {
     setIsLoading(true);
     setError(null);
 
-    getCitas()
-      .then((citas) => {
+    const cargarAtenciones = async () => {
+      try {
+        const citas = await getCitas();
         if (!activo) return;
 
-        const atendidas = citas
-          .filter((cita) => cita.estado === 'atendida')
-          .map<AppointmentReview>((cita) => ({
+        const atendidas = citas.filter((cita) => cita.estado === 'atendida');
+
+        // Consultar valoraciones existentes de los veterinarios involucrados para prehidratar el estado
+        const vetIds = Array.from(new Set(atendidas.map((c) => c.veterinario.id)));
+        const reviewsResponses = await Promise.all(
+          vetIds.map((id) => reviewService.getVeterinarianReviews(id).catch(() => null))
+        );
+
+        if (!activo) return;
+
+        const reviewByAppointmentId = new Map<string, { rating: number; comment?: string }>();
+        for (const resp of reviewsResponses) {
+          if (resp && Array.isArray(resp.valoraciones)) {
+            for (const v of resp.valoraciones) {
+              if (v.appointmentId) {
+                reviewByAppointmentId.set(v.appointmentId, {
+                  rating: v.rating,
+                  comment: v.comment || undefined,
+                });
+              }
+            }
+          }
+        }
+
+        const mapped: AppointmentReview[] = atendidas.map((cita) => {
+          const existingReview = reviewByAppointmentId.get(cita.id);
+          return {
             id: cita.id,
             petName: cita.mascota.nombre,
             service: cita.veterinario.especialidad_nombre || 'Consulta general',
             veterinarian: cita.veterinario.nombre,
             date: formatearFecha(cita.fecha_hora),
             status: 'ATENDIDA',
-          }));
+            rating: existingReview?.rating,
+            comment: existingReview?.comment,
+            reviewed: Boolean(existingReview),
+          };
+        });
 
-        setAppointments(atendidas);
-      })
-      .catch(() => {
+        setAppointments(mapped);
+      } catch (err) {
         if (!activo) return;
-        setError('No se pudieron cargar tus atenciones. Inténtalo de nuevo.');
+        setError(
+          err instanceof Error
+            ? err.message
+            : 'No se pudieron cargar tus atenciones. Inténtalo de nuevo.'
+        );
         setAppointments([]);
-      })
-      .finally(() => {
+      } finally {
         if (activo) setIsLoading(false);
-      });
+      }
+    };
+
+    void cargarAtenciones();
 
     return () => {
       activo = false;

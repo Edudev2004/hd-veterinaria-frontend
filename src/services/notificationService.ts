@@ -1,4 +1,4 @@
-import { apiRequest, apiRequestWithTimeout } from './apiClient';
+import { apiRequestWithTimeout } from './apiClient';
 import { Notificacion } from '../features/notifications/notification';
 
 interface NotificationResponse {
@@ -51,21 +51,29 @@ const toNotification = (notification: NotificationResponse): Notificacion => {
 };
 
 export const notificationService = {
-  async obtenerNotificaciones(): Promise<Notificacion[]> {
-    const notifications = await apiRequest<NotificationResponse[]>('/api/notificaciones');
+  async obtenerNotificaciones(timeoutMs = 10000): Promise<Notificacion[]> {
+    const notifications = await apiRequestWithTimeout<NotificationResponse[]>(
+      '/api/notificaciones',
+      {},
+      timeoutMs
+    );
     return notifications.map(toNotification);
   },
 
-  async obtenerConteoNoLeidas(): Promise<number> {
-    const response = await apiRequest<UnreadCountResponse>('/api/notificaciones/no-leidas');
+  async obtenerConteoNoLeidas(timeoutMs = 10000): Promise<number> {
+    const response = await apiRequestWithTimeout<UnreadCountResponse>(
+      '/api/notificaciones/no-leidas',
+      {},
+      timeoutMs
+    );
     return response.noLeidas;
   },
 
-  async obtenerRecordatorios(): Promise<RecordatorioCita[]> {
+  async obtenerRecordatorios(timeoutMs = 15000): Promise<RecordatorioCita[]> {
     const appointments = await apiRequestWithTimeout<ReminderAppointmentResponse[]>(
       '/api/recordatorios',
       {},
-      15000
+      timeoutMs
     );
     return appointments.map((appointment) => ({
       id: appointment.id,
@@ -76,13 +84,25 @@ export const notificationService = {
     }));
   },
 
-  async marcarComoLeida(id: string): Promise<void> {
-    await apiRequest<void>(`/api/notificaciones/${encodeURIComponent(id)}/leer`, {
-      method: 'PATCH'
-    });
+  async marcarComoLeida(id: string, timeoutMs = 10000): Promise<void> {
+    await apiRequestWithTimeout<void>(
+      `/api/notificaciones/${encodeURIComponent(id)}/leer`,
+      { method: 'PATCH' },
+      timeoutMs
+    );
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('notifications-updated'));
+    }
   },
 
-  async marcarTodasComoLeidas(): Promise<void> {
-    await apiRequest<void>('/api/notificaciones/leer-todas', { method: 'PATCH' });
+  async marcarTodasComoLeidas(timeoutMs = 10000): Promise<void> {
+    await apiRequestWithTimeout<void>(
+      '/api/notificaciones/leer-todas',
+      { method: 'PATCH' },
+      timeoutMs
+    );
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('notifications-updated'));
+    }
   }
 };
