@@ -27,6 +27,8 @@ export interface CitaAgenda {
   created_at: string;
   mascota: MascotaResumen;
   propietario: PropietarioResumen;
+  motivo_cancelacion?: string;
+  diagnostico?: DiagnosisApiDTO | null;
 }
 
 /* ---------- Respuestas del backend (AppointmentResponse y anidados) ---------- */
