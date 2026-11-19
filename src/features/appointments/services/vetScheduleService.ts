@@ -146,29 +146,20 @@ export const marcarCitaComoAtendida = async (
 
 export const marcarCitaComoNoAtendida = async (
   citaId: string,
-  veterinarioId: string
-): Promise<CitaAgenda | null> => {
-  await new Promise((resolve) => setTimeout(resolve, 200));
+  motivo: string
+): Promise<CitaAgenda> => {
+  const motivoLimpio = motivo.trim();
 
-  const citas = getStoredCitas();
-  const indice = citas.findIndex(
-    (cita) =>
-      cita.id === citaId && cita.veterinario_id === veterinarioId
-  );
-
-  if (indice < 0) {
-    return null;
+  if (!motivoLimpio) {
+    throw new Error('Debes indicar el motivo por el que la cita no fue atendida.');
   }
 
-  const citaActualizada: CitaAgenda = {
-    ...citas[indice],
-    estado: 'no_atendida'
-  };
+  const cita = await apiRequest<AppointmentApiDTO>(
+    `/api/citas/${citaId}/no-atendida`,
+    { method: 'PATCH', body: { reason: motivoLimpio } }
+  );
 
-  citas[indice] = citaActualizada;
-  saveStoredCitas(citas);
-
-  return citaActualizada;
+  return toCitaAgenda(cita);
 };
 
 export const vetScheduleService = {
