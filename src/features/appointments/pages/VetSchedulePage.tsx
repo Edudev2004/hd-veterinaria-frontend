@@ -139,6 +139,12 @@ export const VetSchedulePage: React.FC = () => {
         </div>
       </div>
 
+      {error && (
+        <p className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
+          {error}
+        </p>
+      )}
+
       <div className="rounded-2xl border border-slate-100 bg-white p-4">
         <div className="mb-3 flex gap-2 border-b border-slate-100 pb-3">
           {FILTROS.map((clave) => (
