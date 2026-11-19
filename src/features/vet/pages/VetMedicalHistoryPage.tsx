@@ -13,10 +13,8 @@ import {
   Sparkles,
   AlertCircle
 } from 'lucide-react';
-import {
-  getTodasLasMascotasConHistorial,
-  getHistorialPorMascota
-} from '../../../services/historialService';
+import { getHistorialPorMascota } from '../../../services/historialService';
+import { getMisPacientes } from '../services/vetPatientService';
 import { EntradaHistorialClinico, MascotaExpediente } from '../../../types/historial.types';
 import { HistorialClinicoModal } from '../../pets/components/HistorialClinicoModal';
 
@@ -32,13 +30,26 @@ export const VetMedicalHistoryPage: React.FC = () => {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState<boolean>(false);
 
-  // Cargar lista de pacientes al montar
+  // Cargar lista de pacientes reales del veterinario al montar
   useEffect(() => {
-    const list = getTodasLasMascotasConHistorial();
-    setPacientes(list);
-    if (list.length > 0 && !selectedPet) {
-      setSelectedPet(list[0].mascota);
-    }
+    let active = true;
+
+    getMisPacientes()
+      .then((list) => {
+        if (!active) return;
+        setPacientes(list);
+        if (list.length > 0) {
+          setSelectedPet(list[0].mascota);
+        }
+      })
+      .catch((err: unknown) => {
+        if (!active) return;
+        console.error('Error al cargar pacientes del veterinario:', err);
+      });
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   // Cargar historial médico cuando cambia la mascota seleccionada
