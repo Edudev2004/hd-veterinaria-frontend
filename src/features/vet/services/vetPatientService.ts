@@ -1,3 +1,4 @@
+import { apiRequestWithTimeout } from '../../../services/apiClient';
 import type { MascotaExpediente } from '../../../types/historial.types';
 
 export interface PetResponse {
@@ -54,4 +55,14 @@ export const toPaciente = (item: VetPatientResponse): PacienteVeterinario => {
     totalAtenciones: item.totalAtenciones ?? 0,
     ultimaAtencion: item.ultimaAtencion
   };
+};
+
+export const getMisPacientes = async (): Promise<PacienteVeterinario[]> => {
+  const response = await apiRequestWithTimeout<VetPatientResponse[]>(
+    '/api/veterinarios/me/pacientes',
+    {},
+    15000
+  );
+
+  return (response ?? []).map(toPaciente);
 };
