@@ -9,6 +9,7 @@ type ValoresFormulario = Pick<
 interface VetConsultationFormProps {
   initialValues?: ValoresFormulario;
   guardando?: boolean;
+  textoBoton?: string;
   onSubmit: (values: ValoresFormulario) => Promise<void> | void;
 }
 
@@ -21,6 +22,7 @@ const valoresIniciales: ValoresFormulario = {
 export const VetConsultationForm: React.FC<VetConsultationFormProps> = ({
   initialValues,
   guardando = false,
+  textoBoton = 'Guardar atención',
   onSubmit
 }) => {
   const [values, setValues] = useState<ValoresFormulario>(
@@ -130,7 +132,7 @@ export const VetConsultationForm: React.FC<VetConsultationFormProps> = ({
           disabled={guardando}
           className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {guardando ? 'Guardando...' : 'Guardar atención'}
+          {guardando ? 'Guardando...' : textoBoton}
         </button>
       </div>
     </form>
