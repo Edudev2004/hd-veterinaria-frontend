@@ -97,10 +97,7 @@ export const VetSchedulePage: React.FC = () => {
   const atendidas = citas.filter((cita) => cita.estado === "atendida").length;
   const pendientes = citas.filter((cita) => cita.estado === "pendiente").length;
 
-  const hoy = new Date().toLocaleDateString("es-PE", {
-    day: "2-digit",
-    month: "long",
-  });
+  const fechaLarga = formatearFechaLarga(fecha);
 
   const alternarDetalle = (citaId: string) => {
     setCitaExpandidaId((citaActual) => (citaActual === citaId ? null : citaId));
@@ -114,11 +111,20 @@ export const VetSchedulePage: React.FC = () => {
             Agenda Diaria del Veterinario
           </h1>
           <p className="text-sm text-slate-500">
-            Hoy, {hoy} · {citas.length} citas programadas
+            {fechaLarga} · {citas.length} citas programadas
           </p>
         </div>
 
         <div className="flex gap-3">
+          <label className="flex flex-col justify-center text-xs text-slate-500">
+            Fecha
+            <input
+              type="date"
+              value={fecha}
+              onChange={(e) => e.target.value && setFecha(e.target.value)}
+              className="mt-1 rounded-lg border border-slate-200 px-2 py-1 text-sm text-slate-700 outline-none focus:border-primary"
+            />
+          </label>
           <div className="rounded-xl bg-tertiary px-4 py-2 text-center">
             <p className="text-xs text-slate-500">Atendidas</p>
             <p className="text-lg font-bold text-primary">{atendidas}</p>
