@@ -220,7 +220,9 @@ export const VetMedicalHistoryPage: React.FC = () => {
               </div>
             ) : pacientesFiltrados.length === 0 ? (
               <div className="p-6 text-center text-xs text-slate-400 bg-slate-50 rounded-2xl border border-slate-100">
-                No se encontraron pacientes que coincidan con la búsqueda.
+                {pacientes.length === 0
+                  ? 'Aún no tienes pacientes con citas registradas.'
+                  : 'No se encontraron pacientes que coincidan con la búsqueda.'}
               </div>
             ) : (
               pacientesFiltrados.map((item) => {
