@@ -13,7 +13,8 @@ import {
 
 interface PetFormProps {
   mascota?: Mascota;
-  onSuccess: () => void;
+  /** Recibe la mascota tal como quedó guardada en el backend. */
+  onSuccess: (guardada: Mascota) => void;
 }
 
 export const PetForm: React.FC<PetFormProps> = ({ mascota, onSuccess }) => {
@@ -44,12 +45,10 @@ export const PetForm: React.FC<PetFormProps> = ({ mascota, onSuccess }) => {
     try {
       setIsSubmitting(true);
       setError(null);
-      if (mascota) {
-        await updatePet(mascota.id, formData);
-      } else {
-        await registerPet(formData);
-      }
-      onSuccess();
+      const guardada = mascota
+        ? await updatePet(mascota.id, formData)
+        : await registerPet(formData);
+      onSuccess(guardada);
     } catch (err: any) {
       setError(err?.message || "Ocurrió un error al guardar la mascota.");
     } finally {
