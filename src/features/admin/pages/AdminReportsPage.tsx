@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import * as XLSX from 'xlsx';
 import {
   AlertCircle,
   BarChart3,
@@ -11,8 +10,9 @@ import {
   Stethoscope,
 } from 'lucide-react';
 import {
-  etiquetaEspecie,
-  etiquetaEstado,
+  descargarExcelCitas,
+  descargarExcelMascotas,
+  descargarExcelVeterinarios,
   getMascotasPorEspecie,
   getRankingVeterinarios,
   getReporteCitas,
@@ -20,8 +20,6 @@ import {
   ReporteCitas,
   VeterinarioRanking,
 } from '@/services/adminReportApi';
-import { getCitas } from '@/services/citaService';
-import { adminVeterinarianService } from '../services/adminVeterinarianService';
 
 // ---- Utilidades ----
 
@@ -47,46 +45,15 @@ const mensajeDeError = (error: unknown): string =>
     ? error.message
     : 'No se pudo cargar la información. Intenta nuevamente.';
 
-const formatFechaLegible = (isoDate?: string): string => {
-  if (!isoDate) return '-';
-  try {
-    const parts = isoDate.split('T')[0].split('-');
-    if (parts.length === 3) {
-      return `${parts[2]}/${parts[1]}/${parts[0]}`;
-    }
-  } catch {}
-  return isoDate;
-};
-
-const formatHoraLegible = (isoDate?: string): string => {
-  if (!isoDate) return '-';
-  try {
-    if (isoDate.includes('T')) {
-      return isoDate.split('T')[1].substring(0, 5);
-    }
-  } catch {}
-  return '-';
-};
-
-interface ExcelSheetConfig {
-  sheetName: string;
-  rows: (string | number | null | undefined)[][];
-  colWidths?: number[];
-}
-
-const exportToExcel = (filename: string, sheets: ExcelSheetConfig[]) => {
-  const wb = XLSX.utils.book_new();
-
-  sheets.forEach((s) => {
-    const ws = XLSX.utils.aoa_to_sheet(s.rows);
-    if (s.colWidths && s.colWidths.length > 0) {
-      ws['!cols'] = s.colWidths.map((w) => ({ wch: w }));
-    }
-    const safeSheetName = s.sheetName.replace(/[\\/*?:[\]]/g, '').substring(0, 31);
-    XLSX.utils.book_append_sheet(wb, ws, safeSheetName);
-  });
-
-  XLSX.writeFile(wb, filename);
+const guardarArchivo = (archivo: Blob, nombreArchivo: string): void => {
+  const url = URL.createObjectURL(archivo);
+  const enlace = document.createElement('a');
+  enlace.href = url;
+  enlace.download = nombreArchivo;
+  document.body.appendChild(enlace);
+  enlace.click();
+  document.body.removeChild(enlace);
+  URL.revokeObjectURL(url);
 };
 
 const porcentaje = (parte: number, total: number): number => (total > 0 ? (parte / total) * 100 : 0);
@@ -146,6 +113,9 @@ export const AdminReportsPage: React.FC = () => {
   const [cargandoGenerales, setCargandoGenerales] = useState(true);
   const [errorGenerales, setErrorGenerales] = useState<string | null>(null);
 
+  const [descargando, setDescargando] = useState<'citas' | 'veterinarios' | 'especies' | null>(null);
+  const [errorDescarga, setErrorDescarga] = useState<string | null>(null);
+
   const rangoInvalido = Boolean(startDate && endDate && startDate > endDate);
   const rangoIncompleto = !startDate || !endDate;
 
@@ -192,238 +162,51 @@ export const AdminReportsPage: React.FC = () => {
   const contarEstado = (estado: string) =>
     reporteCitas?.porEstado.find((item) => item.estado === estado)?.cantidad ?? 0;
 
-  // ---- Exportación CSV profesional, estructurada y compatible con Excel ----
+  // ---- Exportación oficial a Excel (.xlsx) generada por backend con Apache POI ----
 
   const exportCitas = async () => {
-    if (!reporteCitas) return;
-
-    let citasDetalle = reporteCitas.detalleCitas ?? [];
-    if (citasDetalle.length === 0) {
-      try {
-        const todas = await getCitas();
-        citasDetalle = todas
-          .filter((c) => {
-            const f = c.fecha_hora ? c.fecha_hora.split('T')[0] : '';
-            return (!startDate || f >= startDate) && (!endDate || f <= endDate);
-          })
-          .map((c) => ({
-            id: c.id,
-            fechaHora: c.fecha_hora,
-            estado: c.estado.toUpperCase(),
-            mascotaNombre: c.mascota.nombre,
-            especie: c.mascota.especie,
-            raza: c.mascota.raza || 'Mestizo',
-            propietarioNombre: c.propietario?.nombre || 'No asignado',
-            propietarioTelefono: c.propietario?.telefono || 'No registrado',
-            propietarioEmail: c.propietario?.email || 'No registrado',
-            veterinarioNombre: c.veterinario.nombre,
-            especialidad: c.veterinario.especialidad_nombre || 'Medicina General',
-            motivo: c.motivo || 'Consulta médica',
-            observacion: c.motivo_cancelacion || (c.estado === 'atendida' ? 'Atención médica completada' : '-'),
-          }));
-      } catch (e) {
-        console.error('Error al obtener citas para reporte:', e);
-      }
+    if (!startDate || !endDate || rangoInvalido) return;
+    try {
+      setDescargando('citas');
+      setErrorDescarga(null);
+      const blob = await descargarExcelCitas(startDate, endDate);
+      guardarArchivo(blob, `reporte_citas_${startDate}_${endDate}.xlsx`);
+    } catch (e) {
+      console.error('Error al descargar reporte de citas en Excel:', e);
+      setErrorDescarga('No se pudo generar el reporte de citas en formato Excel.');
+    } finally {
+      setDescargando(null);
     }
-
-    const rowsDetalle = citasDetalle.map((c, i) => [
-      i + 1,
-      formatFechaLegible(c.fechaHora),
-      formatHoraLegible(c.fechaHora),
-      etiquetaEstado(c.estado),
-      c.mascotaNombre,
-      etiquetaEspecie(c.especie),
-      c.raza || 'Mestizo',
-      c.propietarioNombre || 'No asignado',
-      c.propietarioTelefono || 'No registrado',
-      c.veterinarioNombre || 'No asignado',
-      c.especialidad || 'Medicina General',
-      c.motivo || 'Consulta médica',
-      c.observacion || '-',
-    ]);
-
-    const rowsResumen = [
-      ...reporteCitas.porEstado.map((item) => [
-        item.etiqueta,
-        item.cantidad,
-        `${porcentaje(item.cantidad, reporteCitas.total).toFixed(1)}%`,
-      ]),
-      ['TOTAL GENERAL', reporteCitas.total, '100.0%'],
-    ];
-
-    exportToExcel(`reporte-citas_${reporteCitas.fechaInicio}_${reporteCitas.fechaFin}.xlsx`, [
-      {
-        sheetName: 'Detalle de Citas',
-        colWidths: [6, 14, 10, 16, 20, 14, 18, 26, 18, 26, 22, 28, 36],
-        rows: [
-          ['VETHD PLATAFORMA CLÍNICA - REPORTE DETALLADO DE CITAS MÉDICAS'],
-          ['Período del reporte:', `${reporteCitas.fechaInicio} al ${reporteCitas.fechaFin}`],
-          ['Fecha y hora de emisión:', new Date().toLocaleString('es-PE')],
-          ['Total de citas registradas:', reporteCitas.total],
-          [],
-          [
-            'N°',
-            'Fecha',
-            'Hora',
-            'Estado de Cita',
-            'Nombre Mascota',
-            'Especie',
-            'Raza',
-            'Propietario',
-            'Teléfono Contacto',
-            'Médico Veterinario',
-            'Especialidad Médica',
-            'Motivo de Consulta',
-            'Observaciones / Diagnóstico / Cancelación',
-          ],
-          ...(rowsDetalle.length > 0 ? rowsDetalle : [['-', '-', '-', '-', 'Sin registros detallados en el período', '-', '-', '-', '-', '-', '-', '-', '-']]),
-        ],
-      },
-      {
-        sheetName: 'Resumen Estadístico',
-        colWidths: [22, 18, 24],
-        rows: [
-          ['RESUMEN ESTADÍSTICO DE CITAS POR ESTADO'],
-          ['Período:', `${reporteCitas.fechaInicio} al ${reporteCitas.fechaFin}`],
-          [],
-          ['Estado de Cita', 'Cantidad de Citas', 'Porcentaje del Período'],
-          ...rowsResumen,
-        ],
-      },
-    ]);
   };
 
   const exportVeterinarios = async () => {
-    let vetsList: { nombre: string; dni?: string; email?: string; especialidades?: string[]; active?: boolean; atenciones: number }[] = [];
     try {
-      const adminVets = await adminVeterinarianService.listar();
-      vetsList = adminVets.map((av) => {
-        const found = ranking.find((r) => r.id === av.id || r.nombre.toLowerCase() === av.fullName.toLowerCase());
-        return {
-          nombre: av.fullName,
-          dni: av.dni,
-          email: av.email,
-          especialidades: av.specialties,
-          active: av.active,
-          atenciones: found ? found.atenciones : 0,
-        };
-      }).sort((a, b) => b.atenciones - a.atenciones);
-    } catch {
-      vetsList = ranking.map((r) => ({
-        nombre: r.nombre,
-        email: r.email,
-        especialidades: r.especialidad ? [r.especialidad] : ['Medicina General'],
-        active: r.activo !== false,
-        atenciones: r.atenciones,
-      }));
+      setDescargando('veterinarios');
+      setErrorDescarga(null);
+      const blob = await descargarExcelVeterinarios();
+      const fecha = toIsoDate(new Date());
+      guardarArchivo(blob, `ranking_veterinarios_${fecha}.xlsx`);
+    } catch (e) {
+      console.error('Error al descargar reporte de veterinarios en Excel:', e);
+      setErrorDescarga('No se pudo generar el reporte de veterinarios en formato Excel.');
+    } finally {
+      setDescargando(null);
     }
-
-    const totalAtenciones = vetsList.reduce((acc, v) => acc + v.atenciones, 0);
-
-    const rowsVets = vetsList.map((vet, idx) => [
-      idx + 1,
-      vet.nombre,
-      vet.dni || '-',
-      vet.especialidades && vet.especialidades.length > 0 ? vet.especialidades.join(', ') : 'Medicina General',
-      vet.email || '-',
-      vet.active !== false ? 'Activo' : 'Inactivo',
-      vet.atenciones,
-      `${porcentaje(vet.atenciones, totalAtenciones).toFixed(1)}%`,
-    ]);
-
-    exportToExcel('ranking-veterinarios.xlsx', [
-      {
-        sheetName: 'Ranking Veterinarios',
-        colWidths: [10, 28, 14, 28, 30, 14, 18, 25],
-        rows: [
-          ['VETHD PLATAFORMA CLÍNICA - REPORTE Y RANKING DEL EQUIPO VETERINARIO'],
-          ['Fecha y hora de emisión:', new Date().toLocaleString('es-PE')],
-          ['Total de médicos veterinarios:', vetsList.length],
-          ['Total de atenciones atendidas:', totalAtenciones],
-          [],
-          [
-            'Posición',
-            'Médico Veterinario',
-            'DNI',
-            'Especialidades',
-            'Correo Electrónico',
-            'Estado',
-            'Citas Atendidas',
-            'Participación (% del Total)',
-          ],
-          ...rowsVets,
-          ['Total General', '-', '-', '-', '-', '-', totalAtenciones, '100.0%'],
-        ],
-      },
-    ]);
   };
 
   const exportEspecies = async () => {
-    const rowsEspecies = [
-      ...especies.map((item, idx) => [
-        idx + 1,
-        item.especie,
-        item.cantidad,
-        `${porcentaje(item.cantidad, totalMascotas).toFixed(1)}%`,
-      ]),
-      ['Total General', 'Todas las especies', totalMascotas, '100.0%'],
-    ];
-
-    let rowsPacientes: (string | number)[][] = [];
     try {
-      const citas = await getCitas();
-      const mapaMascotas = new Map<string, { nombre: string; especie: string; raza: string; propietario: string; telefono: string }>();
-      citas.forEach((c) => {
-        if (c.mascota && !mapaMascotas.has(c.mascota.id)) {
-          mapaMascotas.set(c.mascota.id, {
-            nombre: c.mascota.nombre,
-            especie: etiquetaEspecie(c.mascota.especie),
-            raza: c.mascota.raza || 'Mestizo',
-            propietario: c.propietario?.nombre || 'No asignado',
-            telefono: c.propietario?.telefono || 'No registrado',
-          });
-        }
-      });
-      rowsPacientes = Array.from(mapaMascotas.values()).map((p, i) => [
-        i + 1,
-        p.nombre,
-        p.especie,
-        p.raza,
-        p.propietario,
-        p.telefono,
-      ]);
-    } catch {}
-
-    const sheets: ExcelSheetConfig[] = [
-      {
-        sheetName: 'Distribución por Especie',
-        colWidths: [8, 22, 24, 28],
-        rows: [
-          ['VETHD PLATAFORMA CLÍNICA - REPORTE DEMOGRÁFICO DE PACIENTES POR ESPECIE'],
-          ['Fecha y hora de emisión:', new Date().toLocaleString('es-PE')],
-          ['Total de mascotas activas:', totalMascotas],
-          ['Especies registradas:', especies.length],
-          [],
-          ['N°', 'Especie Animal', 'Cantidad de Mascotas', 'Porcentaje de la Población'],
-          ...rowsEspecies,
-        ],
-      },
-    ];
-
-    if (rowsPacientes.length > 0) {
-      sheets.push({
-        sheetName: 'Padrón de Pacientes',
-        colWidths: [8, 22, 16, 20, 28, 20],
-        rows: [
-          ['PADRÓN DE PACIENTES REGISTRADOS EN SISTEMA'],
-          [],
-          ['N°', 'Nombre de Mascota', 'Especie', 'Raza', 'Propietario', 'Teléfono Contacto'],
-          ...rowsPacientes,
-        ],
-      });
+      setDescargando('especies');
+      setErrorDescarga(null);
+      const blob = await descargarExcelMascotas();
+      const fecha = toIsoDate(new Date());
+      guardarArchivo(blob, `reporte_mascotas_especies_${fecha}.xlsx`);
+    } catch (e) {
+      console.error('Error al descargar reporte de especies en Excel:', e);
+      setErrorDescarga('No se pudo generar el reporte de especies en formato Excel.');
+    } finally {
+      setDescargando(null);
     }
-
-    exportToExcel('mascotas-por-especie.xlsx', sheets);
   };
 
   const tarjetas = [
@@ -667,16 +450,29 @@ export const AdminReportsPage: React.FC = () => {
           </div>
         </div>
 
+        {errorDescarga && (
+          <div className="mb-4 flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            <span>{errorDescarga}</span>
+          </div>
+        )}
+
         <div className="grid gap-4 md:grid-cols-3">
           <button
             type="button"
             onClick={exportCitas}
-            disabled={!reporteCitas || cargandoCitas || Boolean(errorCitas) || rangoInvalido}
+            disabled={!reporteCitas || cargandoCitas || Boolean(errorCitas) || rangoInvalido || descargando !== null}
             className="rounded-xl border border-slate-200 p-4 text-left transition hover:border-emerald-300 hover:bg-emerald-50/30 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <div className="flex items-center gap-2">
-              <FileSpreadsheet className="h-4 w-4 text-emerald-600" />
-              <p className="font-semibold text-slate-800">Exportar citas (.xlsx)</p>
+              {descargando === 'citas' ? (
+                <Loader2 className="h-4 w-4 animate-spin text-emerald-600" />
+              ) : (
+                <FileSpreadsheet className="h-4 w-4 text-emerald-600" />
+              )}
+              <p className="font-semibold text-slate-800">
+                {descargando === 'citas' ? 'Generando Excel...' : 'Exportar citas (.xlsx)'}
+              </p>
             </div>
             <p className="mt-1 text-xs text-slate-500">Detalle registro por registro y resumen estadístico.</p>
           </button>
@@ -684,12 +480,18 @@ export const AdminReportsPage: React.FC = () => {
           <button
             type="button"
             onClick={exportVeterinarios}
-            disabled={cargandoGenerales || Boolean(errorGenerales) || ranking.length === 0}
+            disabled={cargandoGenerales || Boolean(errorGenerales) || ranking.length === 0 || descargando !== null}
             className="rounded-xl border border-slate-200 p-4 text-left transition hover:border-emerald-300 hover:bg-emerald-50/30 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <div className="flex items-center gap-2">
-              <FileSpreadsheet className="h-4 w-4 text-emerald-600" />
-              <p className="font-semibold text-slate-800">Exportar veterinarios (.xlsx)</p>
+              {descargando === 'veterinarios' ? (
+                <Loader2 className="h-4 w-4 animate-spin text-emerald-600" />
+              ) : (
+                <FileSpreadsheet className="h-4 w-4 text-emerald-600" />
+              )}
+              <p className="font-semibold text-slate-800">
+                {descargando === 'veterinarios' ? 'Generando Excel...' : 'Exportar veterinarios (.xlsx)'}
+              </p>
             </div>
             <p className="mt-1 text-xs text-slate-500">Padrón médico, especialidades y ranking de atenciones.</p>
           </button>
@@ -697,12 +499,18 @@ export const AdminReportsPage: React.FC = () => {
           <button
             type="button"
             onClick={exportEspecies}
-            disabled={cargandoGenerales || Boolean(errorGenerales) || especies.length === 0}
+            disabled={cargandoGenerales || Boolean(errorGenerales) || especies.length === 0 || descargando !== null}
             className="rounded-xl border border-slate-200 p-4 text-left transition hover:border-emerald-300 hover:bg-emerald-50/30 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <div className="flex items-center gap-2">
-              <FileSpreadsheet className="h-4 w-4 text-emerald-600" />
-              <p className="font-semibold text-slate-800">Exportar especies (.xlsx)</p>
+              {descargando === 'especies' ? (
+                <Loader2 className="h-4 w-4 animate-spin text-emerald-600" />
+              ) : (
+                <FileSpreadsheet className="h-4 w-4 text-emerald-600" />
+              )}
+              <p className="font-semibold text-slate-800">
+                {descargando === 'especies' ? 'Generando Excel...' : 'Exportar especies (.xlsx)'}
+              </p>
             </div>
             <p className="mt-1 text-xs text-slate-500">Demografía por especie y padrón de pacientes.</p>
           </button>

@@ -203,6 +203,101 @@ export async function apiRequest<T>(
   return (data ?? undefined) as T;
 }
 
+/**
+ * Cliente HTTP para descarga de archivos binarios (Excel, PDF, blobs).
+ * Adjunta el token JWT y procesa cabeceras de descarga de archivo.
+ */
+export async function apiDownloadBlob(
+  path: string,
+  options: ApiRequestOptions = {},
+): Promise<Blob> {
+  const { method = "GET", body, auth = true, token, signal } = options;
+
+  const headers: Record<string, string> = {
+    Accept: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/octet-stream, */*",
+  };
+
+  if (body !== undefined) {
+    headers["Content-Type"] = "application/json";
+  }
+
+  const effectiveToken = token ?? (auth ? getToken() : null);
+
+  if (effectiveToken) {
+    headers.Authorization = `Bearer ${effectiveToken}`;
+  }
+
+  const url = `${API_URL}${path.startsWith("/") ? path : `/${path}`}`;
+
+  let response: Response;
+
+  try {
+    response = await fetch(url, {
+      method,
+      headers,
+      body: body === undefined ? undefined : JSON.stringify(body),
+      signal,
+    });
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") {
+      throw error;
+    }
+
+    const connectionMessage =
+      "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución.";
+
+    window.dispatchEvent(
+      new CustomEvent("vethd:server-error", {
+        detail: {
+          status: 503,
+          message: connectionMessage,
+        },
+      }),
+    );
+
+    throw new ApiError(0, connectionMessage);
+  }
+
+  if (!response.ok) {
+    const rawBody = await response.text();
+    let data: unknown = null;
+
+    if (rawBody) {
+      try {
+        data = JSON.parse(rawBody);
+      } catch {
+        data = rawBody;
+      }
+    }
+
+    const errorMessage = extractErrorMessage(data, response.status);
+
+    if (response.status === 401 && auth) {
+      clearSession();
+      window.dispatchEvent(new CustomEvent("vethd:unauthorized"));
+    }
+
+    if (response.status >= 500) {
+      window.dispatchEvent(
+        new CustomEvent("vethd:server-error", {
+          detail: {
+            status: response.status,
+            message: errorMessage,
+          },
+        }),
+      );
+    }
+
+    throw new ApiError(
+      response.status,
+      errorMessage,
+      data,
+    );
+  }
+
+  return await response.blob();
+}
+
 export async function apiRequestWithTimeout<T>(
   path: string,
   options: ApiRequestOptions = {},

@@ -1,4 +1,4 @@
-import { apiRequest } from './apiClient';
+import { apiRequest, apiDownloadBlob } from './apiClient';
 
 // ---- DTOs tal como los devuelve el backend (AdminReportController) ----
 
@@ -161,4 +161,22 @@ export const getEstadisticasDashboard = async (): Promise<EstadisticasDashboard>
     totalMascotas: dto.totalMascotas,
     totalCitas: dto.totalCitas,
   };
+};
+
+// ---- Métodos de descarga directa de reportes Excel (.xlsx) generados con Apache POI ----
+
+export const descargarExcelCitas = async (
+  fechaInicio: string,
+  fechaFin: string,
+): Promise<Blob> => {
+  const params = new URLSearchParams({ fechaInicio, fechaFin });
+  return apiDownloadBlob(`/api/admin/reportes/citas/excel?${params}`);
+};
+
+export const descargarExcelVeterinarios = async (): Promise<Blob> => {
+  return apiDownloadBlob('/api/admin/reportes/veterinarios/excel');
+};
+
+export const descargarExcelMascotas = async (): Promise<Blob> => {
+  return apiDownloadBlob('/api/admin/reportes/mascotas/excel');
 };
