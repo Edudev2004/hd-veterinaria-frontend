@@ -17,8 +17,7 @@ import {
   Users,
   ShieldCheck,
   Award,
-  Layers,
-  ChevronDown
+  Layers
 } from 'lucide-react';
 
 export type PortalType = 'propietario' | 'veterinario' | 'admin';
@@ -30,7 +29,6 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ onNewAppointmentClick }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [activePortal, setActivePortal] = useState<PortalType>('propietario');
-  const [isPortalMenuOpen, setIsPortalMenuOpen] = useState(false);
   
   const navigate = useNavigate();
   const location = useLocation();
@@ -90,20 +88,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewAppointmentClick }) => {
 
   const currentNav = navPortals[activePortal];
 
-  const handlePortalSwitch = (portal: PortalType) => {
-    setActivePortal(portal);
-    setIsPortalMenuOpen(false);
-    if (portal === 'propietario') navigate('/dashboard');
-    if (portal === 'veterinario') navigate('/veterinario/agenda');
-    if (portal === 'admin') navigate('/admin/dashboard');
-  };
-
   return (
     <aside
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
         setIsHovered(false);
-        setIsPortalMenuOpen(false);
       }}
       className={`hidden md:flex fixed top-0 left-0 h-screen bg-[#edf2fa] border-r border-slate-200/80 z-40 transition-all duration-300 ease-in-out flex-col justify-between p-4 shadow-sm ${
         isHovered ? 'w-64' : 'w-20'
@@ -128,53 +117,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewAppointmentClick }) => {
           </div>
         </div>
 
-        {/* Portal Badge / Switcher (Dropdown only for Admin) */}
+        {/* Portal Badge */}
         {isHovered && (
           <div className="relative px-1">
-            {user?.rol === 'admin' ? (
-              <>
-                <button
-                  onClick={() => setIsPortalMenuOpen(!isPortalMenuOpen)}
-                  className="w-full flex items-center justify-between px-3 py-2 bg-white/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 hover:bg-white transition-all shadow-xs cursor-pointer"
-                >
-                  <span>{currentNav.title}</span>
-                  <ChevronDown className="w-4 h-4 text-slate-400" />
-                </button>
-
-                {isPortalMenuOpen && (
-                  <div className="absolute top-full left-1 right-1 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-50 py-1 flex flex-col">
-                    <button
-                      onClick={() => handlePortalSwitch('admin')}
-                      className={`px-3 py-2 text-left text-xs font-medium hover:bg-slate-50 cursor-pointer ${
-                        activePortal === 'admin' ? 'text-[#0d9488] font-bold' : 'text-slate-700'
-                      }`}
-                    >
-                      Panel Administración
-                    </button>
-                    <button
-                      onClick={() => handlePortalSwitch('veterinario')}
-                      className={`px-3 py-2 text-left text-xs font-medium hover:bg-slate-50 cursor-pointer ${
-                        activePortal === 'veterinario' ? 'text-[#0d9488] font-bold' : 'text-slate-700'
-                      }`}
-                    >
-                      Panel Veterinario
-                    </button>
-                    <button
-                      onClick={() => handlePortalSwitch('propietario')}
-                      className={`px-3 py-2 text-left text-xs font-medium hover:bg-slate-50 cursor-pointer ${
-                        activePortal === 'propietario' ? 'text-[#0d9488] font-bold' : 'text-slate-700'
-                      }`}
-                    >
-                      Portal Propietario
-                    </button>
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="w-full px-3 py-2 bg-white/60 border border-slate-200/80 rounded-xl text-xs font-bold text-slate-700 shadow-2xs">
-                {currentNav.title}
-              </div>
-            )}
+            <div className="w-full px-3 py-2 bg-white/80 border border-slate-200/80 rounded-xl text-xs font-bold text-slate-700 shadow-2xs">
+              {currentNav.title}
+            </div>
           </div>
         )}
 

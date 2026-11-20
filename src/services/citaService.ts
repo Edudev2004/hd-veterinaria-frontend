@@ -55,9 +55,18 @@ interface SpecialtyDTO {
   active: boolean;
 }
 
+interface OwnerDTO {
+  id: string;
+  fullName: string;
+  dni?: string | null;
+  phone?: string | null;
+  email?: string | null;
+}
+
 interface AppointmentDTO {
   id: string;
   pet: PetDTO;
+  owner?: OwnerDTO | null;
   veterinarian: VeterinarianDTO;
   specialty: SpecialtyDTO | null;
   scheduledAt: string;
@@ -212,6 +221,15 @@ const toCitaDetallada = (dto: AppointmentDTO): CitaDetallada => {
     created_at: dto.createdAt ?? new Date().toISOString(),
     mascota: toMascota(dto.pet),
     veterinario: toVeterinario(dto.veterinarian, especialidadId),
+    propietario: dto.owner
+      ? {
+          id: dto.owner.id,
+          nombre: dto.owner.fullName,
+          dni: dto.owner.dni ?? undefined,
+          telefono: dto.owner.phone ?? undefined,
+          email: dto.owner.email ?? undefined,
+        }
+      : undefined,
     motivo_original: dto.reason,
     motivo_cancelacion: dto.cancellationReason
   };
