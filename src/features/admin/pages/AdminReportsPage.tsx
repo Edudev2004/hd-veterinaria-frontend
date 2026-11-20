@@ -1,374 +1,469 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
+  AlertCircle,
   BarChart3,
   CalendarDays,
-  PawPrint,
-  Stethoscope,
   Loader2,
-  Download,
-  AlertCircle,
+  PawPrint,
+  RefreshCw,
+  Stethoscope,
 } from 'lucide-react';
 import {
-  adminReportsService,
-  CitasReporteDTO,
-  VeterinarioRankingDTO,
-  MascotasEspecieDTO,
-} from '../services/adminReportsService';
+  getMascotasPorEspecie,
+  getRankingVeterinarios,
+  getReporteCitas,
+  MascotasPorEspecie,
+  ReporteCitas,
+  VeterinarioRanking,
+} from '@/services/adminReportApi';
+
+// ---- Utilidades ----
+
+const toIsoDate = (date: Date): string => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+};
+
+const primerDiaDelMes = (): string => {
+  const hoy = new Date();
+  return toIsoDate(new Date(hoy.getFullYear(), hoy.getMonth(), 1));
+};
+
+const ultimoDiaDelMes = (): string => {
+  const hoy = new Date();
+  return toIsoDate(new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0));
+};
+
+const mensajeDeError = (error: unknown): string =>
+  error instanceof Error && error.message
+    ? error.message
+    : 'No se pudo cargar la información. Intenta nuevamente.';
+
+const csvCell = (value: string | number): string => `"${String(value).replace(/"/g, '""')}"`;
+
+const downloadCsv = (filename: string, headers: string[], rows: (string | number)[][]) => {
+  const csv = [headers, ...rows].map((row) => row.map(csvCell).join(',')).join('\n');
+  // BOM para que Excel respete las tildes.
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+};
+
+const porcentaje = (parte: number, total: number): number => (total > 0 ? (parte / total) * 100 : 0);
+
+const COLORES_ESTADO: Record<string, string> = {
+  ATENDIDA: 'bg-green-500',
+  PENDIENTE: 'bg-amber-400',
+  CONFIRMADA: 'bg-blue-500',
+  CANCELADA: 'bg-red-400',
+  NO_ATENDIDA: 'bg-slate-400',
+};
+
+// ---- Componentes pequeños ----
+
+const EstadoCarga: React.FC = () => (
+  <div className="flex items-center justify-center gap-2 py-10 text-sm text-slate-500">
+    <Loader2 className="h-4 w-4 animate-spin" />
+    Cargando...
+  </div>
+);
+
+const EstadoError: React.FC<{ mensaje: string; onRetry: () => void }> = ({ mensaje, onRetry }) => (
+  <div className="flex flex-col items-center gap-3 rounded-xl border border-red-100 bg-red-50 p-6 text-center">
+    <div className="flex items-center gap-2 text-sm text-red-700">
+      <AlertCircle className="h-4 w-4" />
+      {mensaje}
+    </div>
+    <button
+      type="button"
+      onClick={onRetry}
+      className="inline-flex items-center gap-1 rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100"
+    >
+      <RefreshCw className="h-3 w-3" />
+      Reintentar
+    </button>
+  </div>
+);
+
+const EstadoVacio: React.FC<{ mensaje: string }> = ({ mensaje }) => (
+  <div className="rounded-xl border border-dashed border-slate-200 p-8 text-center">
+    <p className="text-sm text-slate-500">{mensaje}</p>
+  </div>
+);
+
+// ---- Página ----
 
 export const AdminReportsPage: React.FC = () => {
-  const getDefaultDates = () => {
-    const now = new Date();
-    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-    const today = now.toISOString().split('T')[0];
-    return { firstDay, today };
-  };
+  const [startDate, setStartDate] = useState(primerDiaDelMes);
+  const [endDate, setEndDate] = useState(ultimoDiaDelMes);
 
-  const { firstDay, today } = getDefaultDates();
-  const [startDate, setStartDate] = useState(firstDay);
-  const [endDate, setEndDate] = useState(today);
+  const [reporteCitas, setReporteCitas] = useState<ReporteCitas | null>(null);
+  const [cargandoCitas, setCargandoCitas] = useState(true);
+  const [errorCitas, setErrorCitas] = useState<string | null>(null);
 
-  const [citasReporte, setCitasReporte] = useState<CitasReporteDTO | null>(null);
-  const [rankingVets, setRankingVets] = useState<VeterinarioRankingDTO[]>([]);
-  const [especiesReporte, setEspeciesReporte] = useState<MascotasEspecieDTO[]>([]);
+  const [ranking, setRanking] = useState<VeterinarioRanking[]>([]);
+  const [especies, setEspecies] = useState<MascotasPorEspecie[]>([]);
+  const [cargandoGenerales, setCargandoGenerales] = useState(true);
+  const [errorGenerales, setErrorGenerales] = useState<string | null>(null);
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const rangoInvalido = Boolean(startDate && endDate && startDate > endDate);
+  const rangoIncompleto = !startDate || !endDate;
 
-  const cargarReportes = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
+  const cargarCitas = useCallback(async () => {
+    if (rangoInvalido || rangoIncompleto) return;
+    setCargandoCitas(true);
+    setErrorCitas(null);
     try {
-      const [citas, vets, especies] = await Promise.all([
-        adminReportsService.obtenerReporteCitas(startDate, endDate),
-        adminReportsService.obtenerRankingVeterinarios(),
-        adminReportsService.obtenerReporteMascotasPorEspecie(),
-      ]);
-      setCitasReporte(citas);
-      setRankingVets(vets);
-      setEspeciesReporte(especies);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al cargar los reportes estadísticos.');
+      setReporteCitas(await getReporteCitas(startDate, endDate));
+    } catch (error) {
+      setErrorCitas(mensajeDeError(error));
     } finally {
-      setIsLoading(false);
+      setCargandoCitas(false);
     }
-  }, [startDate, endDate]);
+  }, [startDate, endDate, rangoInvalido, rangoIncompleto]);
+
+  const cargarGenerales = useCallback(async () => {
+    setCargandoGenerales(true);
+    setErrorGenerales(null);
+    try {
+      const [rankingData, especiesData] = await Promise.all([
+        getRankingVeterinarios(),
+        getMascotasPorEspecie(),
+      ]);
+      setRanking(rankingData);
+      setEspecies(especiesData);
+    } catch (error) {
+      setErrorGenerales(mensajeDeError(error));
+    } finally {
+      setCargandoGenerales(false);
+    }
+  }, []);
 
   useEffect(() => {
-    void cargarReportes();
-  }, [cargarReportes]);
+    void cargarCitas();
+  }, [cargarCitas]);
 
-  const downloadCsv = (filename: string, content: string) => {
-    const blob = new Blob([content], {
-      type: 'text/csv;charset=utf-8;',
-    });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    link.click();
-    URL.revokeObjectURL(url);
+  useEffect(() => {
+    void cargarGenerales();
+  }, [cargarGenerales]);
+
+  const totalMascotas = especies.reduce((sum, item) => sum + item.cantidad, 0);
+  const maxAtenciones = Math.max(1, ...ranking.map((vet) => vet.atenciones));
+  const contarEstado = (estado: string) =>
+    reporteCitas?.porEstado.find((item) => item.estado === estado)?.cantidad ?? 0;
+
+  // ---- Exportación CSV con datos reales ----
+
+  const exportCitas = () => {
+    if (!reporteCitas) return;
+    downloadCsv(
+      `reporte-citas_${reporteCitas.fechaInicio}_${reporteCitas.fechaFin}.csv`,
+      ['Estado', 'Cantidad', 'Porcentaje'],
+      [
+        ...reporteCitas.porEstado.map((item) => [
+          item.etiqueta,
+          item.cantidad,
+          `${porcentaje(item.cantidad, reporteCitas.total).toFixed(1)}%`,
+        ]),
+        ['Total', reporteCitas.total, '100%'],
+      ],
+    );
   };
 
-  const exportCitasPorEstado = () => {
-    const headers = ['Estado', 'Total de Citas'];
-    const rows = Object.entries(citasReporte?.desglosePorEstado || {}).map(([estado, cant]) => [
-      estado,
-      cant.toString(),
-    ]);
-
-    const csv = [
-      headers.join(','),
-      ...rows.map((row) => row.map((value) => `"${value}"`).join(',')),
-      `"TOTAL GENERAL","${citasReporte?.totalCitas || 0}"`,
-    ].join('\n');
-
-    downloadCsv(`reporte-citas-${startDate}-a-${endDate}.csv`, csv);
+  const exportVeterinarios = () => {
+    downloadCsv(
+      'ranking-veterinarios.csv',
+      ['Posición', 'Veterinario', 'Atenciones'],
+      ranking.map((vet, index) => [index + 1, vet.nombre, vet.atenciones]),
+    );
   };
 
-  const exportVeterinarians = () => {
-    const headers = ['Posición', 'Veterinario', 'Atenciones Realizadas'];
-    const rows = [...rankingVets].map((vet, index) => [
-      (index + 1).toString(),
-      vet.nombreCompleto,
-      vet.citasAtendidas.toString(),
-    ]);
-
-    const csv = [
-      headers.join(','),
-      ...rows.map((row) => row.map((value) => `"${value}"`).join(',')),
-    ].join('\n');
-
-    downloadCsv('ranking-veterinarios.csv', csv);
+  const exportEspecies = () => {
+    downloadCsv(
+      'mascotas-por-especie.csv',
+      ['Especie', 'Mascotas', 'Porcentaje'],
+      especies.map((item) => [
+        item.especie,
+        item.cantidad,
+        `${porcentaje(item.cantidad, totalMascotas).toFixed(1)}%`,
+      ]),
+    );
   };
 
-  const exportSpecies = () => {
-    const headers = ['Especie', 'Cantidad de Mascotas'];
-    const rows = especiesReporte.map((item) => [
-      item.especie,
-      item.cantidad.toString(),
-    ]);
-
-    const csv = [
-      headers.join(','),
-      ...rows.map((row) => row.map((value) => `"${value}"`).join(',')),
-    ].join('\n');
-
-    downloadCsv('estadisticas-especies.csv', csv);
-  };
-
-  const totalAtendidas = citasReporte?.desglosePorEstado?.['ATENDIDA'] ?? 0;
-  const totalCanceladas = citasReporte?.desglosePorEstado?.['CANCELADA'] ?? 0;
-  const totalPendientes = citasReporte?.desglosePorEstado?.['PENDIENTE'] ?? 0;
-  const totalMascotas = especiesReporte.reduce((acc, curr) => acc + curr.cantidad, 0);
+  const tarjetas = [
+    {
+      titulo: 'Citas del período',
+      valor: reporteCitas?.total,
+      detalle: 'Total registradas',
+      icono: <CalendarDays size={24} />,
+    },
+    {
+      titulo: 'Citas atendidas',
+      valor: reporteCitas ? contarEstado('ATENDIDA') : undefined,
+      detalle: 'En el período seleccionado',
+      icono: <Stethoscope size={24} />,
+    },
+    {
+      titulo: 'Citas canceladas',
+      valor: reporteCitas ? contarEstado('CANCELADA') : undefined,
+      detalle: 'En el período seleccionado',
+      icono: <BarChart3 size={24} />,
+    },
+    {
+      titulo: 'Mascotas activas',
+      valor: cargandoGenerales || errorGenerales ? undefined : totalMascotas,
+      detalle: 'Registradas en el sistema',
+      icono: <PawPrint size={24} />,
+    },
+  ];
 
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-800">
-          Reportes y Estadísticas
-        </h1>
+        <h1 className="text-2xl font-bold text-slate-800">Reportes y Estadísticas</h1>
         <p className="mt-1 text-sm text-slate-500">
           Información estadística consolidada y reportes del sistema en tiempo real.
         </p>
       </div>
 
-      {error && (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <AlertCircle className="w-5 h-5 text-rose-600" />
-            <p>{error}</p>
-          </div>
-          <button
-            onClick={() => void cargarReportes()}
-            className="font-bold underline"
-          >
-            Reintentar
-          </button>
-        </div>
-      )}
-
-      {/* Filtro de Fechas */}
-      <div className="rounded-2xl bg-white p-6 shadow-sm border border-slate-200">
-        <div className="mb-4">
-          <h2 className="text-base font-bold text-slate-800">
-            Filtro de Período para Citas
-          </h2>
-          <p className="text-xs text-slate-500">
-            Selecciona el rango de fechas para consultar las atenciones.
+      {/* Filtro por período */}
+      <div className="rounded-2xl bg-white p-6 shadow-sm">
+        <div className="mb-5">
+          <h2 className="text-lg font-bold text-slate-800">Filtro por período</h2>
+          <p className="mt-1 text-sm text-slate-500">
+            Selecciona el período que deseas consultar en el reporte de citas.
           </p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 items-end">
           <div>
-            <label htmlFor="startDate" className="mb-1.5 block text-xs font-semibold text-slate-700">
+            <label htmlFor="startDate" className="mb-2 block text-sm font-medium text-slate-700">
               Fecha de inicio
             </label>
             <input
               id="startDate"
               type="date"
               value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500"
+              max={endDate || undefined}
+              onChange={(event) => setStartDate(event.target.value)}
+              className="w-full rounded-lg border border-slate-200 px-4 py-2 text-sm outline-none transition focus:border-slate-400"
             />
           </div>
 
           <div>
-            <label htmlFor="endDate" className="mb-1.5 block text-xs font-semibold text-slate-700">
+            <label htmlFor="endDate" className="mb-2 block text-sm font-medium text-slate-700">
               Fecha de fin
             </label>
             <input
               id="endDate"
               type="date"
               value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500"
+              min={startDate || undefined}
+              onChange={(event) => setEndDate(event.target.value)}
+              className="w-full rounded-lg border border-slate-200 px-4 py-2 text-sm outline-none transition focus:border-slate-400"
             />
           </div>
-
-          <div>
-            <button
-              onClick={() => void cargarReportes()}
-              disabled={isLoading}
-              className="w-full bg-slate-900 hover:bg-slate-800 text-white font-medium text-sm py-2 px-4 rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-50"
-            >
-              {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Actualizar Reportes'}
-            </button>
-          </div>
         </div>
+
+        {rangoInvalido && (
+          <p className="mt-3 text-sm text-red-600">
+            La fecha de inicio no puede ser posterior a la fecha de fin.
+          </p>
+        )}
+        {rangoIncompleto && (
+          <p className="mt-3 text-sm text-amber-600">Selecciona ambas fechas para ver el reporte.</p>
+        )}
       </div>
 
-      {/* Tarjetas Resumen */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-2xl bg-white p-5 shadow-xs border border-slate-200">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-            <CalendarDays size={20} />
+      {/* Tarjetas resumen */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {tarjetas.map((tarjeta) => (
+          <div key={tarjeta.titulo} className="rounded-2xl bg-white p-5 shadow-sm">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-700">
+              {tarjeta.icono}
+            </div>
+            <p className="mt-4 text-sm font-medium text-slate-500">{tarjeta.titulo}</p>
+            <p className="mt-1 text-3xl font-bold text-slate-800">{tarjeta.valor ?? '—'}</p>
+            <p className="mt-1 text-xs text-slate-400">{tarjeta.detalle}</p>
           </div>
-          <p className="mt-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Citas en el período</p>
-          <p className="text-2xl font-bold text-slate-800 mt-1">{citasReporte?.totalCitas ?? 0}</p>
-          <p className="text-xs text-slate-400 mt-0.5">Entre {startDate} y {endDate}</p>
-        </div>
-
-        <div className="rounded-2xl bg-white p-5 shadow-xs border border-slate-200">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-            <Stethoscope size={20} />
-          </div>
-          <p className="mt-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Citas Atendidas</p>
-          <p className="text-2xl font-bold text-emerald-700 mt-1">{totalAtendidas}</p>
-          <p className="text-xs text-slate-400 mt-0.5">Completadas con éxito</p>
-        </div>
-
-        <div className="rounded-2xl bg-white p-5 shadow-xs border border-slate-200">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-600">
-            <BarChart3 size={20} />
-          </div>
-          <p className="mt-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Canceladas / Pendientes</p>
-          <p className="text-2xl font-bold text-slate-800 mt-1">{totalCanceladas} / {totalPendientes}</p>
-          <p className="text-xs text-slate-400 mt-0.5">En el rango seleccionado</p>
-        </div>
-
-        <div className="rounded-2xl bg-white p-5 shadow-xs border border-slate-200">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-50 text-purple-600">
-            <PawPrint size={20} />
-          </div>
-          <p className="mt-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Mascotas</p>
-          <p className="text-2xl font-bold text-slate-800 mt-1">{totalMascotas}</p>
-          <p className="text-xs text-slate-400 mt-0.5">Distribuidas por especie</p>
-        </div>
+        ))}
       </div>
 
-      {isLoading ? (
-        <div className="flex items-center justify-center p-12 bg-white rounded-2xl border border-slate-200">
-          <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
+      {/* Citas por estado */}
+      <div className="rounded-2xl bg-white p-6 shadow-sm">
+        <div className="mb-5 flex flex-col gap-1">
+          <h2 className="text-lg font-bold text-slate-800">Citas por período</h2>
+          <p className="text-sm text-slate-500">
+            Citas registradas entre {startDate || '—'} y {endDate || '—'}, agrupadas por estado.
+          </p>
+        </div>
+
+        {rangoInvalido || rangoIncompleto ? (
+          <EstadoVacio mensaje="Corrige el período seleccionado para consultar el reporte." />
+        ) : cargandoCitas ? (
+          <EstadoCarga />
+        ) : errorCitas ? (
+          <EstadoError mensaje={errorCitas} onRetry={cargarCitas} />
+        ) : !reporteCitas || reporteCitas.total === 0 ? (
+          <EstadoVacio mensaje="No se encontraron citas para el período seleccionado." />
+        ) : (
+          <div className="flex flex-col gap-5">
+            {reporteCitas.porEstado.map((item) => {
+              const pct = porcentaje(item.cantidad, reporteCitas.total);
+              return (
+                <div key={item.estado}>
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="text-sm font-medium text-slate-700">{item.etiqueta}</span>
+                    <span className="text-sm font-semibold text-slate-800">
+                      {item.cantidad} ({pct.toFixed(1)}%)
+                    </span>
+                  </div>
+                  <div className="h-3 overflow-hidden rounded-full bg-slate-100">
+                    <div
+                      className={`h-full rounded-full ${COLORES_ESTADO[item.estado] ?? 'bg-slate-500'}`}
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+            <p className="text-sm font-medium text-slate-700">
+              Total de citas: {reporteCitas.total}
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Ranking de veterinarios + Mascotas por especie */}
+      {cargandoGenerales ? (
+        <div className="rounded-2xl bg-white p-6 shadow-sm">
+          <EstadoCarga />
+        </div>
+      ) : errorGenerales ? (
+        <div className="rounded-2xl bg-white p-6 shadow-sm">
+          <EstadoError mensaje={errorGenerales} onRetry={cargarGenerales} />
         </div>
       ) : (
-        <>
-          {/* Desglose de Citas por Estado */}
-          <div className="rounded-2xl bg-white p-6 shadow-xs border border-slate-200">
-            <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <div>
-                <h2 className="text-base font-bold text-slate-800">
-                  Desglose de Citas por Estado
-                </h2>
-                <p className="text-xs text-slate-500">
-                  Distribución de estados para el período {startDate} al {endDate}.
-                </p>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <div className="rounded-2xl bg-white p-6 shadow-sm">
+            <div className="mb-5">
+              <h2 className="text-lg font-bold text-slate-800">Veterinarios más solicitados</h2>
+              <p className="mt-1 text-sm text-slate-500">
+                Ranking según la cantidad de citas atendidas (histórico).
+              </p>
+            </div>
+
+            {ranking.length === 0 ? (
+              <EstadoVacio mensaje="Aún no hay citas atendidas para generar el ranking." />
+            ) : (
+              <div className="flex flex-col gap-4">
+                {ranking.map((vet, index) => (
+                  <div key={vet.id}>
+                    <div className="mb-2 flex items-center justify-between gap-2">
+                      <span className="truncate text-sm font-medium text-slate-800">
+                        <span className="mr-2 font-semibold text-slate-500">#{index + 1}</span>
+                        {vet.nombre}
+                      </span>
+                      <span className="shrink-0 text-sm font-semibold text-slate-800">
+                        {vet.atenciones} {vet.atenciones === 1 ? 'atención' : 'atenciones'}
+                      </span>
+                    </div>
+                    <div className="h-3 overflow-hidden rounded-full bg-slate-100">
+                      <div
+                        className="h-full rounded-full bg-blue-500"
+                        style={{ width: `${(vet.atenciones / maxAtenciones) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
-
-              <button
-                onClick={exportCitasPorEstado}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-700 hover:bg-slate-50"
-              >
-                <Download className="w-3.5 h-3.5" />
-                Exportar CSV
-              </button>
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-4">
-              {Object.entries(citasReporte?.desglosePorEstado || {}).map(([estado, cant]) => (
-                <div key={estado} className="p-4 rounded-xl border border-slate-100 bg-slate-50">
-                  <span className="text-xs font-semibold text-slate-500 uppercase">{estado}</span>
-                  <p className="text-xl font-bold text-slate-800 mt-1">{cant}</p>
-                </div>
-              ))}
-            </div>
+            )}
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-2">
-            {/* Ranking de Veterinarios */}
-            <div className="rounded-2xl bg-white p-6 shadow-xs border border-slate-200">
-              <div className="mb-4 flex items-center justify-between">
-                <div>
-                  <h2 className="text-base font-bold text-slate-800">
-                    Veterinarios más solicitados
-                  </h2>
-                  <p className="text-xs text-slate-500">
-                    Ranking de veterinarios según citas atendidas.
-                  </p>
-                </div>
-
-                <button
-                  onClick={exportVeterinarians}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-700 hover:bg-slate-50"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  CSV
-                </button>
-              </div>
-
-              {rankingVets.length === 0 ? (
-                <p className="text-xs text-slate-400 py-6 text-center">No hay atenciones registradas todavía.</p>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-sm">
-                    <thead>
-                      <tr className="border-b border-slate-100 text-xs text-slate-400 uppercase">
-                        <th className="py-2.5 px-3">#</th>
-                        <th className="py-2.5 px-3">Veterinario</th>
-                        <th className="py-2.5 px-3 text-right">Atenciones</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {rankingVets.map((vet, idx) => (
-                        <tr key={vet.veterinarianId} className="hover:bg-slate-50">
-                          <td className="py-3 px-3 font-semibold text-slate-700">#{idx + 1}</td>
-                          <td className="py-3 px-3 font-medium text-slate-800">{vet.nombreCompleto}</td>
-                          <td className="py-3 px-3 text-right font-bold text-emerald-600">{vet.citasAtendidas}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+          <div className="rounded-2xl bg-white p-6 shadow-sm">
+            <div className="mb-5">
+              <h2 className="text-lg font-bold text-slate-800">Mascotas por especie</h2>
+              <p className="mt-1 text-sm text-slate-500">
+                Distribución de mascotas activas registradas en el sistema.
+              </p>
             </div>
 
-            {/* Mascotas por Especie */}
-            <div className="rounded-2xl bg-white p-6 shadow-xs border border-slate-200">
-              <div className="mb-4 flex items-center justify-between">
-                <div>
-                  <h2 className="text-base font-bold text-slate-800">
-                    Distribución por Especie
-                  </h2>
-                  <p className="text-xs text-slate-500">
-                    Población de mascotas registradas en la clínica.
-                  </p>
-                </div>
-
-                <button
-                  onClick={exportSpecies}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-700 hover:bg-slate-50"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  CSV
-                </button>
-              </div>
-
-              {especiesReporte.length === 0 ? (
-                <p className="text-xs text-slate-400 py-6 text-center">No hay mascotas registradas.</p>
-              ) : (
-                <div className="flex flex-col gap-3">
-                  {especiesReporte.map((item) => {
-                    const percent = totalMascotas > 0 ? (item.cantidad / totalMascotas) * 100 : 0;
-                    return (
-                      <div key={item.especie} className="flex flex-col gap-1">
-                        <div className="flex justify-between text-xs font-medium text-slate-700">
-                          <span>{item.especie}</span>
-                          <span>{item.cantidad} ({percent.toFixed(1)}%)</span>
-                        </div>
-                        <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                          <div
-                            style={{ width: `${percent}%` }}
-                            className="h-full bg-emerald-500 rounded-full"
-                          />
-                        </div>
+            {especies.length === 0 ? (
+              <EstadoVacio mensaje="Aún no hay mascotas registradas." />
+            ) : (
+              <div className="flex flex-col gap-5">
+                {especies.map((item) => {
+                  const pct = porcentaje(item.cantidad, totalMascotas);
+                  return (
+                    <div key={item.especie}>
+                      <div className="mb-2 flex items-center justify-between">
+                        <span className="text-sm font-medium text-slate-700">{item.especie}</span>
+                        <span className="text-sm font-semibold text-slate-800">
+                          {item.cantidad} ({pct.toFixed(1)}%)
+                        </span>
                       </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
+                      <div className="h-3 overflow-hidden rounded-full bg-slate-100">
+                        <div
+                          className="h-full rounded-full bg-emerald-500"
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
-        </>
+        </div>
       )}
+
+      {/* Exportación */}
+      <div className="rounded-2xl bg-white p-6 shadow-sm">
+        <div className="mb-5">
+          <h2 className="text-lg font-bold text-slate-800">Exportar reportes</h2>
+          <p className="mt-1 text-sm text-slate-500">
+            Descarga los reportes con los datos actuales en formato CSV.
+          </p>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-3">
+          <button
+            type="button"
+            onClick={exportCitas}
+            disabled={!reporteCitas || cargandoCitas || Boolean(errorCitas) || rangoInvalido}
+            className="rounded-xl border border-slate-200 p-4 text-left transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <p className="font-semibold text-slate-800">Exportar citas</p>
+            <p className="mt-1 text-sm text-slate-500">Resumen por estado del período seleccionado.</p>
+          </button>
+
+          <button
+            type="button"
+            onClick={exportVeterinarios}
+            disabled={cargandoGenerales || Boolean(errorGenerales) || ranking.length === 0}
+            className="rounded-xl border border-slate-200 p-4 text-left transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <p className="font-semibold text-slate-800">Exportar veterinarios</p>
+            <p className="mt-1 text-sm text-slate-500">Ranking de veterinarios por atenciones.</p>
+          </button>
+
+          <button
+            type="button"
+            onClick={exportEspecies}
+            disabled={cargandoGenerales || Boolean(errorGenerales) || especies.length === 0}
+            className="rounded-xl border border-slate-200 p-4 text-left transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <p className="font-semibold text-slate-800">Exportar especies</p>
+            <p className="mt-1 text-sm text-slate-500">Mascotas activas agrupadas por especie.</p>
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
