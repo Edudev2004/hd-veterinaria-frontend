@@ -1,8 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import * as XLSX from 'xlsx';
 import {
   AlertCircle,
   BarChart3,
   CalendarDays,
+  FileSpreadsheet,
   Loader2,
   PawPrint,
   RefreshCw,
@@ -45,11 +47,6 @@ const mensajeDeError = (error: unknown): string =>
     ? error.message
     : 'No se pudo cargar la información. Intenta nuevamente.';
 
-const csvCell = (value: string | number | null | undefined): string => {
-  if (value === null || value === undefined) return '""';
-  return `"${String(value).replace(/"/g, '""')}"`;
-};
-
 const formatFechaLegible = (isoDate?: string): string => {
   if (!isoDate) return '-';
   try {
@@ -71,43 +68,25 @@ const formatHoraLegible = (isoDate?: string): string => {
   return '-';
 };
 
-interface CsvSection {
-  title?: string;
-  metadata?: [string, string | number][];
-  headers?: string[];
-  rows?: (string | number | null | undefined)[][];
+interface ExcelSheetConfig {
+  sheetName: string;
+  rows: (string | number | null | undefined)[][];
+  colWidths?: number[];
 }
 
-const downloadStructuredCsv = (filename: string, sections: CsvSection[]) => {
-  // Directiva estándar 'sep=;' para que Excel en español e internacional lo reconozca automáticamente como columnas limpias
-  const lines: string[] = ['sep=;'];
+const exportToExcel = (filename: string, sheets: ExcelSheetConfig[]) => {
+  const wb = XLSX.utils.book_new();
 
-  sections.forEach((sec, sIdx) => {
-    if (sIdx > 0) lines.push('');
-    if (sec.title) lines.push(`"${sec.title.replace(/"/g, '""')}"`);
-    if (sec.metadata) {
-      sec.metadata.forEach(([k, v]) => {
-        lines.push(`${csvCell(k)};${csvCell(v)}`);
-      });
+  sheets.forEach((s) => {
+    const ws = XLSX.utils.aoa_to_sheet(s.rows);
+    if (s.colWidths && s.colWidths.length > 0) {
+      ws['!cols'] = s.colWidths.map((w) => ({ wch: w }));
     }
-    if (sec.headers && sec.headers.length > 0) {
-      lines.push(sec.headers.map(csvCell).join(';'));
-    }
-    if (sec.rows && sec.rows.length > 0) {
-      sec.rows.forEach((row) => {
-        lines.push(row.map(csvCell).join(';'));
-      });
-    }
+    const safeSheetName = s.sheetName.replace(/[\\/*?:[\]]/g, '').substring(0, 31);
+    XLSX.utils.book_append_sheet(wb, ws, safeSheetName);
   });
 
-  const csv = lines.join('\r\n');
-  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-  link.click();
-  URL.revokeObjectURL(url);
+  XLSX.writeFile(wb, filename);
 };
 
 const porcentaje = (parte: number, total: number): number => (total > 0 ? (parte / total) * 100 : 0);
@@ -272,38 +251,44 @@ export const AdminReportsPage: React.FC = () => {
       ['TOTAL GENERAL', reporteCitas.total, '100.0%'],
     ];
 
-    downloadStructuredCsv(`reporte-citas_${reporteCitas.fechaInicio}_${reporteCitas.fechaFin}.csv`, [
+    exportToExcel(`reporte-citas_${reporteCitas.fechaInicio}_${reporteCitas.fechaFin}.xlsx`, [
       {
-        title: 'VETHD PLATAFORMA CLÍNICA - REPORTE DETALLADO DE CITAS MÉDICAS',
-        metadata: [
+        sheetName: 'Detalle de Citas',
+        colWidths: [6, 14, 10, 16, 20, 14, 18, 26, 18, 26, 22, 28, 36],
+        rows: [
+          ['VETHD PLATAFORMA CLÍNICA - REPORTE DETALLADO DE CITAS MÉDICAS'],
           ['Período del reporte:', `${reporteCitas.fechaInicio} al ${reporteCitas.fechaFin}`],
           ['Fecha y hora de emisión:', new Date().toLocaleString('es-PE')],
           ['Total de citas registradas:', reporteCitas.total],
+          [],
+          [
+            'N°',
+            'Fecha',
+            'Hora',
+            'Estado de Cita',
+            'Nombre Mascota',
+            'Especie',
+            'Raza',
+            'Propietario',
+            'Teléfono Contacto',
+            'Médico Veterinario',
+            'Especialidad Médica',
+            'Motivo de Consulta',
+            'Observaciones / Diagnóstico / Cancelación',
+          ],
+          ...(rowsDetalle.length > 0 ? rowsDetalle : [['-', '-', '-', '-', 'Sin registros detallados en el período', '-', '-', '-', '-', '-', '-', '-', '-']]),
         ],
       },
       {
-        title: 'DETALLE COMPLETO DE CITAS PROGRAMADAS Y ATENDIDAS',
-        headers: [
-          'N°',
-          'Fecha',
-          'Hora',
-          'Estado de Cita',
-          'Nombre Mascota',
-          'Especie',
-          'Raza',
-          'Propietario',
-          'Teléfono Contacto',
-          'Médico Veterinario',
-          'Especialidad',
-          'Motivo de Consulta',
-          'Observaciones / Diagnóstico / Cancelación',
+        sheetName: 'Resumen Estadístico',
+        colWidths: [22, 18, 24],
+        rows: [
+          ['RESUMEN ESTADÍSTICO DE CITAS POR ESTADO'],
+          ['Período:', `${reporteCitas.fechaInicio} al ${reporteCitas.fechaFin}`],
+          [],
+          ['Estado de Cita', 'Cantidad de Citas', 'Porcentaje del Período'],
+          ...rowsResumen,
         ],
-        rows: rowsDetalle.length > 0 ? rowsDetalle : [['-', '-', '-', '-', 'Sin registros detallados en el período', '-', '-', '-', '-', '-', '-', '-', '-']],
-      },
-      {
-        title: 'RESUMEN ESTADÍSTICO POR ESTADO DE ATENCIÓN',
-        headers: ['Estado de Cita', 'Cantidad de Citas', 'Porcentaje del Período'],
-        rows: rowsResumen,
       },
     ]);
   };
@@ -346,28 +331,26 @@ export const AdminReportsPage: React.FC = () => {
       `${porcentaje(vet.atenciones, totalAtenciones).toFixed(1)}%`,
     ]);
 
-    downloadStructuredCsv('ranking-veterinarios.csv', [
+    exportToExcel('ranking-veterinarios.xlsx', [
       {
-        title: 'VETHD PLATAFORMA CLÍNICA - REPORTE Y RANKING DEL EQUIPO VETERINARIO',
-        metadata: [
+        sheetName: 'Ranking Veterinarios',
+        colWidths: [10, 28, 14, 28, 30, 14, 18, 25],
+        rows: [
+          ['VETHD PLATAFORMA CLÍNICA - REPORTE Y RANKING DEL EQUIPO VETERINARIO'],
           ['Fecha y hora de emisión:', new Date().toLocaleString('es-PE')],
           ['Total de médicos veterinarios:', vetsList.length],
           ['Total de atenciones atendidas:', totalAtenciones],
-        ],
-      },
-      {
-        title: 'RANKING DE PROFESIONALES SEGÚN CITAS ATENDIDAS',
-        headers: [
-          'Posición',
-          'Médico Veterinario',
-          'DNI',
-          'Especialidades',
-          'Correo Electrónico',
-          'Estado',
-          'Citas Atendidas',
-          'Participación (% del Total)',
-        ],
-        rows: [
+          [],
+          [
+            'Posición',
+            'Médico Veterinario',
+            'DNI',
+            'Especialidades',
+            'Correo Electrónico',
+            'Estado',
+            'Citas Atendidas',
+            'Participación (% del Total)',
+          ],
           ...rowsVets,
           ['Total General', '-', '-', '-', '-', '-', totalAtenciones, '100.0%'],
         ],
@@ -411,31 +394,36 @@ export const AdminReportsPage: React.FC = () => {
       ]);
     } catch {}
 
-    const sections: CsvSection[] = [
+    const sheets: ExcelSheetConfig[] = [
       {
-        title: 'VETHD PLATAFORMA CLÍNICA - REPORTE DEMOGRÁFICO DE PACIENTES POR ESPECIE',
-        metadata: [
+        sheetName: 'Distribución por Especie',
+        colWidths: [8, 22, 24, 28],
+        rows: [
+          ['VETHD PLATAFORMA CLÍNICA - REPORTE DEMOGRÁFICO DE PACIENTES POR ESPECIE'],
           ['Fecha y hora de emisión:', new Date().toLocaleString('es-PE')],
           ['Total de mascotas activas:', totalMascotas],
           ['Especies registradas:', especies.length],
+          [],
+          ['N°', 'Especie Animal', 'Cantidad de Mascotas', 'Porcentaje de la Población'],
+          ...rowsEspecies,
         ],
-      },
-      {
-        title: 'DISTRIBUCIÓN Y DENSIDAD POR ESPECIE ANIMAL',
-        headers: ['N°', 'Especie Animal', 'Cantidad de Mascotas', 'Porcentaje de la Población'],
-        rows: rowsEspecies,
       },
     ];
 
     if (rowsPacientes.length > 0) {
-      sections.push({
-        title: 'PADRÓN DE PACIENTES REGISTRADOS EN SISTEMA',
-        headers: ['N°', 'Nombre de Mascota', 'Especie', 'Raza', 'Propietario', 'Teléfono Contacto'],
-        rows: rowsPacientes,
+      sheets.push({
+        sheetName: 'Padrón de Pacientes',
+        colWidths: [8, 22, 16, 20, 28, 20],
+        rows: [
+          ['PADRÓN DE PACIENTES REGISTRADOS EN SISTEMA'],
+          [],
+          ['N°', 'Nombre de Mascota', 'Especie', 'Raza', 'Propietario', 'Teléfono Contacto'],
+          ...rowsPacientes,
+        ],
       });
     }
 
-    downloadStructuredCsv('mascotas-por-especie.csv', sections);
+    exportToExcel('mascotas-por-especie.xlsx', sheets);
   };
 
   const tarjetas = [
@@ -667,11 +655,16 @@ export const AdminReportsPage: React.FC = () => {
 
       {/* Exportación */}
       <div className="rounded-2xl bg-white p-6 shadow-sm">
-        <div className="mb-5">
-          <h2 className="text-lg font-bold text-slate-800">Exportar reportes</h2>
-          <p className="mt-1 text-sm text-slate-500">
-            Descarga los reportes con los datos actuales en formato CSV.
-          </p>
+        <div className="mb-5 flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+            <FileSpreadsheet className="h-5 w-5" />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold text-slate-800">Exportar reportes a Excel</h2>
+            <p className="text-sm text-slate-500">
+              Descarga los reportes consolidados en formato oficial Microsoft Excel (.xlsx).
+            </p>
+          </div>
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
@@ -679,30 +672,39 @@ export const AdminReportsPage: React.FC = () => {
             type="button"
             onClick={exportCitas}
             disabled={!reporteCitas || cargandoCitas || Boolean(errorCitas) || rangoInvalido}
-            className="rounded-xl border border-slate-200 p-4 text-left transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-xl border border-slate-200 p-4 text-left transition hover:border-emerald-300 hover:bg-emerald-50/30 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <p className="font-semibold text-slate-800">Exportar citas</p>
-            <p className="mt-1 text-sm text-slate-500">Resumen por estado del período seleccionado.</p>
+            <div className="flex items-center gap-2">
+              <FileSpreadsheet className="h-4 w-4 text-emerald-600" />
+              <p className="font-semibold text-slate-800">Exportar citas (.xlsx)</p>
+            </div>
+            <p className="mt-1 text-xs text-slate-500">Detalle registro por registro y resumen estadístico.</p>
           </button>
 
           <button
             type="button"
             onClick={exportVeterinarios}
             disabled={cargandoGenerales || Boolean(errorGenerales) || ranking.length === 0}
-            className="rounded-xl border border-slate-200 p-4 text-left transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-xl border border-slate-200 p-4 text-left transition hover:border-emerald-300 hover:bg-emerald-50/30 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <p className="font-semibold text-slate-800">Exportar veterinarios</p>
-            <p className="mt-1 text-sm text-slate-500">Ranking de veterinarios por atenciones.</p>
+            <div className="flex items-center gap-2">
+              <FileSpreadsheet className="h-4 w-4 text-emerald-600" />
+              <p className="font-semibold text-slate-800">Exportar veterinarios (.xlsx)</p>
+            </div>
+            <p className="mt-1 text-xs text-slate-500">Padrón médico, especialidades y ranking de atenciones.</p>
           </button>
 
           <button
             type="button"
             onClick={exportEspecies}
             disabled={cargandoGenerales || Boolean(errorGenerales) || especies.length === 0}
-            className="rounded-xl border border-slate-200 p-4 text-left transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-xl border border-slate-200 p-4 text-left transition hover:border-emerald-300 hover:bg-emerald-50/30 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <p className="font-semibold text-slate-800">Exportar especies</p>
-            <p className="mt-1 text-sm text-slate-500">Mascotas activas agrupadas por especie.</p>
+            <div className="flex items-center gap-2">
+              <FileSpreadsheet className="h-4 w-4 text-emerald-600" />
+              <p className="font-semibold text-slate-800">Exportar especies (.xlsx)</p>
+            </div>
+            <p className="mt-1 text-xs text-slate-500">Demografía por especie y padrón de pacientes.</p>
           </button>
         </div>
       </div>
