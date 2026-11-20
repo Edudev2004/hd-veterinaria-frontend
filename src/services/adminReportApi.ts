@@ -2,17 +2,37 @@ import { apiRequest } from './apiClient';
 
 // ---- DTOs tal como los devuelve el backend (AdminReportController) ----
 
+export interface CitaReporteDetalleDTO {
+  id: string;
+  fechaHora: string;
+  estado: string;
+  mascotaNombre: string;
+  especie: string;
+  raza: string;
+  propietarioNombre: string;
+  propietarioTelefono: string;
+  propietarioEmail: string;
+  veterinarioNombre: string;
+  especialidad: string;
+  motivo: string;
+  observacion: string;
+}
+
 interface CitasReporteDTO {
   fechaInicio: string;
   fechaFin: string;
   totalCitas: number;
   desglosePorEstado: Record<string, number>;
+  detalleCitas?: CitaReporteDetalleDTO[];
 }
 
 interface VeterinarioRankingDTO {
   veterinarianId: string;
   nombreCompleto: string;
   citasAtendidas: number;
+  email?: string;
+  especialidad?: string;
+  activo?: boolean;
 }
 
 interface MascotasEspecieDTO {
@@ -40,12 +60,16 @@ export interface ReporteCitas {
   fechaFin: string;
   total: number;
   porEstado: EstadoCitaConteo[];
+  detalleCitas: CitaReporteDetalleDTO[];
 }
 
 export interface VeterinarioRanking {
   id: string;
   nombre: string;
   atenciones: number;
+  email?: string;
+  especialidad?: string;
+  activo?: boolean;
 }
 
 export interface MascotasPorEspecie {
@@ -98,6 +122,7 @@ export const getReporteCitas = async (
     fechaFin: dto.fechaFin,
     total: dto.totalCitas,
     porEstado,
+    detalleCitas: dto.detalleCitas ?? [],
   };
 };
 
@@ -107,6 +132,9 @@ export const getRankingVeterinarios = async (): Promise<VeterinarioRanking[]> =>
     id: dto.veterinarianId,
     nombre: dto.nombreCompleto,
     atenciones: dto.citasAtendidas,
+    email: dto.email,
+    especialidad: dto.especialidad,
+    activo: dto.activo,
   }));
 };
 

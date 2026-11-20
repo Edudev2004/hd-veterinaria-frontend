@@ -44,12 +44,13 @@ const TYPE_CONFIG = {
   },
 };
 
-export const Toast: React.FC<ToastProps> = ({ toast, onClose }) => {
+export const Toast = React.forwardRef<HTMLDivElement, ToastProps>(({ toast, onClose }, ref) => {
   const config = TYPE_CONFIG[toast.type] || TYPE_CONFIG.error;
   const IconComponent = config.icon;
 
   return (
     <motion.div
+      ref={ref}
       layout
       initial={{ opacity: 0, y: -16, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -81,4 +82,6 @@ export const Toast: React.FC<ToastProps> = ({ toast, onClose }) => {
       </button>
     </motion.div>
   );
-};
+});
+
+Toast.displayName = 'Toast';

@@ -62,6 +62,14 @@ export interface MascotaCita {
   foto_url?: string; // text
 }
 
+export interface PropietarioCita {
+  id: string;
+  nombre: string;
+  dni?: string;
+  telefono?: string;
+  email?: string;
+}
+
 /**
  * Cita con información unida de las tablas mascotas, veterinarios, usuarios y especialidades
  * para el renderizado en vistas y componentes
@@ -69,6 +77,7 @@ export interface MascotaCita {
 export interface CitaDetallada extends Cita {
   mascota: MascotaCita;
   veterinario: VeterinarioDetallado;
+  propietario?: PropietarioCita;
 }
 
 /**
