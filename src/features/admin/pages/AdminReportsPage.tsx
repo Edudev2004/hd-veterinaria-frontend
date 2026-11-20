@@ -9,6 +9,8 @@ import {
   Stethoscope,
 } from 'lucide-react';
 import {
+  etiquetaEspecie,
+  etiquetaEstado,
   getMascotasPorEspecie,
   getRankingVeterinarios,
   getReporteCitas,
@@ -16,6 +18,8 @@ import {
   ReporteCitas,
   VeterinarioRanking,
 } from '@/services/adminReportApi';
+import { getCitas } from '@/services/citaService';
+import { adminVeterinarianService } from '../services/adminVeterinarianService';
 
 // ---- Utilidades ----
 
@@ -41,11 +45,62 @@ const mensajeDeError = (error: unknown): string =>
     ? error.message
     : 'No se pudo cargar la información. Intenta nuevamente.';
 
-const csvCell = (value: string | number): string => `"${String(value).replace(/"/g, '""')}"`;
+const csvCell = (value: string | number | null | undefined): string => {
+  if (value === null || value === undefined) return '""';
+  return `"${String(value).replace(/"/g, '""')}"`;
+};
 
-const downloadCsv = (filename: string, headers: string[], rows: (string | number)[][]) => {
-  const csv = [headers, ...rows].map((row) => row.map(csvCell).join(',')).join('\n');
-  // BOM para que Excel respete las tildes.
+const formatFechaLegible = (isoDate?: string): string => {
+  if (!isoDate) return '-';
+  try {
+    const parts = isoDate.split('T')[0].split('-');
+    if (parts.length === 3) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+  } catch {}
+  return isoDate;
+};
+
+const formatHoraLegible = (isoDate?: string): string => {
+  if (!isoDate) return '-';
+  try {
+    if (isoDate.includes('T')) {
+      return isoDate.split('T')[1].substring(0, 5);
+    }
+  } catch {}
+  return '-';
+};
+
+interface CsvSection {
+  title?: string;
+  metadata?: [string, string | number][];
+  headers?: string[];
+  rows?: (string | number | null | undefined)[][];
+}
+
+const downloadStructuredCsv = (filename: string, sections: CsvSection[]) => {
+  // Directiva estándar 'sep=;' para que Excel en español e internacional lo reconozca automáticamente como columnas limpias
+  const lines: string[] = ['sep=;'];
+
+  sections.forEach((sec, sIdx) => {
+    if (sIdx > 0) lines.push('');
+    if (sec.title) lines.push(`"${sec.title.replace(/"/g, '""')}"`);
+    if (sec.metadata) {
+      sec.metadata.forEach(([k, v]) => {
+        lines.push(`${csvCell(k)};${csvCell(v)}`);
+      });
+    }
+    if (sec.headers && sec.headers.length > 0) {
+      lines.push(sec.headers.map(csvCell).join(';'));
+    }
+    if (sec.rows && sec.rows.length > 0) {
+      sec.rows.forEach((row) => {
+        lines.push(row.map(csvCell).join(';'));
+      });
+    }
+  });
+
+  const csv = lines.join('\r\n');
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
@@ -158,42 +213,229 @@ export const AdminReportsPage: React.FC = () => {
   const contarEstado = (estado: string) =>
     reporteCitas?.porEstado.find((item) => item.estado === estado)?.cantidad ?? 0;
 
-  // ---- Exportación CSV con datos reales ----
+  // ---- Exportación CSV profesional, estructurada y compatible con Excel ----
 
-  const exportCitas = () => {
+  const exportCitas = async () => {
     if (!reporteCitas) return;
-    downloadCsv(
-      `reporte-citas_${reporteCitas.fechaInicio}_${reporteCitas.fechaFin}.csv`,
-      ['Estado', 'Cantidad', 'Porcentaje'],
-      [
-        ...reporteCitas.porEstado.map((item) => [
-          item.etiqueta,
-          item.cantidad,
-          `${porcentaje(item.cantidad, reporteCitas.total).toFixed(1)}%`,
-        ]),
-        ['Total', reporteCitas.total, '100%'],
-      ],
-    );
+
+    let citasDetalle = reporteCitas.detalleCitas ?? [];
+    if (citasDetalle.length === 0) {
+      try {
+        const todas = await getCitas();
+        citasDetalle = todas
+          .filter((c) => {
+            const f = c.fecha_hora ? c.fecha_hora.split('T')[0] : '';
+            return (!startDate || f >= startDate) && (!endDate || f <= endDate);
+          })
+          .map((c) => ({
+            id: c.id,
+            fechaHora: c.fecha_hora,
+            estado: c.estado.toUpperCase(),
+            mascotaNombre: c.mascota.nombre,
+            especie: c.mascota.especie,
+            raza: c.mascota.raza || 'Mestizo',
+            propietarioNombre: c.propietario?.nombre || 'No asignado',
+            propietarioTelefono: c.propietario?.telefono || 'No registrado',
+            propietarioEmail: c.propietario?.email || 'No registrado',
+            veterinarioNombre: c.veterinario.nombre,
+            especialidad: c.veterinario.especialidad_nombre || 'Medicina General',
+            motivo: c.motivo || 'Consulta médica',
+            observacion: c.motivo_cancelacion || (c.estado === 'atendida' ? 'Atención médica completada' : '-'),
+          }));
+      } catch (e) {
+        console.error('Error al obtener citas para reporte:', e);
+      }
+    }
+
+    const rowsDetalle = citasDetalle.map((c, i) => [
+      i + 1,
+      formatFechaLegible(c.fechaHora),
+      formatHoraLegible(c.fechaHora),
+      etiquetaEstado(c.estado),
+      c.mascotaNombre,
+      etiquetaEspecie(c.especie),
+      c.raza || 'Mestizo',
+      c.propietarioNombre || 'No asignado',
+      c.propietarioTelefono || 'No registrado',
+      c.veterinarioNombre || 'No asignado',
+      c.especialidad || 'Medicina General',
+      c.motivo || 'Consulta médica',
+      c.observacion || '-',
+    ]);
+
+    const rowsResumen = [
+      ...reporteCitas.porEstado.map((item) => [
+        item.etiqueta,
+        item.cantidad,
+        `${porcentaje(item.cantidad, reporteCitas.total).toFixed(1)}%`,
+      ]),
+      ['TOTAL GENERAL', reporteCitas.total, '100.0%'],
+    ];
+
+    downloadStructuredCsv(`reporte-citas_${reporteCitas.fechaInicio}_${reporteCitas.fechaFin}.csv`, [
+      {
+        title: 'VETHD PLATAFORMA CLÍNICA - REPORTE DETALLADO DE CITAS MÉDICAS',
+        metadata: [
+          ['Período del reporte:', `${reporteCitas.fechaInicio} al ${reporteCitas.fechaFin}`],
+          ['Fecha y hora de emisión:', new Date().toLocaleString('es-PE')],
+          ['Total de citas registradas:', reporteCitas.total],
+        ],
+      },
+      {
+        title: 'DETALLE COMPLETO DE CITAS PROGRAMADAS Y ATENDIDAS',
+        headers: [
+          'N°',
+          'Fecha',
+          'Hora',
+          'Estado de Cita',
+          'Nombre Mascota',
+          'Especie',
+          'Raza',
+          'Propietario',
+          'Teléfono Contacto',
+          'Médico Veterinario',
+          'Especialidad',
+          'Motivo de Consulta',
+          'Observaciones / Diagnóstico / Cancelación',
+        ],
+        rows: rowsDetalle.length > 0 ? rowsDetalle : [['-', '-', '-', '-', 'Sin registros detallados en el período', '-', '-', '-', '-', '-', '-', '-', '-']],
+      },
+      {
+        title: 'RESUMEN ESTADÍSTICO POR ESTADO DE ATENCIÓN',
+        headers: ['Estado de Cita', 'Cantidad de Citas', 'Porcentaje del Período'],
+        rows: rowsResumen,
+      },
+    ]);
   };
 
-  const exportVeterinarios = () => {
-    downloadCsv(
-      'ranking-veterinarios.csv',
-      ['Posición', 'Veterinario', 'Atenciones'],
-      ranking.map((vet, index) => [index + 1, vet.nombre, vet.atenciones]),
-    );
+  const exportVeterinarios = async () => {
+    let vetsList: { nombre: string; dni?: string; email?: string; especialidades?: string[]; active?: boolean; atenciones: number }[] = [];
+    try {
+      const adminVets = await adminVeterinarianService.listar();
+      vetsList = adminVets.map((av) => {
+        const found = ranking.find((r) => r.id === av.id || r.nombre.toLowerCase() === av.fullName.toLowerCase());
+        return {
+          nombre: av.fullName,
+          dni: av.dni,
+          email: av.email,
+          especialidades: av.specialties,
+          active: av.active,
+          atenciones: found ? found.atenciones : 0,
+        };
+      }).sort((a, b) => b.atenciones - a.atenciones);
+    } catch {
+      vetsList = ranking.map((r) => ({
+        nombre: r.nombre,
+        email: r.email,
+        especialidades: r.especialidad ? [r.especialidad] : ['Medicina General'],
+        active: r.activo !== false,
+        atenciones: r.atenciones,
+      }));
+    }
+
+    const totalAtenciones = vetsList.reduce((acc, v) => acc + v.atenciones, 0);
+
+    const rowsVets = vetsList.map((vet, idx) => [
+      idx + 1,
+      vet.nombre,
+      vet.dni || '-',
+      vet.especialidades && vet.especialidades.length > 0 ? vet.especialidades.join(', ') : 'Medicina General',
+      vet.email || '-',
+      vet.active !== false ? 'Activo' : 'Inactivo',
+      vet.atenciones,
+      `${porcentaje(vet.atenciones, totalAtenciones).toFixed(1)}%`,
+    ]);
+
+    downloadStructuredCsv('ranking-veterinarios.csv', [
+      {
+        title: 'VETHD PLATAFORMA CLÍNICA - REPORTE Y RANKING DEL EQUIPO VETERINARIO',
+        metadata: [
+          ['Fecha y hora de emisión:', new Date().toLocaleString('es-PE')],
+          ['Total de médicos veterinarios:', vetsList.length],
+          ['Total de atenciones atendidas:', totalAtenciones],
+        ],
+      },
+      {
+        title: 'RANKING DE PROFESIONALES SEGÚN CITAS ATENDIDAS',
+        headers: [
+          'Posición',
+          'Médico Veterinario',
+          'DNI',
+          'Especialidades',
+          'Correo Electrónico',
+          'Estado',
+          'Citas Atendidas',
+          'Participación (% del Total)',
+        ],
+        rows: [
+          ...rowsVets,
+          ['Total General', '-', '-', '-', '-', '-', totalAtenciones, '100.0%'],
+        ],
+      },
+    ]);
   };
 
-  const exportEspecies = () => {
-    downloadCsv(
-      'mascotas-por-especie.csv',
-      ['Especie', 'Mascotas', 'Porcentaje'],
-      especies.map((item) => [
+  const exportEspecies = async () => {
+    const rowsEspecies = [
+      ...especies.map((item, idx) => [
+        idx + 1,
         item.especie,
         item.cantidad,
         `${porcentaje(item.cantidad, totalMascotas).toFixed(1)}%`,
       ]),
-    );
+      ['Total General', 'Todas las especies', totalMascotas, '100.0%'],
+    ];
+
+    let rowsPacientes: (string | number)[][] = [];
+    try {
+      const citas = await getCitas();
+      const mapaMascotas = new Map<string, { nombre: string; especie: string; raza: string; propietario: string; telefono: string }>();
+      citas.forEach((c) => {
+        if (c.mascota && !mapaMascotas.has(c.mascota.id)) {
+          mapaMascotas.set(c.mascota.id, {
+            nombre: c.mascota.nombre,
+            especie: etiquetaEspecie(c.mascota.especie),
+            raza: c.mascota.raza || 'Mestizo',
+            propietario: c.propietario?.nombre || 'No asignado',
+            telefono: c.propietario?.telefono || 'No registrado',
+          });
+        }
+      });
+      rowsPacientes = Array.from(mapaMascotas.values()).map((p, i) => [
+        i + 1,
+        p.nombre,
+        p.especie,
+        p.raza,
+        p.propietario,
+        p.telefono,
+      ]);
+    } catch {}
+
+    const sections: CsvSection[] = [
+      {
+        title: 'VETHD PLATAFORMA CLÍNICA - REPORTE DEMOGRÁFICO DE PACIENTES POR ESPECIE',
+        metadata: [
+          ['Fecha y hora de emisión:', new Date().toLocaleString('es-PE')],
+          ['Total de mascotas activas:', totalMascotas],
+          ['Especies registradas:', especies.length],
+        ],
+      },
+      {
+        title: 'DISTRIBUCIÓN Y DENSIDAD POR ESPECIE ANIMAL',
+        headers: ['N°', 'Especie Animal', 'Cantidad de Mascotas', 'Porcentaje de la Población'],
+        rows: rowsEspecies,
+      },
+    ];
+
+    if (rowsPacientes.length > 0) {
+      sections.push({
+        title: 'PADRÓN DE PACIENTES REGISTRADOS EN SISTEMA',
+        headers: ['N°', 'Nombre de Mascota', 'Especie', 'Raza', 'Propietario', 'Teléfono Contacto'],
+        rows: rowsPacientes,
+      });
+    }
+
+    downloadStructuredCsv('mascotas-por-especie.csv', sections);
   };
 
   const tarjetas = [
