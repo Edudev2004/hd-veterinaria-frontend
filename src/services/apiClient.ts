@@ -202,3 +202,36 @@ export async function apiRequest<T>(
 
   return (data ?? undefined) as T;
 }
+
+export async function apiRequestWithTimeout<T>(
+  path: string,
+  options: ApiRequestOptions = {},
+  timeoutMs = 15000,
+): Promise<T> {
+  const controller = new AbortController();
+  let timedOut = false;
+  const timeoutId = setTimeout(() => {
+    timedOut = true;
+    controller.abort();
+  }, timeoutMs);
+
+  const forwardAbort = () => controller.abort(options.signal?.reason);
+  if (options.signal?.aborted) {
+    forwardAbort();
+  } else {
+    options.signal?.addEventListener("abort", forwardAbort, { once: true });
+  }
+
+  try {
+    return await apiRequest<T>(path, { ...options, signal: controller.signal });
+  } catch (error) {
+    if (timedOut) {
+      throw new ApiError(0, "La solicitud tardó demasiado. Inténtalo nuevamente.");
+    }
+
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+    options.signal?.removeEventListener("abort", forwardAbort);
+  }
+}

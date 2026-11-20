@@ -1,3 +1,5 @@
+import { apiRequest } from '@/services/apiClient';
+import type { DiagnosisApiDTO } from '../../appointments/types/vetSchedule.types';
 import type {
   GuardarAtencionInput,
   RegistroAtencion
@@ -9,29 +11,10 @@ interface AtencionEnCurso {
   iniciadaAt: string;
 }
 
-const STORAGE_ATENCIONES_KEY = 'vethd_db_atenciones_veterinarias';
 const STORAGE_ATENCIONES_EN_CURSO_KEY =
   'vethd_db_atenciones_en_curso';
 const STORAGE_ATENCION_ACTIVA_ANTERIOR_KEY =
   'vethd_db_atencion_activa';
-
-const getStoredAtenciones = (): RegistroAtencion[] => {
-  const data = localStorage.getItem(STORAGE_ATENCIONES_KEY);
-
-  if (!data) {
-    return [];
-  }
-
-  try {
-    return JSON.parse(data) as RegistroAtencion[];
-  } catch {
-    return [];
-  }
-};
-
-const saveStoredAtenciones = (atenciones: RegistroAtencion[]): void => {
-  localStorage.setItem(STORAGE_ATENCIONES_KEY, JSON.stringify(atenciones));
-};
 
 const getStoredAtencionesEnCurso = (): AtencionEnCurso[] => {
   const data = localStorage.getItem(STORAGE_ATENCIONES_EN_CURSO_KEY);
@@ -146,57 +129,39 @@ const limpiarAtencionActiva = (
   saveStoredAtencionesEnCurso(atencionesActualizadas);
 };
 
-const getAtencionByCita = async (
+const toRegistroAtencion = (
   citaId: string,
-  veterinarioId: string
-): Promise<RegistroAtencion | null> => {
-  await new Promise((resolve) => setTimeout(resolve, 150));
+  dto: DiagnosisApiDTO
+): RegistroAtencion => ({
+  id: dto.id,
+  citaId,
+  diagnostico: dto.diagnosis,
+  tratamiento: dto.treatment ?? '',
+  notas: dto.notes ?? '',
+  createdAt: dto.createdAt
+});
 
-  return (
-    getStoredAtenciones().find(
-      (atencion) =>
-        atencion.citaId === citaId &&
-        atencion.veterinarioId === veterinarioId
-    ) ?? null
-  );
-};
-
-const guardarAtencion = async (
+/**
+ * Registra el diagnóstico de una cita ya ATENDIDA (POST /api/citas/{id}/consulta).
+ */
+const registrarConsulta = async (
   input: GuardarAtencionInput
 ): Promise<RegistroAtencion> => {
-  await new Promise((resolve) => setTimeout(resolve, 150));
+  const notas = input.notas.trim();
 
-  const atenciones = getStoredAtenciones();
-  const ahora = new Date().toISOString();
-
-  const indiceExistente = atenciones.findIndex(
-    (atencion) =>
-      atencion.citaId === input.citaId &&
-      atencion.veterinarioId === input.veterinarioId
+  const diagnostico = await apiRequest<DiagnosisApiDTO>(
+    `/api/citas/${input.citaId}/consulta`,
+    {
+      method: 'POST',
+      body: {
+        diagnosis: input.diagnostico.trim(),
+        treatment: input.tratamiento.trim(),
+        notes: notas || undefined
+      }
+    }
   );
 
-  const registro: RegistroAtencion = {
-    id:
-      indiceExistente >= 0
-        ? atenciones[indiceExistente].id
-        : `atencion-${Date.now()}`,
-    ...input,
-    createdAt:
-      indiceExistente >= 0
-        ? atenciones[indiceExistente].createdAt
-        : ahora,
-    updatedAt: ahora
-  };
-
-  if (indiceExistente >= 0) {
-    atenciones[indiceExistente] = registro;
-  } else {
-    atenciones.push(registro);
-  }
-
-  saveStoredAtenciones(atenciones);
-
-  return registro;
+  return toRegistroAtencion(input.citaId, diagnostico);
 };
 
 export const vetConsultationService = {
@@ -204,6 +169,5 @@ export const vetConsultationService = {
   getAtencionesEnCurso,
   getAtencionActiva,
   limpiarAtencionActiva,
-  getAtencionByCita,
-  guardarAtencion
+  registrarConsulta
 };

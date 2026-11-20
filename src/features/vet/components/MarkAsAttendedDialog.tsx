@@ -55,8 +55,9 @@ export const MarkAsAttendedDialog: React.FC<
           </h2>
 
           <p className="mt-2 text-sm text-slate-500">
-            Confirmarás que la atención de {nombreMascota} fue finalizada. La
-            cita dejará de aparecer en Atenciones en curso.
+            Al confirmar, la cita de {nombreMascota} se marcará como atendida y
+            se guardará el diagnóstico registrado. La cita dejará de aparecer
+            en Atenciones en curso.
           </p>
         </div>
 

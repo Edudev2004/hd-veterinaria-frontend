@@ -1,6 +1,6 @@
 export interface Notificacion {
   id: string;
-  usuario_id: string;
+  titulo?: string;
   mensaje: string;
   tipo: 'cita' | 'recordatorio' | 'sistema';
   leido: boolean;
