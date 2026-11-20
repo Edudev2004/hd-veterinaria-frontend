@@ -46,7 +46,7 @@ const csvCell = (value: string | number): string => `"${String(value).replace(/"
 const downloadCsv = (filename: string, headers: string[], rows: (string | number)[][]) => {
   const csv = [headers, ...rows].map((row) => row.map(csvCell).join(',')).join('\n');
   // BOM para que Excel respete las tildes.
-  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
@@ -146,11 +146,11 @@ export const AdminReportsPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    cargarCitas();
+    void cargarCitas();
   }, [cargarCitas]);
 
   useEffect(() => {
-    cargarGenerales();
+    void cargarGenerales();
   }, [cargarGenerales]);
 
   const totalMascotas = especies.reduce((sum, item) => sum + item.cantidad, 0);
@@ -228,7 +228,7 @@ export const AdminReportsPage: React.FC = () => {
       <div>
         <h1 className="text-2xl font-bold text-slate-800">Reportes y Estadísticas</h1>
         <p className="mt-1 text-sm text-slate-500">
-          Consulta información estadística y reportes del sistema veterinario.
+          Información estadística consolidada y reportes del sistema en tiempo real.
         </p>
       </div>
 
@@ -241,7 +241,7 @@ export const AdminReportsPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 items-end">
           <div>
             <label htmlFor="startDate" className="mb-2 block text-sm font-medium text-slate-700">
               Fecha de inicio

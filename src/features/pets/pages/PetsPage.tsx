@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { AlertCircle, PawPrint, Plus, X } from "lucide-react";
+import { AlertCircle, CheckCircle2, PawPrint, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { PetForm } from "../components/PetForm";
 import { PetCard } from "../components/PetCard";
@@ -15,6 +15,7 @@ export const PetsPage: React.FC = () => {
   const [editingMascota, setEditingMascota] = useState<Mascota | null>(null);
   const [selectedMascota, setSelectedMascota] = useState<Mascota | null>(null);
   const [mascotaParaHistorial, setMascotaParaHistorial] = useState<Mascota | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const loadMascotas = async () => {
     try {
@@ -29,7 +30,19 @@ export const PetsPage: React.FC = () => {
     loadMascotas();
   }, []);
 
-  const handleSuccess = () => {
+  // La confirmación desaparece sola a los 5 segundos.
+  useEffect(() => {
+    if (!successMessage) return;
+    const timer = setTimeout(() => setSuccessMessage(null), 5000);
+    return () => clearTimeout(timer);
+  }, [successMessage]);
+
+  const handleSuccess = (guardada: Mascota) => {
+    setSuccessMessage(
+      editingMascota
+        ? `Los cambios de ${guardada.nombre} se guardaron correctamente.`
+        : `${guardada.nombre} se registró correctamente.`
+    );
     loadMascotas();
     setShowForm(false);
     setEditingMascota(null);
@@ -75,6 +88,24 @@ export const PetsPage: React.FC = () => {
           )}
         </Button>
       </div>
+
+      {successMessage && (
+        <div
+          role="status"
+          className="bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 flex items-start gap-3 text-emerald-700 text-xs sm:text-sm animate-in fade-in"
+        >
+          <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5 text-emerald-600" />
+          <span className="flex-1">{successMessage}</span>
+          <button
+            type="button"
+            onClick={() => setSuccessMessage(null)}
+            aria-label="Cerrar mensaje"
+            className="text-emerald-500 hover:text-emerald-800 text-xs font-bold"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {loadError && (
         <div className="bg-rose-50 border border-rose-200 rounded-xl p-3.5 flex items-start gap-3 text-rose-600 text-xs sm:text-sm">
