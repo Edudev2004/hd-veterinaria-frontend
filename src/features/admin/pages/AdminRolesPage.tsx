@@ -53,7 +53,8 @@ export const AdminRolesPage: React.FC = () => {
     setError(null);
     try {
       const data = await adminRolesService.listar();
-      setRoles(data);
+      // Ocultar rol redundante ROLE_OWNER para mantener solo ROLE_PROPIETARIO
+      setRoles(data.filter((r) => r.name !== 'ROLE_OWNER' && r.name !== 'OWNER'));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al cargar los roles.');
     } finally {
